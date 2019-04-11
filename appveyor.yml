@@ -1,0 +1,61 @@
+##====---- appveyor.yml                                               ----====##
+shallow_clone: true
+
+skip_branch_with_pr: true
+skip_commits:
+  files:
+  - .git*
+  - LICENSE
+  - '**/*.md'
+
+image:
+- Visual Studio 2017
+
+configuration:
+- PowerShell
+- PowerShell_Core
+
+for:
+-
+  matrix:
+    only:
+    - configuration: PowerShell
+  install:
+  - ps: Import-Module -Name .\AppVeyorHelpers.psd1
+  build_script:
+  - ps: .\RunTests.ps1
+  - ps: Assert-ValidCodecovYML
+  - ps: |
+      if ($BuildName -ne 'placeholder') {
+        Send-Message -Error 'BuildName escaped RunTests.ps1' -Details $BuildName
+      }
+  on_finish:
+  - ps: Limit-TestResultUpload
+-
+  matrix:
+    only:
+    - configuration: PowerShell_Core
+  install:
+  - pwsh: Import-Module -Name .\AppVeyorHelpers.psd1
+  build_script:
+  - pwsh: .\RunTests.ps1
+  - pwsh: Assert-ValidCodecovYML
+  - pwsh: |
+      if ($BuildName -ne 'placeholder') {
+        Send-Message -Error 'BuildName escaped RunTests.ps1' -Details $BuildName
+      }
+  on_finish:
+  - pwsh: Limit-TestResultUpload
+
+
+##====--------------------------------------------------------------------====##
+init:
+- ps: |
+    $out =  "-- CI Session Configuration --`n"
+    $out += "$env:APPVEYOR_BUILD_WORKER_IMAGE - $env:CONFIGURATION - "
+    $out += "$env:PLATFORM`nOS / platform:       "
+    $tmp = (Get-WmiObject Win32_OperatingSystem).name
+    $out += "$($tmp -split "[|]" | Select-Object -First 1) / "
+    $out += "$((Get-WmiObject Win32_OperatingSystem).OSArchitecture)`n"
+    Write-Output "$out"
+- cd %APPVEYOR_BUILD_FOLDER%
