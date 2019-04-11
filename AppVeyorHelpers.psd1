@@ -12,7 +12,7 @@ Code released under the MIT license.'
 Description = 'Helper functions for use on the AppVeyor CI platform.
 Messages pushed to the build console and the AppVeyor message API.
 Test results pushed to the AppVeyor build console Test output.
-Codecoverage output to codecov.io.'
+Code coverage send to codecov.io.'
 
 # ID used to uniquely identify this module
 # GUID = 'd0a9150d-b6a4-4b17-a325-e3a24fed0aa9'
@@ -56,6 +56,7 @@ Codecoverage output to codecov.io.'
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 NestedModules = @(
   'Codecov',
+  'Convert-FileEncoding',
   'Send-Message',
   'Send-TestResult',
   'Test-Command'
@@ -79,6 +80,7 @@ ModuleList = @()
 # List of all files packaged with this module
 FileList = @(
   'Codecov.psm1',
+  'Convert-FileEncoding.psm1',
   'Send-Message.psm1',
   'Send-TestResult.psm1',
   'Test-Command.psm1'
