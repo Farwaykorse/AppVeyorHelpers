@@ -35,14 +35,9 @@ Import-Module "${PSScriptRoot}\AppVeyorHelpers.psd1"
 ##====--------------------------------------------------------------------====##
 if (-not (Get-Module Pester)) {
   Send-Message -Warning "Pester is not installed."
-  $(Import-Module Pester)
-  if (Get-Module Pester) {
-    Write-Host 'Imported existing Pester version.'
-  } else {
-    Install-Module Pester -Force
-  }
+} else {
+  Get-Module Pester -ListAvailable
 }
-Get-Module Pester -ListAvailable
 
 ##====--------------------------------------------------------------------====##
 # Pester Configuration
