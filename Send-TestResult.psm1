@@ -27,6 +27,8 @@ function Send-TestResult {
     if (-not $env:APPVEYOR) {
       Write-Verbose 'Not on AppVeyor CI platform. Upload disabled.'
       $UseWhatIf = $true
+    } else {
+      $UseWhatIf = $false
     }
     $URL = "https://ci.appveyor.com/api/testresults/${Format}/$($env:APPVEYOR_JOB_ID)"
   }

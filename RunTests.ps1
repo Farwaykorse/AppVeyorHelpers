@@ -82,6 +82,8 @@ $result = Invoke-Pester `
 if (-not $env:AppVeyor) {
   Write-Verbose 'No AppVeyor environment detected. Uploads disabled.'
   $UseWhatif = $true
+} else {
+  $UseWhatif = $false
 }
 Send-TestResult -File $OutputFile -Format $OutputFormatUpload `
   -WhatIf:$UseWhatif
