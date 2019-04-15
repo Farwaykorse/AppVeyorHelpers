@@ -23,6 +23,7 @@ for:
   install:
   - ps: Import-Module -Name .\AppVeyorHelpers.psd1
   - ps: Install-Module Pester -Force
+  - ps: Get-Module Pester -ListAvailable
   build_script:
   - ps: .\RunTests.ps1
   - ps: Assert-ValidCodecovYML
@@ -39,6 +40,7 @@ for:
   install:
   - pwsh: Import-Module -Name .\AppVeyorHelpers.psd1
   - pwsh: Install-Module Pester -Force
+  - pwsh: Get-Module Pester -ListAvailable
   build_script:
   - pwsh: .\RunTests.ps1
   - pwsh: Assert-ValidCodecovYML

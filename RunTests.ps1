@@ -31,15 +31,6 @@ ForEach ($file in $manifest) {
 Import-Module "${PSScriptRoot}\AppVeyorHelpers.psd1"
 
 ##====--------------------------------------------------------------------====##
-# Install Pester
-##====--------------------------------------------------------------------====##
-if (-not (Get-Module Pester)) {
-  Send-Message -Warning "Pester is not installed."
-} else {
-  Get-Module Pester -ListAvailable
-}
-
-##====--------------------------------------------------------------------====##
 # Pester Configuration
 ##====--------------------------------------------------------------------====##
 # Specifies the test files run by Pester.
