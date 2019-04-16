@@ -27,6 +27,7 @@ for:
   build_script:
   - ps: $BuildName = 'placeholder'
   - ps: .\RunTests.ps1
+  test_script:
   - ps: Assert-ValidCodecovYML
   - ps: |
       if ($BuildName -ne 'placeholder') {
@@ -45,6 +46,7 @@ for:
   build_script:
   - pwsh: $BuildName = 'placeholder'
   - pwsh: .\RunTests.ps1
+  test_script:
   - pwsh: Assert-ValidCodecovYML
   - pwsh: |
       if ($BuildName -ne 'placeholder') {
