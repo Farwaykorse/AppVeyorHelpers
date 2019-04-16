@@ -16,7 +16,8 @@ Describe 'Send-TestResult' {
       Should -Match '-Whatif.*-Confirm'
   }
   Context 'Input Errors' {
-    if (Get-Module BitsTransfer) {
+    if ((Get-Module BitsTransfer) -or (Get-Module BitsTransfer -ListAvailable))
+    {
       Mock Start-BitsTransfer { return $null } -ModuleName Send-TestResult
     }
     # Suppress output to the Appveyor Message API.

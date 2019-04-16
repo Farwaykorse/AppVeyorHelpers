@@ -47,7 +47,8 @@ function Send-TestResult {
             "$($MyInvocation.MyCommand): Skip, empty file: ${FilePath}"
           continue
         }
-        if (Get-Module BitsTransfer) {
+        if ( (Get-Module BitsTransfer) -or
+             (Get-Module BitsTransfer -ListAvailable) ) {
           Start-BitsTransfer -Asynchronous -TransferType Upload `
             -DisplayName 'AppVeyorTestUpload'                   `
             -Description 'Upload results to AppVeyor.'          `
