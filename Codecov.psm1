@@ -197,23 +197,27 @@ function Assert-ValidCodecovYML {
     # Path to the yml-file. (codecov.yml or .codecov.yml)
     # Note that when it matches multiple files only the first match is used.
     [SupportsWildcards()]
-    [ValidateScript({ Test-Path "$_" })]
-    [ValidatePattern('[\\/]?\.?codecov\.yml$')]
+    [ValidatePattern('(^|[\\\/])\.?codecov\.yml$')]
     [ValidateNotNullOrEmpty()]
     [Alias('File','FileName')]
-    [String]$Path = "${PSScriptRoot}/../../*codecov.yml"
+    [String]$Path
   )
   Begin
   {
     Write-Verbose 'Validate Yaml file at codecov.io/validate'
-    [Object[]]$Path = Resolve-Path $Path
-    if ($Path -and ($Path.Length -gt 1)) {
-      $Path | Send-Message -Warning `
-        -Message 'Multiple matches found. Processing first match only.'
-      $Path = $Path[0]
+    if (-not $Path) {
+      $Path = Test-DefaultLocations
     }
-    Write-Verbose "Resolved path: $($Path.Path)"
-    $content = Get-Content -Raw -LiteralPath ($Path.Path)
+    [Object[]]$Path = Resolve-Path $Path -ErrorAction SilentlyContinue
+    if (-not $Path) {
+      Send-Message -Error -Message ( $MyInvocation.MyCommand.ToString() +
+        ': no Codecov configuration file detected.' )
+    } elseif ($Path.Count -gt 1) {
+      $Path | Send-Message -Warning ( $MyInvocation.MyCommand.ToString() +
+        'Multiple matches found. Processing first match only.' )
+    }
+    Write-Verbose ('Resolved path: ' + $Path[0].Path)
+    $content = Get-Content -Raw -LiteralPath ($Path[0].Path)
     if ($content -eq $null ) {
       Send-Message -Error -Message "$($MyInvocation.MyCommand): Empty File"
     }
@@ -221,10 +225,10 @@ function Assert-ValidCodecovYML {
   }
   Process
   {
-    if ($PSCmdlet.ShouldProcess($Path.Path, "Upload to $Uri")) {
+    if ($PSCmdlet.ShouldProcess($Path[0].Path, "Upload to $Uri")) {
       try {
         $output = Invoke-RestMethod -Uri https://codecov.io/validate `
-          -Body (Get-Content -Raw -LiteralPath ($Path.Path)) -Method POST
+          -Body (Get-Content -Raw -LiteralPath ($Path[0].Path)) -Method POST
       } catch {
         if ($PSVersionTable.PSVersion.Major -lt 6) { # confirmed for v5.1
           $details= "($(
@@ -248,6 +252,22 @@ function Assert-ValidCodecovYML {
   }
 } #/ function Assert-ValidCodecovYML
 ##====--------------------------------------------------------------------====##
+
+function Test-DefaultLocations {
+  if ($env:APPVEYOR) {
+    Write-Verbose 'Fall back to root of build directory.'
+    $Path = (${env:APPVEYOR_BUILD_FOLDER} + '/.codecov.yml')
+    if (Test-Path $Path) { return $Path }
+    $Path = (${env:APPVEYOR_BUILD_FOLDER} + '/codecov.yml')
+    if (Test-Path $Path) { return $Path }
+  }
+  $Path = ('./.codecov.yml')
+  if (Test-Path $Path) { return $Path }
+  $Path = ('./codecov.yml')
+  return $Path
+}
+
+
 
 Export-ModuleMember `
   -Function Send-Codecov, Assert-ValidCodecovYML `

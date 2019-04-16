@@ -1,4 +1,3 @@
-## Ensure the module is available
 Import-Module -Name ${PSScriptRoot}\Codecov.psm1 -Force
 
 Set-StrictMode -Version Latest
@@ -32,10 +31,18 @@ Describe 'Assert-ValidCodecovYML' {
       { Assert-ValidCodecovYML -Path 'TestDrive:\.codecov.yml' 6>$null } |
         Should -Throw 'Empty File'
     }
+  }
+  Context 'Multiple matches' {
     It 'Multiple matches' {
+      New-Item -Path TestDrive:\ -Name dir1 -ItemType Directory
+      New-Item -Path TestDrive:\dir1 -Name codecov.yml
+      New-Item -Path TestDrive:\ -Name dir2 -ItemType Directory
+      New-Item -Path TestDrive:\dir2 -Name codecov.yml
       # Warning + Error
-      { Assert-ValidCodecovYML -Path 'TestDrive:\*codecov.yml' *>$null } |
+      { Assert-ValidCodecovYML -Path 'TestDrive:\*\codecov.yml' *>$null } |
         Should -Throw 'Empty File'
+      { Assert-ValidCodecovYML -Path 'TestDrive:\*codecov.yml' 6>$null } |
+        Should -Throw 'does not match'
     }
   }
   Context 'Alias' {
@@ -47,6 +54,9 @@ Describe 'Assert-ValidCodecovYML' {
       { Assert-ValidCodecovYML -FileName 'TestDrive:\codecov.yml' 6>$null } |
         Should -Throw 'Empty File'
     }
+  }
+  Context 'No input' {
+
   }
   Context 'Input Validation' {
     It 'fail on missing argument' {
@@ -71,13 +81,13 @@ Describe 'Assert-ValidCodecovYML' {
         Should -Throw 'pattern'
     }
     It 'non-existent dir' {
-      { Assert-ValidCodecovYML -Path 'TestDrive:\InvalidDir\codecov.yml' } |
-        Should -Throw 'validation script'
+      { Assert-ValidCodecovYML -Path 'TestDrive:\InvalidDir\codecov.yml' `
+        6>$null } | Should -Throw 'no Codecov configuration file detected'
     }
     New-Item -Path TestDrive:\ -Name directory -ItemType Directory
     It 'non-existent file' {
-      { Assert-ValidCodecovYML -Path 'TestDrive:\directory\codecov.yml' } |
-        Should -Throw 'validation script'
+      { Assert-ValidCodecovYML -Path 'TestDrive:\directory\codecov.yml' `
+        6>$null } | Should -Throw 'no Codecov configuration file detected'
     }
     In -Path 'TestDrive:\' {
       It 'passing relative path' {

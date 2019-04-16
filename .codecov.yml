@@ -1,0 +1,17 @@
+##====---- AppVeyorHelpers Codecov configuration                      ----====##
+# Repository yaml.
+# Documentation: https://docs.codecov.io
+##====--------------------------------------------------------------------====##
+coverage:
+  precision: 5
+  round: down
+  range: "85...100"
+
+fixes:
+- "projects\AppVeyorHelpers::" # reduce root for OpenCppCoverage on AppVeyor
+
+# Pull-request Comments
+comment:
+  layout: "header, diff, flags, files"
+  behavior: default
+  require_changes: no
