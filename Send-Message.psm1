@@ -153,9 +153,8 @@ function Send-Message {
         Write-Host $intDetails -ForegroundColor Red
       }
       if (-not $ContinueOnError) {
-        if (Assert-CI) {
-          $Host.SetShouldExit(1)
-        } else { throw $Message }
+        if (Assert-CI) { $Host.SetShouldExit(1) }
+        throw $Message
       }
     } elseif ($Warning) {
       if ($intDetails -and -not $HideDetails) { $Message += "`n${intDetails}" }
@@ -174,7 +173,8 @@ function Send-Message {
 .SYNOPSIS
   Check if executed on the AppVeyor CI platform.
 .DESCRIPTION
-  Basic check for variables, allows for simple mocking.
+  Basic check for variables, allows for mocking to disable pushing to the
+  AppVeyor Message API.
 #>
 function Assert-CI {
   return ($env:APPVEYOR -or $env:CI)

@@ -30,7 +30,7 @@ Describe 'Send-Message' {
       Should -MatchExactly 'SYNOPSIS' -Because $msg_documentation
   }
   Context 'Input Errors' {
-    # Suppress output to Message console.
+    # Suppress output to the Appveyor Message API.
     Mock Assert-CI { return $false } -ModuleName Send-Message
 
     It 'Mandatory parameter Message' {

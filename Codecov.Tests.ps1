@@ -7,6 +7,8 @@ $global:msg_documentation = 'at least 1 empty line above documentation'
 
 ##====--------------------------------------------------------------------====##
 Describe 'Assert-ValidCodecovYML' {
+  # Suppress output to the Appveyor Message API.
+  Mock Assert-CI { return $false } -ModuleName Send-Message
   # Temporary working directory (Pesters TestDrive:\)
   New-Item -Path TestDrive:\ -Name codecov.yml  # Valid
   New-Item -Path TestDrive:\ -Name .codecov.yml # Valid
@@ -31,6 +33,7 @@ Describe 'Assert-ValidCodecovYML' {
         Should -Throw 'Empty File'
     }
     It 'Multiple matches' {
+      # Warning + Error
       { Assert-ValidCodecovYML -Path 'TestDrive:\*codecov.yml' *>$null } |
         Should -Throw 'Empty File'
     }
@@ -181,11 +184,11 @@ Describe 'Internal Install-Uploader' {
     }
     Context 'Check-Installed = $false' {
       Mock Check-Installed { return $false } -ModuleName Codecov
-      Mock Send-Message { throw $Message } -ModuleName Codecov
+      # Suppress output to the Appveyor Message API.
+      Mock Assert-CI { return $false } -ModuleName Send-Message
 
       It 'throws when all attempts fail' {
         { Install-Uploader 2>$null 6>&1 } | Should -Throw
-          Assert-MockCalled Send-Message -Exactly 1 -Scope It
       }
     }
   }
@@ -278,6 +281,9 @@ Describe 'Send-Codecov' {
   }
   Context 'Input Validation, Path' {
     Mock Send-Report { return $FilePath } -ModuleName Codecov
+    # Suppress output to the Appveyor Message API.
+    Mock Assert-CI { return $false } -ModuleName Send-Message
+
     It 'Path is mandatory' {
       { Send-Codecov -BuildName build } | Should -Throw '-Path is required'
     }
@@ -386,9 +392,12 @@ Describe 'Send-Codecov' {
     Assert-MockCalled Send-Report -ModuleName Codecov -Exactly 2 -Scope Context
   }
   Context 'Input Validation, Flag' {
+    # Suppress output to the Appveyor Message API.
+    Mock Assert-CI { return $false } -ModuleName Send-Message
     Mock Send-Report { return $Flag } -ModuleName Codecov
     New-Item -Path TestDrive: -Name report.xml
     'text' > TestDrive:\report.xml
+
     It 'throws on empty Flag' {
       { Send-Codecov '.\*.xml' -BuildName build -Flag } |
         Should -Throw 'missing an argument'

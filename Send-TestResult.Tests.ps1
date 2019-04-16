@@ -19,6 +19,9 @@ Describe 'Send-TestResult' {
     if (Get-Module BitsTransfer) {
       Mock Start-BitsTransfer { return $null } -ModuleName Send-TestResult
     }
+    # Suppress output to the Appveyor Message API.
+    Mock Assert-CI { return $false } -ModuleName Send-Message
+
     New-Item -Path TestDrive:\ -Name file.xml -ItemType File
     '<?xml version="1.0" encoding="UTF-8"?>' >> TestDrive:\file.xml
     New-Item -Path TestDrive:\ -Name emptyfile.json -ItemType File
@@ -76,10 +79,12 @@ Describe 'Send-TestResult' {
     It 'Aliases for Path' {
       { Send-TestResult -Report 'TestDrive:\emptyfile.json' JUnit 3>$null } |
         Should -not -Throw
+      Assert-MockCalled Assert-CI -Exactly 1 -Scope It -ModuleName Send-Message
       { Send-TestResult -File 'TestDrive:\emptyfile.json' JUnit 3>$null } |
         Should -not -Throw
       { Send-TestResult -FileName 'TestDrive:\emptyfile.json' JUnit 3>$null } |
         Should -not -Throw
+      Assert-MockCalled Assert-CI -Exactly 3 -Scope It -ModuleName Send-Message
     }
     # parameter: Format
     It 'Required parameter Format' {

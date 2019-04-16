@@ -44,7 +44,7 @@ function Send-Codecov {
     $BuildName = Correct-BuildName($BuildName)
     Write-Verbose "BuildName: $BuildName"
     if ($Flag -and ($Flag -cnotmatch '^[a-z0-9_]{1,45}$')) {
-      Send-Message -Error `
+      Send-Message -Error -Message `
         "$($MyInvocation.MyCommand): Invalid flag name for codecov.io" `
         -Details $Flag 
     }
@@ -53,7 +53,7 @@ function Send-Codecov {
   {
     foreach ($item in $Path) {
       if (-not ($item -imatch '.*\.xml$')) {
-        Send-Message -Error `
+        Send-Message -Error -Message `
           "$($MyInvocation.MyCommand): Invalid pattern: ${item}" `
           -ContinueOnError:$($Path.Count -ne 1)
         continue
@@ -61,7 +61,7 @@ function Send-Codecov {
       [Object[]]$ResolvedList = Resolve-Path -Path $item `
         -ErrorAction SilentlyContinue
       if (-not $ResolvedList) {
-        Send-Message -Error `
+        Send-Message -Error -Message `
           "$($MyInvocation.MyCommand): Invalid path (non-existing): ${item}" `
           -ContinueOnError:$($Path.Count -ne 1)
         continue
@@ -69,7 +69,7 @@ function Send-Codecov {
       foreach ($FilePath in $ResolvedList) {
         Write-Verbose "Report: ${FilePath}"
         if ( $(Get-Content -Raw -LiteralPath ($FilePath.Path) ) -eq $null ) {
-          Send-Message -Warning `
+          Send-Message -Warning -Message `
             "$($MyInvocation.MyCommand): Skip, empty file: ${FilePath}"
           continue
         }
@@ -209,13 +209,13 @@ function Assert-ValidCodecovYML {
     [Object[]]$Path = Resolve-Path $Path
     if ($Path -and ($Path.Length -gt 1)) {
       $Path | Send-Message -Warning `
-        'Multiple matches found. Processing first match only.'
+        -Message 'Multiple matches found. Processing first match only.'
       $Path = $Path[0]
     }
     Write-Verbose "Resolved path: $($Path.Path)"
     $content = Get-Content -Raw -LiteralPath ($Path.Path)
     if ($content -eq $null ) {
-      Send-Message -Error "$($MyInvocation.MyCommand): Empty File"
+      Send-Message -Error -Message "$($MyInvocation.MyCommand): Empty File"
     }
     $Uri = 'https://codecov.io/validate'
   }
@@ -235,12 +235,13 @@ function Assert-ValidCodecovYML {
             $_.Exception.Response.StatusCode.value__)) $(
             $_.Exception.Response.ReasonPhrase)"
         }
-        Send-Message `
-          -Error "$($MyInvocation.MyCommand): Validation of Codecov yml failed!" `
+        Send-Message -Error -Message `
+          "$($MyInvocation.MyCommand): Validation of Codecov YAML failed!" `
           -ContinueOnError -Details $details, $_.ErrorDetails
         return $false
       }
-      Send-Message -Info "$($MyInvocation.MyCommand): Validated Codecov yml" `
+      Send-Message -Info -Message `
+        "$($MyInvocation.MyCommand): Validated Codecov yml" `
         -Details $output.ToString() -HideDetails
       return $true
     } else { return $false }
