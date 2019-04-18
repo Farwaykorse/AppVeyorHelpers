@@ -253,21 +253,22 @@ function Assert-ValidCodecovYML {
 } #/ function Assert-ValidCodecovYML
 ##====--------------------------------------------------------------------====##
 
+<#
+.SYNOPSIS
+  Try a few locations for the existence of a (.)codecov.yml file.
+#>
 function Test-DefaultLocations {
-  if ($env:APPVEYOR) {
-    Write-Verbose 'Fall back to root of build directory.'
-    $Path = (${env:APPVEYOR_BUILD_FOLDER} + '/.codecov.yml')
+  if ($env:APPVEYOR_BUILD_FOLDER) {
+    $Path = ($env:APPVEYOR_BUILD_FOLDER + '/.codecov.yml')
     if (Test-Path $Path) { return $Path }
-    $Path = (${env:APPVEYOR_BUILD_FOLDER} + '/codecov.yml')
+    $Path = ($env:APPVEYOR_BUILD_FOLDER + '/codecov.yml')
     if (Test-Path $Path) { return $Path }
   }
-  $Path = ('./.codecov.yml')
+  $Path = './.codecov.yml'
   if (Test-Path $Path) { return $Path }
-  $Path = ('./codecov.yml')
-  return $Path
+  return './codecov.yml'
 }
-
-
+##====--------------------------------------------------------------------====##
 
 Export-ModuleMember `
   -Function Send-Codecov, Assert-ValidCodecovYML `

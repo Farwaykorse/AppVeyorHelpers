@@ -5,6 +5,80 @@ Set-StrictMode -Version Latest
 $global:msg_documentation = 'at least 1 empty line above documentation'
 
 ##====--------------------------------------------------------------------====##
+Describe 'Internal Test-DefaultLocations' {
+  InModuleScope Codecov {
+    It 'has documentation' {
+      Get-Help Test-DefaultLocations | Out-String |
+        Should -MatchExactly 'SYNOPSIS' -Because $msg_documentation
+    }
+    It 'returns a String' {
+      Test-DefaultLocations | Should -BeOfType String
+    }
+    It 'return a path' {
+      Test-Path $(Test-DefaultLocations) -IsValid | Should -Be $true
+    }
+    It 'should match \.?codecov.yml$' {
+      Test-DefaultLocations | Should -Match '\.?codecov.yml$'
+    }
+    Context 'Not on CI platform' {
+      $OriginalValue = $env:APPVEYOR_BUILD_FOLDER
+      $env:APPVEYOR_BUILD_FOLDER = $null
+
+      New-Item -Path TestDrive:\ -Name dir -ItemType Directory
+      New-Item -Path TestDrive:\dir -Name codecov.yml
+      In 'TestDrive:\dir' {
+        It 'find in current directory' {
+          Test-DefaultLocations | Should -Be './codecov.yml'
+        }
+        New-Item -Path .\ -Name .codecov.yml
+        It 'prefer .codecov.yml over codecov.yml' {
+          Test-DefaultLocations | Should -Be './.codecov.yml'
+        }
+        New-Item -Path TestDrive:\ -Name codecov.yml
+        It 'ignore project root' {
+          Test-DefaultLocations | Should -Be './.codecov.yml'
+          New-Item -Path TestDrive:\ -Name .codecov.yml
+          Test-DefaultLocations | Should -Be './.codecov.yml'
+        }
+      }
+      $env:APPVEYOR_BUILD_FOLDER = $OriginalValue
+    }
+    Context 'on CI platform' {
+      $OriginalValue = $env:APPVEYOR_BUILD_FOLDER
+      $env:APPVEYOR_BUILD_FOLDER = 'TestDrive:'
+
+      New-Item -Path TestDrive:\ -Name dir -ItemType Directory
+      New-Item -Path TestDrive:\dir -Name codecov.yml
+      In 'TestDrive:\dir' {
+        It 'find in current directory' {
+          Test-DefaultLocations | Should -Be './codecov.yml'
+        }
+        New-Item -Path .\ -Name .codecov.yml
+        It 'prefer .codecov.yml over codecov.yml' {
+          Test-DefaultLocations | Should -Be './.codecov.yml'
+        }
+        New-Item -Path TestDrive:\ -Name codecov.yml
+        It 'prefer project root' {
+          Test-DefaultLocations | Should -Be 'TestDrive:/codecov.yml'
+        }
+        New-Item -Path TestDrive:\ -Name .codecov.yml
+        It 'prefer .codecov.yml over codecov.yml' {
+          Test-DefaultLocations | Should -Be 'TestDrive:/.codecov.yml'
+        }
+      }
+      $env:APPVEYOR_BUILD_FOLDER = $OriginalValue
+    }
+    It 'variables should be restored' {
+      if ($env:APPVEYOR) {
+        $env:APPVEYOR_BUILD_FOLDER | Should -Be $true
+      } else {
+        $env:APPVEYOR_BUILD_FOLDER | Should -Be $null
+      }
+    }
+  }
+}
+
+##====--------------------------------------------------------------------====##
 Describe 'Assert-ValidCodecovYML' {
   # Suppress output to the Appveyor Message API.
   Mock Assert-CI { return $false } -ModuleName Send-Message
