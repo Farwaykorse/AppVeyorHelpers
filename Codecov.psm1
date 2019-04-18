@@ -240,12 +240,12 @@ function Assert-ValidCodecovYML {
             $_.Exception.Response.ReasonPhrase)"
         }
         Send-Message -Error -Message `
-          "$($MyInvocation.MyCommand): Validation of Codecov YAML failed!" `
+          "Validation of Codecov YAML failed!" `
           -ContinueOnError -Details $details, $_.ErrorDetails
         return $false
       }
       Send-Message -Info -Message `
-        "$($MyInvocation.MyCommand): Validated Codecov yml" `
+        "Validated Codecov yml" `
         -Details $output.ToString() -HideDetails
       return $true
     } else { return $false }
