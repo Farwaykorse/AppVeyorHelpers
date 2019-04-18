@@ -33,8 +33,6 @@ for:
       if ($BuildName -ne 'placeholder') {
         Send-Message -Error 'BuildName escaped RunTests.ps1' -Details $BuildName
       }
-  on_finish:
-  - ps: Limit-TestResultUpload
 -
   matrix:
     only:
@@ -52,8 +50,6 @@ for:
       if ($BuildName -ne 'placeholder') {
         Send-Message -Error 'BuildName escaped RunTests.ps1' -Details $BuildName
       }
-  on_finish:
-  - pwsh: Limit-TestResultUpload
 
 
 ##====--------------------------------------------------------------------====##

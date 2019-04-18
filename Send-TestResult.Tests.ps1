@@ -16,10 +16,6 @@ Describe 'Send-TestResult' {
       Should -Match '-Whatif.*-Confirm'
   }
   Context 'Input Errors' {
-    if ((Get-Module BitsTransfer) -or (Get-Module BitsTransfer -ListAvailable))
-    {
-      Mock Start-BitsTransfer { return $null } -ModuleName Send-TestResult
-    }
     # Suppress output to the Appveyor Message API.
     Mock Assert-CI { return $false } -ModuleName Send-Message
 
@@ -64,18 +60,10 @@ Describe 'Send-TestResult' {
         Should -not -Throw
       { Send-TestResult -Path 'TestDrive:\fil?.xml' JUnit } |
         Should -not -Throw
-      if (Get-Module BitsTransfer) {
-        Assert-MockCalled Start-BitsTransfer -Scope It -Exactly 3 `
-          -ModuleName Send-TestResult
-      }
     }
     It 'Warn on empty file and skip upload' {
       Send-TestResult -Path 'TestDrive:\emptyfile.json' JUnit 3>&1 |
         Should -Match '^Send-TestResult: .* empty file'
-      if (Get-Module BitsTransfer) {
-        Assert-MockCalled Start-BitsTransfer -Scope It -Exactly 0 `
-          -ModuleName Send-TestResult
-      }
     }
     It 'Aliases for Path' {
       { Send-TestResult -Report 'TestDrive:\emptyfile.json' JUnit 3>$null } |
@@ -107,10 +95,6 @@ Describe 'Send-TestResult' {
     It 'No Throw on valid -Format input' {
       { Send-TestResult -Path 'TestDrive:\file.xml' -Format JUnit } |
         Should -not -Throw
-      if (Get-Module BitsTransfer) {
-        Assert-MockCalled Start-BitsTransfer -ModuleName Send-TestResult `
-          -Scope It
-      }
       { Send-TestResult -Path 'TestDrive:\file.xml' -Format NUnit } |
         Should -not -Throw
       { Send-TestResult -Path 'TestDrive:\file.xml' -Format XUnit } |
@@ -119,10 +103,6 @@ Describe 'Send-TestResult' {
         Should -not -Throw
       { Send-TestResult -Path 'TestDrive:\file.xml' -Format MSTest } |
         Should -not -Throw
-      if (Get-Module BitsTransfer) {
-        Assert-MockCalled Start-BitsTransfer -ModuleName Send-TestResult `
-          -Scope It -Exactly 5
-      }
     }
     It 'Throw on unknown -Format input' {
       { Send-TestResult -Path 'TestDrive:\file.xml' -Format Unit } |
