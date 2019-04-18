@@ -52,13 +52,13 @@ Describe 'Send-TestResult' {
         Should -Throw 'validation script for the argument'
     }
     It 'No Throw when spaces in path' {
-      { Send-TestResult -Path 'TestDrive:\name with spaces.xml' JUnit } |
-        Should -not -Throw
+      { Send-TestResult -Path 'TestDrive:\name with spaces.xml' JUnit -WhatIf
+      } | Should -not -Throw
     }
     It 'Support wildcard characters' {
-      { Send-TestResult -Path 'TestDrive:\*.xml' JUnit } |
+      { Send-TestResult -Path 'TestDrive:\*.xml' JUnit -WhatIf } |
         Should -not -Throw
-      { Send-TestResult -Path 'TestDrive:\fil?.xml' JUnit } |
+      { Send-TestResult -Path 'TestDrive:\fil?.xml' JUnit -WhatIf } |
         Should -not -Throw
     }
     It 'Warn on empty file and skip upload' {
@@ -93,15 +93,15 @@ Describe 'Send-TestResult' {
         Should -Throw 'argument is null or empty'
     }
     It 'No Throw on valid -Format input' {
-      { Send-TestResult -Path 'TestDrive:\file.xml' -Format JUnit } |
+      { Send-TestResult -Path 'TestDrive:\file.xml' -Format JUnit -WhatIf } |
         Should -not -Throw
-      { Send-TestResult -Path 'TestDrive:\file.xml' -Format NUnit } |
+      { Send-TestResult -Path 'TestDrive:\file.xml' -Format NUnit -WhatIf } |
         Should -not -Throw
-      { Send-TestResult -Path 'TestDrive:\file.xml' -Format XUnit } |
+      { Send-TestResult -Path 'TestDrive:\file.xml' -Format XUnit -WhatIf } |
         Should -not -Throw
-      { Send-TestResult -Path 'TestDrive:\file.xml' -Format NUnit3 } |
+      { Send-TestResult -Path 'TestDrive:\file.xml' -Format NUnit3 -WhatIf } |
         Should -not -Throw
-      { Send-TestResult -Path 'TestDrive:\file.xml' -Format MSTest } |
+      { Send-TestResult -Path 'TestDrive:\file.xml' -Format MSTest -WhatIf } |
         Should -not -Throw
     }
     It 'Throw on unknown -Format input' {

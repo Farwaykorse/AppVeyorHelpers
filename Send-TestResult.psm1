@@ -24,13 +24,8 @@ function Send-TestResult {
   )
   Begin
   {
-    if (-not $env:APPVEYOR) {
-      Write-Verbose 'Not on AppVeyor CI platform. Upload disabled.'
-      $UseWhatIf = $true
-    } else {
-      $UseWhatIf = $false
-    }
-    $URL = "https://ci.appveyor.com/api/testresults/${Format}/$($env:APPVEYOR_JOB_ID)"
+    $URL = 'https://ci.appveyor.com/api/testresults/' + $Format + '/' +
+      "$($env:APPVEYOR_JOB_ID)"
   }
   Process
   {
@@ -48,9 +43,12 @@ function Send-TestResult {
       }
       if ($PSCmdlet.ShouldProcess($FilePath,'Upload to AppVeyor Test console'))
       {
-        if (-not $UseWhatIf) {
-          $web_client = New-Object 'System.Net.WebClient'
+        $web_client = New-Object 'System.Net.WebClient'
+        try {
           $web_client.UploadFile("${URL}", "${FilePath}")
+        } catch {
+          Send-Message -Error ($MyInvocation.MyCommand.ToString() +
+            ': Upload failed.') -ContinueOnError -Details $FilePath, $URL
         }
       }
     }
