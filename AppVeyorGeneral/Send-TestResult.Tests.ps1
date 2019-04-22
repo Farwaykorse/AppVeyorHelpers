@@ -1,4 +1,4 @@
-Import-Module -Name "${PSScriptRoot}\Send-TestResult.psm1" -Force
+Import-Module -Name "${PSScriptRoot}\Send-TestResult.psd1" -Force
 
 Set-StrictMode -Version Latest
 

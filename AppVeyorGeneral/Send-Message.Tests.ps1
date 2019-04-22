@@ -1,4 +1,4 @@
-Import-Module -Name "${PSScriptRoot}\Send-Message.psm1" -Force
+Import-Module -Name "${PSScriptRoot}\Send-Message.psd1" -Force
 
 Set-StrictMode -Version Latest
 

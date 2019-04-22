@@ -56,4 +56,4 @@ function Send-TestResult {
 } #/ function Send-TestResult
 ##====--------------------------------------------------------------------====##
 
-Export-ModuleMember -Function Send-TestResult, Limit-TestResultUpload
+Export-ModuleMember -Function Send-TestResult

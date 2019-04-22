@@ -1,5 +1,4 @@
-## Ensure the function is available
-Import-Module -Name "${PSScriptRoot}\Convert-FileEncoding.psm1" -Force
+Import-Module -Name "${PSScriptRoot}\Convert-FileEncoding.psd1" -Force
 
 Set-StrictMode -Version Latest
 

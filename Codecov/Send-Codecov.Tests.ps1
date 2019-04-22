@@ -1,209 +1,19 @@
-Import-Module -Name ${PSScriptRoot}\Codecov.psm1 -Force
+Import-Module -Name "${PSScriptRoot}\Send-Codecov.psd1" -Force
 
 Set-StrictMode -Version Latest
 
+##====--------------------------------------------------------------------====##
 $global:msg_documentation = 'at least 1 empty line above documentation'
 
 ##====--------------------------------------------------------------------====##
-Describe 'Internal Test-DefaultLocations' {
-  InModuleScope Codecov {
-    It 'has documentation' {
-      Get-Help Test-DefaultLocations | Out-String |
-        Should -MatchExactly 'SYNOPSIS' -Because $msg_documentation
-    }
-    It 'returns a String' {
-      Test-DefaultLocations | Should -BeOfType String
-    }
-    It 'return a path' {
-      Test-Path $(Test-DefaultLocations) -IsValid | Should -Be $true
-    }
-    It 'should match \.?codecov.yml$' {
-      Test-DefaultLocations | Should -Match '\.?codecov.yml$'
-    }
-    Context 'Not on CI platform' {
-      $OriginalValue = $env:APPVEYOR_BUILD_FOLDER
-      $env:APPVEYOR_BUILD_FOLDER = $null
-
-      New-Item -Path TestDrive:\ -Name dir -ItemType Directory
-      New-Item -Path TestDrive:\dir -Name codecov.yml
-      In 'TestDrive:\dir' {
-        It 'find in current directory' {
-          Test-DefaultLocations | Should -Be './codecov.yml'
-        }
-        New-Item -Path .\ -Name .codecov.yml
-        It 'prefer .codecov.yml over codecov.yml' {
-          Test-DefaultLocations | Should -Be './.codecov.yml'
-        }
-        New-Item -Path TestDrive:\ -Name codecov.yml
-        It 'ignore project root' {
-          Test-DefaultLocations | Should -Be './.codecov.yml'
-          New-Item -Path TestDrive:\ -Name .codecov.yml
-          Test-DefaultLocations | Should -Be './.codecov.yml'
-        }
-      }
-      $env:APPVEYOR_BUILD_FOLDER = $OriginalValue
-    }
-    Context 'on CI platform' {
-      $OriginalValue = $env:APPVEYOR_BUILD_FOLDER
-      $env:APPVEYOR_BUILD_FOLDER = 'TestDrive:'
-
-      New-Item -Path TestDrive:\ -Name dir -ItemType Directory
-      New-Item -Path TestDrive:\dir -Name codecov.yml
-      In 'TestDrive:\dir' {
-        It 'find in current directory' {
-          Test-DefaultLocations | Should -Be './codecov.yml'
-        }
-        New-Item -Path .\ -Name .codecov.yml
-        It 'prefer .codecov.yml over codecov.yml' {
-          Test-DefaultLocations | Should -Be './.codecov.yml'
-        }
-        New-Item -Path TestDrive:\ -Name codecov.yml
-        It 'prefer project root' {
-          Test-DefaultLocations | Should -Be 'TestDrive:/codecov.yml'
-        }
-        New-Item -Path TestDrive:\ -Name .codecov.yml
-        It 'prefer .codecov.yml over codecov.yml' {
-          Test-DefaultLocations | Should -Be 'TestDrive:/.codecov.yml'
-        }
-      }
-      $env:APPVEYOR_BUILD_FOLDER = $OriginalValue
-    }
-    It 'variables should be restored' {
-      if ($env:APPVEYOR) {
-        $env:APPVEYOR_BUILD_FOLDER | Should -Be $true
-      } else {
-        $env:APPVEYOR_BUILD_FOLDER | Should -Be $null
-      }
-    }
-  }
-}
-
-##====--------------------------------------------------------------------====##
-Describe 'Assert-ValidCodecovYML' {
-  # Suppress output to the Appveyor Message API.
-  Mock Assert-CI { return $false } -ModuleName Send-Message
-  # Temporary working directory (Pesters TestDrive:\)
-  New-Item -Path TestDrive:\ -Name codecov.yml  # Valid
-  New-Item -Path TestDrive:\ -Name .codecov.yml # Valid
-  New-Item -Path TestDrive:\ -Name codecov.xml
-  New-Item -Path TestDrive:\ -Name codecovXyml
-  New-Item -Path TestDrive:\ -Name Ycodecov.yml
-  It 'has documentation' {
-    Get-Help Assert-ValidCodecovYML | Out-String |
-      Should -MatchExactly 'SYNOPSIS' -Because $msg_documentation
-  }
-  It 'supports -WhatIf and -Confirm' {
-    Get-Command -Name Assert-ValidCodecovYML -Syntax |
-      Should -Match '-Whatif.*-Confirm'
-  }
-  Context 'Internal Validation' {
-    It 'fail on empty file' {
-      { Assert-ValidCodecovYML -Path 'TestDrive:\codecov.yml' 6>$null } |
-        Should -Throw 'Empty File'
-    }
-    It 'fail on empty file 2' {
-      { Assert-ValidCodecovYML -Path 'TestDrive:\.codecov.yml' 6>$null } |
-        Should -Throw 'Empty File'
-    }
-  }
-  Context 'Multiple matches' {
-    It 'Multiple matches' {
-      New-Item -Path TestDrive:\ -Name dir1 -ItemType Directory
-      New-Item -Path TestDrive:\dir1 -Name codecov.yml
-      New-Item -Path TestDrive:\ -Name dir2 -ItemType Directory
-      New-Item -Path TestDrive:\dir2 -Name codecov.yml
-      # Warning + Error
-      { Assert-ValidCodecovYML -Path 'TestDrive:\*\codecov.yml' *>$null } |
-        Should -Throw 'Empty File'
-      { Assert-ValidCodecovYML -Path 'TestDrive:\*codecov.yml' 6>$null } |
-        Should -Throw 'does not match'
-    }
-  }
-  Context 'Alias' {
-    It 'Alias File' {
-      { Assert-ValidCodecovYML -File 'TestDrive:\codecov.yml' 6>$null } |
-        Should -Throw 'Empty File'
-    }
-    It 'Alias FileName' {
-      { Assert-ValidCodecovYML -FileName 'TestDrive:\codecov.yml' 6>$null } |
-        Should -Throw 'Empty File'
-    }
-  }
-  Context 'No input' {
-
-  }
-  Context 'Input Validation' {
-    It 'fail on missing argument' {
-      { Assert-ValidCodecovYML -Path } | Should -Throw 'Missing an argument'
-    }
-    It 'fail on empty path' {
-      { Assert-ValidCodecovYML -Path '' } |
-        Should -Throw 'argument is null or empty'
-    }
-    It 'fail on $null path' {
-      { Assert-ValidCodecovYML -Path $null } |
-        Should -Throw 'argument is null or empty'
-    }
-    It 'fail on pattern' {
-      { Assert-ValidCodecovYML -Path 'TestDrive:\codecov.xml' } |
-        Should -Throw 'pattern'
-    }
-    It 'fail on pattern 2' {
-      { Assert-ValidCodecovYML -Path 'TestDrive:\codecovXyml' } |
-        Should -Throw 'pattern'
-      { Assert-ValidCodecovYML -Path 'TestDrive:\InvalidDir\codecov.xml' } |
-        Should -Throw 'pattern'
-    }
-    It 'non-existent dir' {
-      { Assert-ValidCodecovYML -Path 'TestDrive:\InvalidDir\codecov.yml' `
-        6>$null } | Should -Throw 'no Codecov configuration file detected'
-    }
-    New-Item -Path TestDrive:\ -Name directory -ItemType Directory
-    It 'non-existent file' {
-      { Assert-ValidCodecovYML -Path 'TestDrive:\directory\codecov.yml' `
-        6>$null } | Should -Throw 'no Codecov configuration file detected'
-    }
-    In -Path 'TestDrive:\' {
-      It 'passing relative path' {
-        { Assert-ValidCodecovYML -Path 'codecov.yml' 6>$null } |
-          Should -Throw 'Empty File'
-      }
-      It 'passing relative path 2' {
-        { Assert-ValidCodecovYML -Path '.\codecov.yml' 6>$null } |
-          Should -Throw 'Empty File'
-      }
-      It 'passing relative path 3' {
-        { Assert-ValidCodecovYML -Path 'directory\..\codecov.yml' 6>$null } |
-          Should -Throw 'Empty File'
-      }
-    }
-  }
-  Context 'Check Samples' {
-    New-Item -Path TestDrive:\ -Name samples -ItemType Directory
-    # valid Sample
-    "coverage:`n  precision: 2" > 'TestDrive:\samples\codecov.yml'
-    It 'valid sample' {
-      Assert-ValidCodecovYML -Path 'TestDrive:\samples\codecov.yml' 6>$null |
-        Should -BeTrue
-    }
-    # invalid sample
-    "coverage:`n  somethingRandom: 2" > 'TestDrive:\samples\codecov.yml'
-    It 'invalid sample' {
-      Assert-ValidCodecovYML -Path 'TestDrive:\samples\codecov.yml' 6>$null |
-        Should -BeFalse
-    }
-  }
-}
-
-##====--------------------------------------------------------------------====##
 Describe 'Internal Check-Installed' {
-  InModuleScope Codecov {
+  InModuleScope Send-Codecov {
     It 'has documentation' {
       Get-Help Check-Installed | Out-String |
         Should -MatchExactly 'SYNOPSIS' -Because $msg_documentation
     }
     Context 'Test-Command: $false; uploader is not installed' {
-      Mock Test-Command { return $false } -ModuleName Codecov
+      Mock Test-Command { return $false } -ModuleName Send-Codecov
 
       $script:CodecovInstalled = $true
       It 'Check-Installed variable $true, skip expensive test' {
@@ -216,7 +26,7 @@ Describe 'Internal Check-Installed' {
       }
     }
     Context 'Test-Command: $true; uploader is installed' {
-      Mock Test-Command { return $true } -ModuleName Codecov
+      Mock Test-Command { return $true } -ModuleName Send-Codecov
 
       $script:CodecovInstalled = $false
       It 'Check-Installed returns $true' {
@@ -232,7 +42,7 @@ Describe 'Internal Check-Installed' {
 
 ##====--------------------------------------------------------------------====##
 Describe 'Internal Install-Uploader' {
-  InModuleScope Codecov {
+  InModuleScope Send-Codecov {
     It 'has documentation' {
       Get-Help Install-Uploader | Out-String |
         Should -MatchExactly 'SYNOPSIS' -Because $msg_documentation
@@ -252,7 +62,7 @@ Describe 'Internal Install-Uploader' {
       Check-Installed | Should -BeTrue
     }
     Context 'Check-Installed = $true' {
-      Mock Check-Installed { return $true } -ModuleName Codecov
+      Mock Check-Installed { return $true } -ModuleName Send-Codecov
 
       It 'runs without error' {
         { Install-Uploader -Verbose } | Should -Not -Throw
@@ -267,7 +77,7 @@ Describe 'Internal Install-Uploader' {
       }
     }
     Context 'Check-Installed = $false' {
-      Mock Check-Installed { return $false } -ModuleName Codecov
+      Mock Check-Installed { return $false } -ModuleName Send-Codecov
       # Suppress output to the Appveyor Message API.
       Mock Assert-CI { return $false } -ModuleName Send-Message
 
@@ -280,7 +90,7 @@ Describe 'Internal Install-Uploader' {
 
 ##====--------------------------------------------------------------------====##
 Describe 'Internal Correct-BuildName' {
-  InModuleScope Codecov {
+  InModuleScope Send-Codecov {
     It 'has documentation' {
       Get-Help Correct-BuildName | Out-String |
         Should -MatchExactly 'SYNOPSIS' -Because $msg_documentation
@@ -309,7 +119,7 @@ Describe 'Internal Correct-BuildName' {
 
 ##====--------------------------------------------------------------------====##
 Describe 'Internal Send-Report' {
-  InModuleScope Codecov {
+  InModuleScope Send-Codecov {
     It 'has documentation' {
       Get-Help Send-Report | Out-String |
         Should -MatchExactly 'SYNOPSIS' -Because $msg_documentation
@@ -364,7 +174,7 @@ Describe 'Send-Codecov' {
       Should -MatchExactly 'SYNOPSIS' -Because $msg_documentation
   }
   Context 'Input Validation, Path' {
-    Mock Send-Report { return $FilePath } -ModuleName Codecov
+    Mock Send-Report { return $FilePath } -ModuleName Send-Codecov
     # Suppress output to the Appveyor Message API.
     Mock Assert-CI { return $false } -ModuleName Send-Message
 
@@ -446,12 +256,13 @@ Describe 'Send-Codecov' {
     }
   }
   Context 'Input Validation, BuildName' {
-    Mock Send-Report { return $BuildName } -ModuleName Codecov
+    Mock Send-Report { return $BuildName } -ModuleName Send-Codecov
     New-Item -Path TestDrive: -Name report.xml
     'text' > TestDrive:\report.xml
     It 'BuildName is mandatory' {
       { Send-Codecov -Path '.\*.xml' } | Should -Throw '-BuildName is required'
-      Assert-MockCalled Send-Report -ModuleName Codecov -Exactly 0 -Scope It
+      Assert-MockCalled Send-Report -ModuleName Send-Codecov -Exactly 0 `
+        -Scope It
     }
     It 'throws on missing BuildName' {
       { Send-Codecov -Path '.\*.xml' -BuildName } |
@@ -470,15 +281,16 @@ Describe 'Send-Codecov' {
         Should -MatchExactly 'Name_Like_This_3'
     }
     It 'valid call (with -Flag)' {
-      Send-Codecov 'TestDrive:\report.xml' -BuildName 'Name Like This 3' -Flag unit_tests_2 |
-        Should -MatchExactly 'Name_Like_This_3'
+      Send-Codecov 'TestDrive:\report.xml' -BuildName 'Name Like This 3' `
+        -Flag unit_tests_2 | Should -MatchExactly 'Name_Like_This_3'
     }
-    Assert-MockCalled Send-Report -ModuleName Codecov -Exactly 2 -Scope Context
+    Assert-MockCalled Send-Report -ModuleName Send-Codecov -Exactly 2 `
+      -Scope Context
   }
   Context 'Input Validation, Flag' {
     # Suppress output to the Appveyor Message API.
     Mock Assert-CI { return $false } -ModuleName Send-Message
-    Mock Send-Report { return $Flag } -ModuleName Codecov
+    Mock Send-Report { return $Flag } -ModuleName Send-Codecov
     New-Item -Path TestDrive: -Name report.xml
     'text' > TestDrive:\report.xml
 
@@ -506,7 +318,8 @@ Describe 'Send-Codecov' {
       { Send-Codecov '.\*.xml' -BuildName build -Flag '#abc' 6>$null } |
         Should -Throw 'invalid flag name'
     }
-    Assert-MockCalled Send-Report -ModuleName Codecov -Exactly 0 -Scope Context
+    Assert-MockCalled Send-Report -ModuleName Send-Codecov -Exactly 0 `
+      -Scope Context
     It 'Flag has a maximum length of 45 characters' {
       { Send-Codecov 'TestDrive:\report.xml' -BuildName build `
         -Flag 'abcdefghijklmnopqrstuvwxyz0123456789_abcdefgh'
@@ -514,16 +327,18 @@ Describe 'Send-Codecov' {
       { Send-Codecov 'TestDrive:\report.xml' -BuildName build `
         -Flag 'abcdefghijklmnopqrstuvwxyz0123456789_abcdefghi' 6>$null
       } | Should -Throw 'invalid flag name'
-      Assert-MockCalled Send-Report -ModuleName Codecov -Exactly 1 -Scope It
+      Assert-MockCalled Send-Report -ModuleName Send-Codecov -Exactly 1 `
+        -Scope It
     }
     It 'valid call' {
       Send-Codecov 'TestDrive:\report.xml' -BuildName build -Flag unit_tests_2 |
         Should -MatchExactly 'unit_tests_2'
-      Assert-MockCalled Send-Report -ModuleName Codecov -Exactly 1 -Scope It
+      Assert-MockCalled Send-Report -ModuleName Send-Codecov -Exactly 1 `
+        -Scope It
     }
   }
   Context 'Aliases' {
-    Mock Send-Report { return $Path } -ModuleName Codecov
+    Mock Send-Report { return $Path } -ModuleName Send-Codecov
     New-Item -Path TestDrive: -Name report.xml
     'text' > TestDrive:\report.xml
     It 'Path alias: Report' {

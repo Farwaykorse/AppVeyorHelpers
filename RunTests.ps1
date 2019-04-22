@@ -19,23 +19,21 @@ $Flag = 'ci_scripts'
 ##====--------------------------------------------------------------------====##
 # Check manifest files
 ##====--------------------------------------------------------------------====##
-Import-Module "${PSScriptRoot}\Send-Message.psm1"
+Import-Module "${PSScriptRoot}\AppVeyorGeneral\Send-Message.psd1"
 
-[Object[]]$manifest = Resolve-Path "${PSScriptRoot}\*.psd1" -Relative
-ForEach ($file in $manifest) {
-  $(Test-ModuleManifest -Path $file).NestedModules |
-    Format-Table Name,ExportedCommands -Wrap | Out-String |
-    Send-Message -Info -Message "Module: $file" -HideDetails
-}
+Resolve-Path "${PSScriptRoot}\*.psd1", "${PSScriptRoot}\*\*.psd1" -Relative |
+  Test-ModuleManifest | Format-Table -Wrap | Out-String |
+  Send-Message -Info -Message 'Detected Modules'
 
-Import-Module "${PSScriptRoot}\AppVeyorHelpers.psd1"
+Import-Module "${PSScriptRoot}\AppVeyorHelpers.psd1" -Force
 
 ##====--------------------------------------------------------------------====##
 # Pester Configuration
 ##====--------------------------------------------------------------------====##
 # Specifies the test files run by Pester.
 # Here: Only run dedicated test-files in directory alongside this script.
-[Object[]]$Script = "${PSScriptRoot}\*.Tests.ps1"
+[Object[]]$Script = "${PSScriptRoot}\*.Tests.ps1",
+                    "${PSScriptRoot}\*\*.Tests.ps1"
 # Runs only tests in Describe blocks named to match this pattern.
 [String[]]$TestName = @('*')
 [String[]]$Tag = ''
@@ -45,9 +43,10 @@ Import-Module "${PSScriptRoot}\AppVeyorHelpers.psd1"
 [String]$OutputFormat = 'NUnitXML'
 [String]$OutputFormatUpload = 'NUnit'
 
-[Object[]]$CodeCoverage = @{
-  Path="${PSScriptRoot}\*.ps?1"; IncludeTests=$false;
-}
+[Object[]]$CodeCoverage = @(
+  @{Path="${PSScriptRoot}\*.ps?1"; IncludeTests=$false},
+  @{Path="${PSScriptRoot}\*\*.ps?1"; IncludeTests=$false}
+)
 [String]$CodeCoverageOutputFile = 'ScriptCodeCoverage.xml'
 [String]$CodeCoverageOutputFileFormat = 'JaCoCo'
 

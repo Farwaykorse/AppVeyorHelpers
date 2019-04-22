@@ -66,7 +66,7 @@ function Convert-FileEncoding {
         Write-Verbose "Running $(${MyInvocation}.MyCommand) in Pwsh."
         $UsePWSH = $true
       } else {
-        Send-Message -Error "$Encoding requires at least PowerShell version 6"
+        throw "$Encoding requires at least PowerShell version 6"
       }
     }
   }
@@ -76,13 +76,13 @@ function Convert-FileEncoding {
       Write-Verbose 'Start a new shell: pwsh'
       if ($LineEnding) {
         Invoke-Expression -Command "pwsh {
-          Import-Module `"${PSScriptRoot}\AppVeyorHelpers.psd1`"
+          Import-Module `"${PSScriptRoot}\Convert-FileEncoding.psd1`"
           $(${MyInvocation}.MyCommand) -SourcePath `"$SourcePath`" ```
             -Encoding:$Encoding -LineEnding:$LineEnding
         }"
       } else {
         Invoke-Expression -Command "pwsh {
-          Import-Module `"${PSScriptRoot}\AppVeyorHelpers.psd1`"
+          Import-Module `"${PSScriptRoot}\Convert-FileEncoding.psd1`"
           $(${MyInvocation}.MyCommand) -SourcePath `"$SourcePath`" ```
             -Encoding:$Encoding
         }"

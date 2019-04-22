@@ -1,33 +1,27 @@
 <#
-  Module manifest for the root module manifest 'AppVeyorHelpers'.
-
-  Documentation:
-  https://docs.microsoft.com/powershell/developer/module/how-to-write-a-powershell-module-manifest
+  Module manifest for 'Send-TestResult'.
 #>
 @{
 ##====--------------------------------------------------------------------====##
-RootModule = ''
-ModuleVersion = '0.2'
+RootModule = 'Send-TestResult.psm1'
+ModuleVersion = '0.1'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
 # CompanyName = 'Unknown'
-# Description of the functionality provided by this module
-Description = 'Helper functions for use on the AppVeyor CI platform.
-Messages pushed to the build console and the AppVeyor message API.
-Test results pushed to the AppVeyor build console Test output.
-Code coverage send to codecov.io.'
+Description = 'Upload results from unit-tests to the test console on AppVeyor.'
 # GUID = 'd0a9150d-b6a4-4b17-a325-e3a24fed0aa9'
+# HelpInfoURI = ''
 
 ##====--------------------------------------------------------------------====##
 # Requirements
 
 # Minimum version of the Windows PowerShell engine required by this module
-# PowerShellVersion = ''
+# PowerShellVersion = '5.1'
 # Name of the Windows PowerShell host required by this module
 # PowerShellHostName = ''
 # Minimum version of the Windows PowerShell host required by this module
-# PowerShellHostVersion = '5.1' # Not supported on Appveyor
+# PowerShellHostVersion = ''
 # Minimum version of the .NET Framework required by this module
 # DotNetFrameworkVersion = ''
 # Minimum version of the common language runtime (CLR) required by this module
@@ -51,16 +45,12 @@ Code coverage send to codecov.io.'
 # RequiredAssemblies = @()
 
 # Modules that must be imported into the global environment prior to importing this module
-# RequiredModules = @()
+RequiredModules = @(
+  @{ModuleName="${PSScriptRoot}\Send-Message.psd1"; ModuleVersion='0.1'}
+)
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-NestedModules = @(
-  "${PSScriptRoot}\General\Convert-FileEncoding.psd1",
-  "${PSScriptRoot}\General\Test-Command.psd1",
-  "${PSScriptRoot}\AppVeyorGeneral\Send-Message.psd1",
-  "${PSScriptRoot}\AppVeyorGeneral\Send-TestResult.psd1",
-  "${PSScriptRoot}\Codecov\Codecov.psd1"
-)
+# NestedModules = @()
 
 ##====--------------------------------------------------------------------====##
 # Export configuration
@@ -77,18 +67,18 @@ AliasesToExport = '*'
 # Private data to pass to the module specified in RootModule/ModuleToProcess
 # PrivateData = ''
 
-# HelpInfo URI of this module
-# HelpInfoURI = ''
-
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''
 
-##====--------------------------------------------------------------------====##
+##====--------------------------------------------------------------------====### List of all modules packaged with this module
 # List of all modules packaged with this module
-ModuleList = @()
+ModuleList = @('.\Send-Message.psd1')
 
 # List of all files packaged with this module
 FileList = @(
-  'AppVeyorHelpers.psd1'
+  'Send-TestResult.psd1',
+  'Send-TestResult.psm1',
+  'Send-TestResult.Tests.ps1'
 )
+
 }

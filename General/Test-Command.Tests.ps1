@@ -1,6 +1,9 @@
-Import-Module -Name ${PSScriptRoot}\Test-Command.psm1 -Force
+Import-Module -Name "${PSScriptRoot}\Test-Command.psd1" -Force
 
 Set-StrictMode -Version Latest
+
+##====--------------------------------------------------------------------====##
+$global:msg_documentation = 'at least 1 empty line above documentation'
 
 ##====--------------------------------------------------------------------====##
 Describe 'Test-Command' {
