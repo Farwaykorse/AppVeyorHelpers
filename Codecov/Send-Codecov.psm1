@@ -40,7 +40,6 @@ function Send-Codecov {
   )
   Begin
   {
-    Install-Uploader -Verbose
     $BuildName = Correct-BuildName($BuildName)
     Write-Verbose "BuildName: $BuildName"
     if ($Flag -and ($Flag -cnotmatch '^[a-z0-9_]{1,45}$')) {
@@ -48,6 +47,7 @@ function Send-Codecov {
         "$($MyInvocation.MyCommand): Invalid flag name for codecov.io" `
         -Details $Flag 
     }
+    Install-Uploader -Verbose
   }
   Process
   {

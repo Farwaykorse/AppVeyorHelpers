@@ -167,6 +167,12 @@ Describe 'Internal Send-Report' {
   }
 }
 
+function Require-CodecovInstalled {
+  if (-not $global:CodecovInstalled) {
+    Set-ItResult -Inconclusive -Because 'Install failure codecov uploader.'
+  }
+}
+
 ##====--------------------------------------------------------------------====##
 Describe 'Send-Codecov' {
   It 'has documentation' {
@@ -199,20 +205,24 @@ Describe 'Send-Codecov' {
         Should -Throw 'argument is null or empty'
     }
     It 'throws on invalid pattern (single path)' {
+      Require-CodecovInstalled
       { Send-Codecov -Path 'report.html' -BuildName build 6>$null } |
         Should -Throw 'invalid pattern'
     }
     It 'no throw on invalid pattern (multiple paths)' {
+      Require-CodecovInstalled
       { Send-Codecov -Path @('report.html','ahaXml') -BuildName build 6>$null
       } | Should -Not -Throw
       Send-Codecov -Path @('report.html','ahaXml') -BuildName build 6>&1 |
         Should -Match 'Invalid pattern'
     }
     It 'throws on non-existing file (single path)' {
+      Require-CodecovInstalled
       { Send-Codecov -Path 'report.xml' -BuildName build 6>$null } |
         Should -Throw 'invalid path'
     }
     It 'no throw on non-existing file (multiple paths)' {
+      Require-CodecovInstalled
       { Send-Codecov -Path @('report.xml','report2.xml') -BuildName build `
         6>$null
       } | Should -Not -Throw
@@ -222,6 +232,7 @@ Describe 'Send-Codecov' {
     In TestDrive:\ {
       New-Item -Path . -Name report.xml
       It 'non-existing file (multiple paths)' {
+        Require-CodecovInstalled
         { Send-Codecov -Path @('report.xml','report2.xml') -BuildName build `
           3>$null 6>$null
         } | Should -Not -Throw
@@ -229,6 +240,7 @@ Describe 'Send-Codecov' {
           3>$null 6>&1 | Should -Match 'Invalid path'
       }
       It 'skips on empty file' {
+        Require-CodecovInstalled
         { Send-Codecov -Path 'report.xml' -BuildName build 3>$null } |
           Should -Not -Throw
         Send-Codecov -Path 'report.xml' -BuildName build 3>&1 |
@@ -236,18 +248,22 @@ Describe 'Send-Codecov' {
       }
       'text to fill file' > report.xml
       It 'valid call' {
+        Require-CodecovInstalled
         Send-Codecov -Path 'report.xml' -BuildName build |
           Should -Match '.*[\\/]report\.xml$'
       }
       It 'wild card characters' {
+        Require-CodecovInstalled
         Send-Codecov -Path 'r*.xml' -BuildName build |
           Should -Match '.*[\\/]report\.xml$'
       }
       It 'wild card characters 2' {
+        Require-CodecovInstalled
         Send-Codecov -Path 'r?port.xml' -BuildName build |
           Should -Match '.*[\\/]report\.xml$'
       }
       It 'Path separators' {
+        Require-CodecovInstalled
         Send-Codecov -Path './report.xml' -BuildName build |
           Should -Match '.*[\\/]report\.xml$'
         Send-Codecov -Path '.\report.xml' -BuildName build |
@@ -277,15 +293,19 @@ Describe 'Send-Codecov' {
         Should -Throw 'argument is null or empty'
     }
     It 'valid call' {
+      Require-CodecovInstalled
       Send-Codecov 'TestDrive:\report.xml' -BuildName 'Name Like This 3' |
         Should -MatchExactly 'Name_Like_This_3'
     }
     It 'valid call (with -Flag)' {
+      Require-CodecovInstalled
       Send-Codecov 'TestDrive:\report.xml' -BuildName 'Name Like This 3' `
         -Flag unit_tests_2 | Should -MatchExactly 'Name_Like_This_3'
     }
-    Assert-MockCalled Send-Report -ModuleName Send-Codecov -Exactly 2 `
-      -Scope Context
+    if ($CodecovInstalled) {
+      Assert-MockCalled Send-Report -ModuleName Send-Codecov -Exactly 2 `
+        -Scope Context
+    }
   }
   Context 'Input Validation, Flag' {
     # Suppress output to the Appveyor Message API.
@@ -321,6 +341,7 @@ Describe 'Send-Codecov' {
     Assert-MockCalled Send-Report -ModuleName Send-Codecov -Exactly 0 `
       -Scope Context
     It 'Flag has a maximum length of 45 characters' {
+      Require-CodecovInstalled
       { Send-Codecov 'TestDrive:\report.xml' -BuildName build `
         -Flag 'abcdefghijklmnopqrstuvwxyz0123456789_abcdefgh'
       } | Should -Not -Throw
@@ -331,6 +352,7 @@ Describe 'Send-Codecov' {
         -Scope It
     }
     It 'valid call' {
+      Require-CodecovInstalled
       Send-Codecov 'TestDrive:\report.xml' -BuildName build -Flag unit_tests_2 |
         Should -MatchExactly 'unit_tests_2'
       Assert-MockCalled Send-Report -ModuleName Send-Codecov -Exactly 1 `
@@ -342,14 +364,17 @@ Describe 'Send-Codecov' {
     New-Item -Path TestDrive: -Name report.xml
     'text' > TestDrive:\report.xml
     It 'Path alias: Report' {
+      Require-CodecovInstalled
       Send-Codecov -Report 'TestDrive:\report.xml' -BuildName build |
         Should -Match 'report.xml'
     }
     It 'Path alias: File' {
+      Require-CodecovInstalled
       Send-Codecov -File 'TestDrive:\Report.xml' -BuildName build |
         Should -Match 'report.xml'
     }
     It 'Path alias: FileName' {
+      Require-CodecovInstalled
       Send-Codecov -FileName 'TestDrive:\report.xml' -BuildName build |
         Should -Match 'report.xml'
     }
