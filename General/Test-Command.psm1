@@ -19,6 +19,9 @@ Set-StrictMode -Version Latest
   Test-Command -Command 'PowerShell exit 123'
   False
 .EXAMPLE
+  Test-Command -Command 'PowerShell exit 123' -IgnoreExitCode
+  True
+.EXAMPLE
   Test-Command -Command 'Write-Output "hey"' -cMatch 'HEY'
   False
 .EXAMPLE
@@ -40,15 +43,19 @@ function Test-Command {
   param(
     [Parameter(Position=0,Mandatory)]
     [ValidateNotNullOrEmpty()]
+    # Command to evaluate.
     [String]$Command,
     [Parameter(Position=1,ParameterSetName='imatch',Mandatory)]
     [ValidateNotNullOrEmpty()]
     [Alias('iMatch')]
+    # Return string to match (case insensitive).
     [String]$Match,
     [Parameter(Position=1,ParameterSetName='cmatch',Mandatory)]
     [ValidateNotNullOrEmpty()]
+    # Return string to match (case sensitive).
     [String]$cMatch,
     [Parameter(ParameterSetName='command')]
+    # Evaluate command for thrown exceptions, but ignore non-zero exit-codes.
     [Switch]$IgnoreExitCode
   )
   if ($Match) {
@@ -100,7 +107,9 @@ function Test-ErrorFree {
   trap {
     return $false
   }
-  $err_out = (Invoke-Expression $Command 1>$null 3>$null 4>$null 5>$null 6>$null) 2>&1
+  $err_out = (
+    Invoke-Expression $Command 1>$null 3>$null 4>$null 5>$null 6>$null
+  ) 2>&1
   if ($err_out -or (-not $IgnoreExitCode -and $LASTEXITCODE)) {
     return $false
   } else {
