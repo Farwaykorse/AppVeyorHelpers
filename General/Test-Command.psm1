@@ -5,6 +5,7 @@ Set-StrictMode -Version Latest
 .Synopsis
   Test a command for errors or output.
 .DESCRIPTION
+  Executes any command, but be aware of side effects!
   Mode 1:
   Executes any command and tests for errors or a non-zero exit code.
   Mode 2:
@@ -36,6 +37,12 @@ Set-StrictMode -Version Latest
 .EXAMPLE
   Test-Command 'Write-Error something 2>&1' -cMatch 'thing'
   True
+.OUTPUTS
+  A Boolean value is returned. True when execution succeeds without errors or
+  the output sting matches. 
+  $LASTEXITCODE is always 0 after execution in Mode 1 (non-matching).
+.NOTES
+  Not capable of containing $Hosts.SetShouldExit().
 #>
 function Test-Command {
   [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Low')]
@@ -66,8 +73,8 @@ function Test-Command {
     return Test-ErrorFree $Command -IgnoreExitCode:$IgnoreExitCode
   }
 }
-
 ##====--------------------------------------------------------------------====##
+
 function Match-Output {
   [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Low')]
   param(
@@ -77,22 +84,21 @@ function Match-Output {
     [String]$Match,
     [Switch]$CaseSensitive
   )
-  trap {
-    continue
-  }
-  if ($CaseSensitive) {
-    if ((Invoke-Expression $Command 2>$null 6>&1) -cmatch $Match ) {
-      return $true
+  try {
+    if ($CaseSensitive) {
+      if ((Invoke-Expression $Command 2>$null 6>&1) -cmatch $Match ) {
+        return $true
+      }
+    } else {
+      if ((Invoke-Expression $Command 2>$null 6>&1) -imatch $Match ) {
+        return $true
+      }
     }
-  } else {
-    if ((Invoke-Expression $Command 2>$null 6>&1) -imatch $Match ) {
-      return $true
-    }
-  }
+  } catch {}
   return $false
 }
-
 ##====--------------------------------------------------------------------====##
+
 # check if command executes without error
 function Test-ErrorFree {
   [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Low')]
@@ -101,21 +107,30 @@ function Test-ErrorFree {
     [String]$Command,
     [Switch]$IgnoreExitCode
   )
-  if (-not $IgnoreExitCode -and $LASTEXITCODE) {
-    $LASTEXITCODE = 0 # Hiding global exit code!
+  Begin
+  {
+    $global:LASTEXITCODE = 0 # Hiding global exit code!
   }
-  trap {
-    return $false
+  Process
+  {
+    try {
+      $err_out = (
+        Invoke-Expression $Command 1>$null 3>$null 4>$null 5>$null 6>$null
+      ) 2>&1
+    } catch {
+      return $false
+    }
+    if (!$? -or $err_out -or (-not $IgnoreExitCode -and $LASTEXITCODE)) {
+      return $false
+    } else {
+      return $true
+    }
   }
-  $err_out = (
-    Invoke-Expression $Command 1>$null 3>$null 4>$null 5>$null 6>$null
-  ) 2>&1
-  if ($err_out -or (-not $IgnoreExitCode -and $LASTEXITCODE)) {
-    return $false
-  } else {
-    return $true
+  End
+  {
+    $global:LASTEXITCODE = 0
   }
 }
-
 ##====--------------------------------------------------------------------====##
+
 Export-ModuleMember -Function Test-Command

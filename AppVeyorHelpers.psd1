@@ -7,17 +7,18 @@
 @{
 ##====--------------------------------------------------------------------====##
 RootModule = ''
-ModuleVersion = '0.3'
+ModuleVersion = '0.4'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
 # CompanyName = 'Unknown'
-# Description of the functionality provided by this module
 Description = 'Helper functions for use on the AppVeyor CI platform.
 Messages pushed to the build console and the AppVeyor message API.
 Test results pushed to the AppVeyor build console Test output.
 Code coverage send to codecov.io.'
 # GUID = 'd0a9150d-b6a4-4b17-a325-e3a24fed0aa9'
+# HelpInfo URI of this module
+# HelpInfoURI = ''
 
 ##====--------------------------------------------------------------------====##
 # Requirements
@@ -40,19 +41,14 @@ Code coverage send to codecov.io.'
 
 # Script files (.ps1) that are run in the caller's environment prior to importing this module
 # ScriptsToProcess = @()
-
 # Type files (.ps1xml) to be loaded when importing this module
 # TypesToProcess = @()
-
 # Format files (.ps1xml) to be loaded when importing this module
 # FormatsToProcess = @()
-
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
-
 # Modules that must be imported into the global environment prior to importing this module
 # RequiredModules = @()
-
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 NestedModules = @(
   "${PSScriptRoot}\General\Convert-FileEncoding.psd1",
@@ -77,9 +73,6 @@ AliasesToExport = '*'
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
 # PrivateData = ''
-
-# HelpInfo URI of this module
-# HelpInfoURI = ''
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''

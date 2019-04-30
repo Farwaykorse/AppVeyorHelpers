@@ -4,7 +4,7 @@
 @{
 ##====--------------------------------------------------------------------====##
 RootModule = 'Test-Command.psm1'
-ModuleVersion = '0.1'
+ModuleVersion = '0.2'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
@@ -17,7 +17,7 @@ Description = ''
 # Requirements
 
 # Minimum version of the Windows PowerShell engine required by this module
-# PowerShellVersion = '5.1'
+PowerShellVersion = '5.1'
 # Name of the Windows PowerShell host required by this module
 # PowerShellHostName = ''
 # Minimum version of the Windows PowerShell host required by this module
@@ -32,22 +32,16 @@ Description = ''
 ##====--------------------------------------------------------------------====##
 # Import configuration
 
-
 # Script files (.ps1) that are run in the caller's environment prior to importing this module
 # ScriptsToProcess = @()
-
 # Type files (.ps1xml) to be loaded when importing this module
 # TypesToProcess = @()
-
 # Format files (.ps1xml) to be loaded when importing this module
 # FormatsToProcess = @()
-
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
-
 # Modules that must be imported into the global environment prior to importing this module
 # RequiredModules = @()
-
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 # NestedModules = @()
 

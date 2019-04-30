@@ -15,15 +15,13 @@ Describe 'Test-Command' {
     Get-Command -Name Test-Command -Syntax |
       Should -Match '-Whatif.*-Confirm'
   }
+
   Context 'Test-ErrorFree' {
     It 'Write-Host' {
       Test-Command -Command 'Write-Host "text"' | Should -BeTrue
     }
     It 'XXX_non-existing' {
       Test-Command -Command 'XXX_non-existing' | Should -BeFalse
-    }
-    It 'Should not leak throw' {
-      { Test-Command 'echo "error"' } | Should -Not -Throw
     }
     It 'Should not leak throw' {
       { Test-Command 'Throw "error"' } | Should -Not -Throw
@@ -38,6 +36,7 @@ Describe 'Test-Command' {
       Test-Command 'Write-Error text' | Should -BeFalse
     }
   }
+
   Context 'Match-Output' {
     It 'Write-Output, success stream (1)' {
       Test-Command -Command 'Write-Output something' -Match 'something' |
@@ -100,7 +99,15 @@ Describe 'Test-Command' {
       Test-Command 'Write-Error something' -cMatch 'thing' | Should -BeFalse
       Test-Command 'Write-Error something 2>&1' -cMatch 'thing' | Should -BeTrue
     }
+    It 'Should not leak throw' {
+      { Test-Command 'throw "txt"' -cMatch 'txt' } | Should -Not -Throw
+    }
+    It 'matching a throw' {
+      Test-Command -Command 'throw "error text"' -Match 'error text' |
+        Should -Be $false
+    }
   }
+
   Context 'Input Errors' {
     It 'should fail on empty command expression' {
       { Test-Command -Command '' } | Should -Throw
@@ -131,21 +138,50 @@ Describe 'Test-Command' {
 
 ##====--------------------------------------------------------------------====##
 Describe 'Test-Command Expensive' -Tag 'Expensive' {
-  Context 'Test-ErrorFree' {
+  Context 'exit code' {
     if ($PSVersionTable.PSVersion.Major -lt 6) {
       $shell = 'PowerShell'
     } else {
       $shell = 'pwsh'
     }
+
     It 'exit code 0' {
       Test-Command -Command "$shell { exit 0 }" | Should -BeTrue
     }
     It 'exit code 1' {
       Test-Command -Command "$shell { exit 1 }" | Should -BeFalse
     }
+    It 'exit code should not leak' {
+      $LASTEXITCODE | Should -Be 0
+      $global:LASTEXITCODE | Should -Be 0
+    }
+    $LASTEXITCODE = 1
+    It 'exit code 0, ignore previous' {
+      Test-Command -Command "$shell { exit 0 }" | Should -BeTrue
+    }
+    $LASTEXITCODE = 0
+    It 'exit code 1, ignore previous' {
+      Test-Command -Command "$shell { exit 1 }" | Should -BeFalse
+    }
     It 'ignore exit code' {
       Test-Command -Command "$shell { exit 1 }" -IgnoreExitCode |
         Should -BeTrue
     }
+  }
+}
+
+##====--------------------------------------------------------------------====##
+Describe 'Test-Command programs on the search path' {
+  It 'curl.exe' {
+    # Sets error code and writes to the error stream.
+    Test-Command 'curl.exe --version' | Should -Be $true
+    Test-Command 'curl.exe' | Should -Be $false
+    Test-Command 'curl.exe' -IgnoreExitCode | Should -Be $false
+    Test-Command 'curl.exe 2>$null' | Should -Be $false
+    Test-Command 'curl.exe 2>$null' -IgnoreExitCode | Should -Be $true
+  }
+  It '7z' {
+    Test-Command '7z' | Should -Be $true
+    Test-Command '7z' -IgnoreExitCode | Should -Be $true
   }
 }
