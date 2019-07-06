@@ -31,9 +31,8 @@ Import-Module "${PSScriptRoot}\AppVeyorHelpers.psd1" -Force
 # Pester Configuration
 ##====--------------------------------------------------------------------====##
 # Specifies the test files run by Pester.
-# Here: Only run dedicated test-files in directory alongside this script.
-[Object[]]$Script = "${PSScriptRoot}\*.Tests.ps1",
-                    "${PSScriptRoot}\*\*.Tests.ps1"
+# Here: Only run dedicated test-files in subdirectories relative to this script.
+[Object[]]$Script = "${PSScriptRoot}\*\*.Tests.ps1"
 # Runs only tests in Describe blocks named to match this pattern.
 [String[]]$TestName = @('*')
 [String[]]$Tag = ''
@@ -44,8 +43,8 @@ Import-Module "${PSScriptRoot}\AppVeyorHelpers.psd1" -Force
 [String]$OutputFormatUpload = 'NUnit'
 
 [Object[]]$CodeCoverage = @(
-  @{Path="${PSScriptRoot}\*.ps?1"; IncludeTests=$false},
-  @{Path="${PSScriptRoot}\*\*.ps?1"; IncludeTests=$false}
+  @{Path="${PSScriptRoot}\*\*.ps1"; IncludeTests=$false},
+  @{Path="${PSScriptRoot}\*\*.psm1"; IncludeTests=$false}
 )
 [String]$CodeCoverageOutputFile = 'ScriptCodeCoverage.xml'
 [String]$CodeCoverageOutputFileFormat = 'JaCoCo'
