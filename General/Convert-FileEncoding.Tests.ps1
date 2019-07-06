@@ -5,6 +5,19 @@ Set-StrictMode -Version Latest
 ##====--------------------------------------------------------------------====##
 $global:msg_documentation = 'at least 1 empty line above documentation'
 
+$PWSH_Avaiable = $false
+if ( $PSVersionTable.PSVersion.Major -lt 6 ) {
+  if ( Test-Command 'pwsh { exit 0 }' ) {
+    $PWSH_Avaiable = $true
+  }
+}
+function Test-RequirePSCore {
+  if (-not $PWSH_Avaiable ) {
+    Set-ItResult -Inconclusive -Because (
+      'This test requires PowerShell version 6+ to be available on the system.')
+  }
+}
+
 ##====--------------------------------------------------------------------====##
 Describe 'Internal Get-EndOfLineCount' {
   InModuleScope Convert-FileEncoding {
@@ -548,13 +561,13 @@ Describe 'Convert-FileEncoding' {
       'TestDrive:\utf8.txt' |
         Should -FileContentMatchExactly 'some text with Unicode ʩ'
     }
-    if ($PSVersionTable.PSVersion.Major -lt 6) {
+    if ($PSVersionTable.PSVersion.Major -lt 6 -and $PWSH_Avaiable) {
       # Pester does not behave well here.
       # Call Convert-FileEncoding in different scope.
       $tmp_drive = (Resolve-Path TestDrive:\).ProviderPath
       Invoke-BackgroundPwsh "$tmp_drive\utf8BOM.txt" UTF8BOM
       Invoke-BackgroundPwsh "$tmp_drive\utf8NoBOM.txt" UTF8NoBOM
-    } else {
+    } elseif ($PWSH_Avaiable) {
       Convert-FileEncoding -Path 'TestDrive:\utf8BOM.txt' -Encoding UTF8BOM
       Convert-FileEncoding -Path 'TestDrive:\utf8NoBOM.txt' -Encoding UTF8NoBOM
     }
@@ -575,6 +588,7 @@ Describe 'Convert-FileEncoding' {
         Should -FileContentMatchExactly 'some text with Unicode ʩ'
     }
     It 'with and without BOM are not equal (with PS v5.1)' {
+      Test-RequirePSCore
       if ($PSVersionTable.PSVersion.Major -ge 6) {
         Set-ItResult -Skipped -Because 'PS v6+ seems to hide the BOM'
       }
@@ -582,6 +596,7 @@ Describe 'Convert-FileEncoding' {
         Should -Not -Be $(Get-Content -Path 'TestDrive:\utf8BOM.txt' -Raw)
     }
     It 'with and without BOM should match after removing BOM' {
+      Test-RequirePSCore
       if ($PSVersionTable.PSVersion.Major -lt 6) {
         Invoke-BackgroundPwsh "$tmp_drive\utf8BOM.txt" UTF8NoBOM
       } else {
@@ -612,6 +627,7 @@ Describe 'Convert-FileEncoding' {
         -FileContentMatchMultiLine '^\nSome text\r\rWith\nMultiple lines\r\n'
     }
     It 'files should be equally converted' {
+      Test-RequirePSCore
       if ($PSVersionTable.PSVersion.Major -lt 6) {
         Invoke-BackgroundPwsh "$tmp_drive\base.txt" 6>$null
         Invoke-BackgroundPwsh "$tmp_drive\file1.txt" 6>$null
@@ -631,6 +647,7 @@ Describe 'Convert-FileEncoding' {
         -FileContentMatchMultiLine '^\nSome text\r\rWith\nMultiple lines\r\n'
     }
     It 'after setting Unix line-endings' {
+      Test-RequirePSCore
       if ($PSVersionTable.PSVersion.Major -lt 6) {
         Invoke-BackgroundPwsh -Path "$tmp_drive\file1.txt" -LineEnding Unix `
           6>$null
@@ -642,10 +659,12 @@ Describe 'Convert-FileEncoding' {
         Should -Not -Be $(Get-Content -Path 'TestDrive:\base.txt' -Raw)
     }
     It 'match after changing to Unix' {
+      Test-RequirePSCore
       'TestDrive:\file1.txt' | Should `
         -FileContentMatchMultiLine '^\nSome text\n\nWith\nMultiple lines\n'
     }
     It 'after setting LF line-endings' {
+      Test-RequirePSCore
       if ($PSVersionTable.PSVersion.Major -lt 6) {
         Invoke-BackgroundPwsh -Path "$tmp_drive\file2.txt" -LineEnding LF `
           6>$null
@@ -659,6 +678,7 @@ Describe 'Convert-FileEncoding' {
         Should -Be $(Get-Content -Path 'TestDrive:\file1.txt' -Raw)
     }
     It 'after setting Windows line-endings' {
+      Test-RequirePSCore
       if ($PSVersionTable.PSVersion.Major -lt 6) {
         Invoke-BackgroundPwsh -Path "$tmp_drive\file1.txt" -LineEnding Windows
       } else {
@@ -671,10 +691,12 @@ Describe 'Convert-FileEncoding' {
           -Because 'it is uses Unix line-endings'
     }
     It 'match after changing to Windows' {
+      Test-RequirePSCore
       'TestDrive:\file1.txt' | Should -FileContentMatchMultiLine `
         '^\r\nSome text\r\n\r\nWith\r\nMultiple lines\r\n'
     }
     It 'after setting CRLF line-endings' {
+      Test-RequirePSCore
       if ($PSVersionTable.PSVersion.Major -lt 6) {
         Invoke-BackgroundPwsh -Path "$tmp_drive\file2.txt" -LineEnding CRLF
       } else {
@@ -686,6 +708,7 @@ Describe 'Convert-FileEncoding' {
         Should -Be $(Get-Content -Path 'TestDrive:\file1.txt' -Raw)
     }
     It 'after setting CR line-endings' {
+      Test-RequirePSCore
       if ($PSVersionTable.PSVersion.Major -lt 6) {
         Invoke-BackgroundPwsh -Path "$tmp_drive\file1.txt" -LineEnding CR
       } else {
@@ -698,6 +721,7 @@ Describe 'Convert-FileEncoding' {
           -Because 'it uses Windows line-endings'
     }
     It 'match after changing to CR' {
+      Test-RequirePSCore
       'TestDrive:\file1.txt' | Should `
         -FileContentMatchMultiLine '^\rSome text\r\rWith\rMultiple lines\r'
     }
