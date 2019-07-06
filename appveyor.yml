@@ -19,6 +19,9 @@ configuration:
 - PowerShell_Core
 
 matrix:
+  exclude:
+  - configuration: PowerShell_Core
+    image: Visual Studio 2013
   allow_failures:
   - configuration: PowerShell_Core
 
@@ -57,7 +60,21 @@ for:
       if ($BuildName -ne 'placeholder') {
         Send-Message -Error 'BuildName escaped RunTests.ps1' -Details $BuildName
       }
-
+-
+  matrix:
+    only:
+    - image: Visual Studio 2013
+  init:
+  - ps: |
+      Write-Output ('-- CI Session Configuration --' + "`n" + 'OS / platform: '+
+        $((Get-WmiObject Win32_OperatingSystem).Name -split "[|]" |
+          Select-Object -First 1) + ' / ' +
+        $((Get-WmiObject Win32_OperatingSystem).OSArchitecture) + "`n" +
+        'Image:         ' + $env:APPVEYOR_BUILD_WORKER_IMAGE + "`n" +
+        'Configuration: ' + $env:CONFIGURATION
+      )
+      Write-Output ('PowerShell v' + $PSVersionTable.PSVersion.ToString())
+      Write-Output ('Initial path: ' + $pwd.Path)
 
 ##====--------------------------------------------------------------------====##
 # Common Scripts
