@@ -98,7 +98,9 @@ function Install-Ninja {
       }
     }
 
-    Invoke-7z $Archive $Path
+    if ($PSCmdlet.ShouldProcess($Archive, ('deflate in: ' + $Path)) ) {
+      Expand-Archive $Archive $Path -FlatPath
+    }
   }
   End
   {
@@ -136,17 +138,6 @@ function Install-Ninja {
   }
 } #/ function Install-Ninja
 ##====--------------------------------------------------------------------====##
-
-function Invoke-7z {
-  [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Low')]
-  param(
-    $Archive,
-    $TargetDir
-  )
-  if ($PSCmdlet.ShouldProcess($Archive, ('extract to: ' + $TargetDir)) ) {
-    7z e -y -bso0 "$Archive" -o"$TargetDir"
-  }
-}
 
 function Remove-Temporary {
   param(

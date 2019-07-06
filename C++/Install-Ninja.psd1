@@ -6,7 +6,7 @@
 #>
 @{
 RootModule = 'Install-Ninja.psm1'
-ModuleVersion = '0.1'
+ModuleVersion = '0.2'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
@@ -19,7 +19,7 @@ Description = ''
 # Requirements
 
 # Minimum version of the Windows PowerShell engine required by this module
-# PowerShellVersion = ''
+PowerShellVersion = '5.1'
 # Name of the Windows PowerShell host required by this module
 # PowerShellHostName = ''
 # Minimum version of the Windows PowerShell host required by this module
@@ -49,6 +49,7 @@ Description = ''
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @(
   @{ModuleName="${PSScriptRoot}\..\General\Test-Command.psd1"; ModuleVersion='0.1'},
+  @{ModuleName="${PSScriptRoot}\..\General\Expand-Archive.psd1"; ModuleVersion='0.1'},
   @{ModuleName="${PSScriptRoot}\..\General\Invoke-Curl.psd1"; ModuleVersion='0.1'},
   @{ModuleName="${PSScriptRoot}\..\AppVeyorGeneral\Send-Message.psd1"; ModuleVersion='0.1'}
 )

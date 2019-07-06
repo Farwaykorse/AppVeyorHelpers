@@ -190,7 +190,7 @@ Describe 'Install-Ninja' {
     New-Item $Path -ItemType Directory -Force
     New-Item $Path -Name 'ninja.exe' -Force
     Mock Invoke-Curl -ModuleName Install-Ninja
-    Mock Invoke-7z -ModuleName Install-Ninja
+    Mock Expand-Archive -ModuleName Install-Ninja
 
     It 'skip download and extraction' {
       { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\' `
@@ -198,7 +198,8 @@ Describe 'Install-Ninja' {
       } | Should -not -Throw
       Assert-MockCalled Invoke-Curl -ModuleName Install-Ninja -Times 0 `
         -Exactly
-      Assert-MockCalled Invoke-7z -ModuleName Install-Ninja -Times 0 -Exactly
+      Assert-MockCalled Expand-Archive -ModuleName Install-Ninja -Times 0 `
+        -Exactly
     }
     It 'removed archive after install' {
       Test-Path $Temporary -PathType Container | Should -Be $false
@@ -211,8 +212,8 @@ Describe 'Install-Ninja' {
         Should -Match 'Skip download and extraction'
       Assert-MockCalled Invoke-Curl -ModuleName Install-Ninja -Times 0 `
         -Exactly -Scope It
-      Assert-MockCalled Invoke-7z -ModuleName Install-Ninja -Times 0 -Exactly `
-        -Scope It
+      Assert-MockCalled Expand-Archive -ModuleName Install-Ninja -Times 0 `
+        -Exactly -Scope It
     }
     It 'WhatIf' {
       { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\' -WhatIf `
@@ -220,8 +221,8 @@ Describe 'Install-Ninja' {
       } | Should -not -Throw
       Assert-MockCalled Invoke-Curl -ModuleName Install-Ninja -Times 0 `
         -Exactly -Scope It
-      Assert-MockCalled Invoke-7z -ModuleName Install-Ninja -Times 0 -Exactly `
-        -Scope It
+      Assert-MockCalled Expand-Archive -ModuleName Install-Ninja -Times 0 `
+        -Exactly -Scope It
     }
   }
 
@@ -229,7 +230,7 @@ Describe 'Install-Ninja' {
     $Temporary = Join-Path $env:TEMP 'ninja-v1.8.2'
     New-Item -Path $Temporary -Name 'ninja-win.zip' -Force 1>$null
     Mock Invoke-Curl -ModuleName Install-Ninja
-    Mock Invoke-7z {
+    Mock Expand-Archive {
       New-Item 'TestDrive:\ninja-v1.8.2' -ItemType Directory -Force
       New-Item 'TestDrive:\ninja-v1.8.2\ninja.exe' -Force
     } -ModuleName Install-Ninja
@@ -240,7 +241,8 @@ Describe 'Install-Ninja' {
       } | Should -not -Throw
       Assert-MockCalled Invoke-Curl -ModuleName Install-Ninja -Times 0 `
         -Exactly
-      Assert-MockCalled Invoke-7z -ModuleName Install-Ninja -Times 1 -Exactly
+      Assert-MockCalled Expand-Archive -ModuleName Install-Ninja -Times 1 `
+        -Exactly
     }
     It 'removed archive after install' {
       Test-Path $Temporary -PathType Container | Should -Be $false
@@ -267,7 +269,7 @@ Describe 'Install-Ninja' {
     Mock Invoke-Curl {
       New-Item -Path $Temporary -Name 'ninja-win.zip' -Force 1>$null
     } -ModuleName Install-Ninja
-    Mock Invoke-7z -ModuleName Install-Ninja
+    Mock Expand-Archive -ModuleName Install-Ninja
 
     It 'start: no archive present' {
       Test-Path -LiteralPath "$(Join-Path $Temporary 'ninja-win.zip')" |
@@ -286,7 +288,7 @@ Describe 'Install-Ninja' {
       } | Should -Throw 'Failed to find ninja.exe in expected location.'
     }
     Assert-MockCalled Invoke-Curl -ModuleName Install-Ninja
-    Assert-MockCalled Invoke-7z -ModuleName Install-Ninja
+    Assert-MockCalled Expand-Archive -ModuleName Install-Ninja
     It 'throw final check (SHA512)' {
       { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\dir' `
         -SHA512 CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E `
@@ -301,7 +303,7 @@ Describe 'Install-Ninja' {
     }
 
     Context 'mock download and extraction' {
-      Mock Invoke-7z {
+      Mock Expand-Archive {
         $installpath = 'TestDrive:\dir\ninja-v1.8.2'
         New-Item $installpath -ItemType Directory -Force 1>$null
         New-Item (Join-Path $installpath 'ninja.exe') -Force 1>$null
