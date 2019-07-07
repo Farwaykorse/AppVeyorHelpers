@@ -9,6 +9,42 @@ Set-StrictMode -Version Latest
   By version tag as published to GitHub.
 .EXAMPLE
   Install-Ninja v1.8.2 -SHA512 9B9CE248240665FCD6404B989F3B3C27ED9682838225E6DC9B67B551774F251E4FF8A207504F941E7C811E7A8BE1945E7BCB94472A335EF15E23A0200A32E6D5
+  -- Install Ninja-build v1.8.2 ...
+  -- Install Ninja-build v1.8.2 ... done
+
+  Download Ninja-build and install to `.\ninja-v1.8.2\`.
+.EXAMPLE
+  Install-Ninja -Tag v1.8.2 -SHA512 $SHA_hash -AddToPath
+  -- Install Ninja-build v1.8.2 ...
+  -- Install Ninja-build v1.8.2 ... done
+
+  [Preferred usage]
+  Add the ninja to the front of `$env:PATH`. To allow execution with: `ninja`.
+.EXAMPLE
+  $NinjaExe = Install-Ninja -Tag v1.8.2 -SHA512 $SHA_hash -AddToPath
+
+  Save the path to `ninja.exe` in a variable.
+.EXAMPLE
+  Install-Ninja v1.8.2 -SHA512 $SHA_hash -InstallDir ~\tools\ninja
+  -- Install Ninja-build v1.8.2 ...
+  -- Install Ninja-build v1.8.2 ... done
+
+  Download Ninja-build and install to `~\tools\ninja\ninja-v1.8.2\`.
+  The given directory needs to exist.
+.EXAMPLE
+  Install-Ninja -Tag v1.8.2
+  -- Install Ninja-build v1.8.2 ...
+  WARNING: Install-Ninja: No hash given.
+  -- Install Ninja-build v1.8.2 ... done
+.EXAMPLE
+  Install-Ninja -Tag v1.8.2 -Quiet
+  WARNING: Install-Ninja: No hash given.
+.EXAMPLE
+  Install-Ninja -Tag v1.8.2 -SHA512 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  -- Install Ninja-build v1.8.2 ...
+  ERROR: Install-Ninja: download hash changed!
+  Expected: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  Actual:   9B9CE248240665FCD6404B989F3B3C27ED9682838225E6DC9B67B551774F251E4FF8A207504F941E7C811E7A8BE1945E7BCB94472A335EF15E23A0200A32E6D5
 #>
 function Install-Ninja {
   [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Low')]
@@ -33,7 +69,7 @@ function Install-Ninja {
     [String]$SHA256,
     [ValidateScript({ Test-Path -LiteralPath "$_" -PathType Container })]
     [ValidateNotNullOrEmpty()]
-    # Where to install to (defaults to the current directory).
+    # An existing directory to install to (defaults to the current directory).
     [String]$InstallDir = $pwd,
     # Add this ninja version to the begin of the current search path.
     [Switch]$AddToPath,
