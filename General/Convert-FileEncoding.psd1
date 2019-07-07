@@ -17,7 +17,7 @@ Description = ''
 # Requirements
 
 # Minimum version of the Windows PowerShell engine required by this module
-# PowerShellVersion = '5.1'
+PowerShellVersion = '5.1'
 # Name of the Windows PowerShell host required by this module
 # PowerShellHostName = ''
 # Minimum version of the Windows PowerShell host required by this module
@@ -33,7 +33,7 @@ Description = ''
 # Import configuration
 
 # Script files (.ps1) that are run in the caller's environment prior to importing this module
-# ScriptsToProcess = @()
+ScriptsToProcess = @("${PSScriptRoot}\Convert-FileEncoding.SystemCheck.ps1")
 
 # Type files (.ps1xml) to be loaded when importing this module
 # TypesToProcess = @()
@@ -78,7 +78,8 @@ ModuleList = @()
 FileList = @(
   'Convert-FileEncoding.psd1',
   'Convert-FileEncoding.psm1',
-  'Convert-FileEncoding.Tests.ps1'
+  'Convert-FileEncoding.Tests.ps1',
+  'Convert-FileEncoding.SystemCheck.ps1'
 )
 
 }
