@@ -7,23 +7,6 @@ $global:msg_documentation = 'at least 1 empty line above documentation'
 $global:msg_interactive = 'executed in interactive PowerShell session'
 
 ##====--------------------------------------------------------------------====##
-Describe 'Internal Assert-CI' {
-  InModuleScope Send-Message {
-    It 'has documentation' {
-      Get-Help Assert-CI | Out-String | Should -MatchExactly 'SYNOPSIS' `
-        -Because $msg_documentation
-    }
-    It 'checks if on a CI platform' {
-      if ($env:APPVEYOR -or $env:CI) {
-        Assert-CI | Should -Be $true
-      } else {
-        Assert-CI | Should -Be $false
-      }
-    }
-  }
-}
-
-##====--------------------------------------------------------------------====##
 Describe 'Send-Message' {
   It 'has documentation' {
     Get-Help Send-Message | Out-String |
