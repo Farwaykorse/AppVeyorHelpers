@@ -18,6 +18,8 @@ configuration:
 - PowerShell
 - PowerShell_Core
 
+platform: Any CPU
+
 matrix:
   exclude:
   - configuration: PowerShell_Core
@@ -28,13 +30,13 @@ for:
   matrix:
     only:
     - configuration: PowerShell
-  init:
-  - ps: Show-SystemInfo -PowerShell
-  - cd %APPVEYOR_BUILD_FOLDER%
   install:
   - ps: Import-Module -Name .\AppVeyorHelpers.psd1
+  - ps: Show-SystemInfo -PowerShell
   - ps: Install-Module Pester -Force
   - ps: Get-Module Pester -ListAvailable
+  before_build:
+  - cd %APPVEYOR_BUILD_FOLDER%
   build_script:
   - ps: $BuildName = 'placeholder'
   - ps: .\RunTests.ps1 -Coverage
@@ -48,12 +50,14 @@ for:
   matrix:
     only:
     - configuration: PowerShell_Core
-  init:
-  - pwsh: Show-SystemInfo -PowerShell
-  - cd %APPVEYOR_BUILD_FOLDER%
   install:
+  - pwsh: |
+      Import-Module -Name .\AppVeyorHelpers.psd1
+      Show-SystemInfo -PowerShell
   - pwsh: Install-Module Pester -Force
   - pwsh: Get-Module Pester -ListAvailable
+  before_build:
+  - cd %APPVEYOR_BUILD_FOLDER%
   build_script:
   - pwsh: $BuildName = 'placeholder'
   - pwsh: .\RunTests.ps1 -Coverage
