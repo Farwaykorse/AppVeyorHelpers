@@ -87,7 +87,7 @@ Describe 'Internal Join-Info' {
 Describe 'Internal Show-<software>Version' {
   InModuleScope Show-SystemInfo {
     Context 'CMake' {
-      if (Test-Command 'cmake --version') { $available = $true }
+      $available = $(Test-Command 'cmake --version')
       It 'no throw' {
           { Show-CMakeVersion } | Should -not -Throw
       }
@@ -99,7 +99,7 @@ Describe 'Internal Show-<software>Version' {
       }
     }
     Context '7-zip' {
-      if (Test-Command '7z') { $available = $true }
+      $available = $(Test-Command '7z')
       It 'no throw' {
           { Show-7zipVersion } | Should -not -Throw
       }
@@ -111,7 +111,7 @@ Describe 'Internal Show-<software>Version' {
       }
     }
     Context 'Python' {
-      if (Test-Command 'python --version') { $available = $true }
+      $available = $(Test-Command 'python --version')
       It 'no throw' {
           { Show-PythonVersion } | Should -not -Throw
       }
@@ -123,7 +123,7 @@ Describe 'Internal Show-<software>Version' {
       }
     }
     Context 'LLVM/clang' {
-      if (Test-Command 'clang-cl --version') { $available = $true }
+      $available = $(Test-Command 'clang-cl --version')
       It 'no throw' {
           { Show-LLVMVersion } | Should -not -Throw
       }
