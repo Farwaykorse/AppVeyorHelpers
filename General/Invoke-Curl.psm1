@@ -91,7 +91,7 @@ function Invoke-Curl {
   }
   Process
   {
-    if ($PSCmdlet.ShouldProcess($URL, ('download to: ' + $OutPath)) ) {
+    if ($PSCmdlet.ShouldProcess($OutPath, ('download from: ' + $URL)) ) {
       $(Invoke-Expression -Command $command) 2>&1
     }
   }
