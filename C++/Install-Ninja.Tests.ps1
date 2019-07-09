@@ -43,44 +43,34 @@ Describe 'Install-Ninja' {
     It 'throws on $null -Tag' {
       { Install-Ninja -Tag $null } | Should -Throw 'argument is null or empty'
     }
-    It 'throws on empty -SHA512' {
-      { Install-Ninja -Tag 'v1.8.2' -SHA512 } |
+    It 'throws on empty -Hash' {
+      { Install-Ninja -Tag 'v1.8.2' -Hash } |
         Should -Throw 'missing an argument'
-    }
-    It 'throws on empty string -SHA512' {
-      { Install-Ninja -Tag 'v1.8.2' -SHA512 '' } |
-        Should -Throw 'argument is null or empty'
-    }
-    It 'throws on $null -SHA512' {
-      { Install-Ninja -Tag 'v1.8.2' -SHA512 $null } |
-        Should -Throw 'argument is null or empty'
-    }
-    It 'throws when -SHA512 length is not 128 characters' {
-      { Install-Ninja -Tag 'v1.8.2' -SHA512 '123456789' } |
-        Should -Throw 'character length'
-    }
-    It 'throws on empty -SHA256' {
       { Install-Ninja -Tag 'v1.8.2' -SHA256 } |
-        Should -Throw 'missing an argument'
+        Should -Throw 'missing an argument' `
+        -Because '-SHA256 is an alias of -Hash'
+      { Install-Ninja -Tag 'v1.8.2' -SHA512 } |
+        Should -Throw 'missing an argument' `
+        -Because '-SHA512 is an alias of -Hash'
     }
-    It 'throws on empty string -SHA256' {
-      { Install-Ninja -Tag 'v1.8.2' -SHA256 '' } |
+    It 'throws on empty string -Hash' {
+      { Install-Ninja -Tag 'v1.8.2' -Hash '' } |
         Should -Throw 'argument is null or empty'
     }
-    It 'throws on $null -SHA256' {
-      { Install-Ninja -Tag 'v1.8.2' -SHA256 $null } |
+    It 'throws on $null -Hash' {
+      { Install-Ninja -Tag 'v1.8.2' -Hash $null } |
         Should -Throw 'argument is null or empty'
     }
-    It 'throws when -SHA256 length is not 64 characters' {
-      { Install-Ninja -Tag 'v1.8.2' -SHA256 '123456789' } |
-        Should -Throw 'character length'
+    It 'throws when -Hash length is not 36, 40, 64, 96 or 128 characters' {
+      { Install-Ninja -Tag 'v1.8.2' -SHA512 '123456789' 1>$null 6>$null } |
+        Should -Throw 'Unsupported hash type'
     }
     It 'throws on use of both -SHA512 and -SHA256' {
       { Install-Ninja -Tag 'v1.8.2' -SHA256 `
         'EE94E44F83E04C32D7F301155708B0D513AA783AC8C0C953DC0C70EC3334FED1' `
         -SHA512 `
         '0000E248240665FCD6404B989F3B3C27ED9682838225E6DC9B67B551774F251E4FF8A207504F941E7C811E7A8BE1945E7BCB94472A335EF15E23A0200A32E6D5'
-      } | Should -Throw 'Parameter set cannot be resolved'
+      } | Should -Throw 'specified more than once'
     }
     It 'throws on empty -InstallDir' {
       { Install-Ninja -Tag 'v1.8.2' -InstallDir } |
@@ -250,15 +240,34 @@ Describe 'Install-Ninja' {
     It 'use existing archive (SHA512)' {
       New-Item -Path $Temporary -Name 'ninja-win.zip' -Force 1>$null
       { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\' `
-        -SHA512 CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E `
+        -Hash CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E `
         6>$null
       } | Should -not -Throw
     }
     It 'use existing archive (SHA256)' {
       New-Item -Path $Temporary -Name 'ninja-win.zip' -Force 1>$null
       { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\' `
-        -SHA256 E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855 `
+        -Hash E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855 `
         6>$null
+      } | Should -not -Throw
+    }
+    It 'use existing archive (SHA384)' {
+      New-Item -Path $Temporary -Name 'ninja-win.zip' -Force 1>$null
+      { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\' `
+        -Hash 72B9E9D279B86EFAE28CF0B960157179BB9A2F641842797F8DB468909B03186C542446BAF7414ACCEA367E6A233E7FFF `
+        6>$null
+      } | Should -not -Throw
+    }
+    It 'use existing archive (SHA1)' {
+      New-Item -Path $Temporary -Name 'ninja-win.zip' -Force 1>$null
+      { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\' `
+        -Hash C68F192E85A12927443BBF535D27B4AA830E7B32 6>$null
+      } | Should -not -Throw
+    }
+    It 'use existing archive (MD5)' {
+      New-Item -Path $Temporary -Name 'ninja-win.zip' -Force 1>$null
+      { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\' `
+        -Hash 14764496D99BB5EA99E761DAB9A38BC4 6>$null
       } | Should -not -Throw
     }
   }
