@@ -6,7 +6,7 @@
 #>
 @{
 RootModule = 'Expand-Archive.psm1'
-ModuleVersion = '0.1'
+ModuleVersion = '0.2'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
@@ -43,7 +43,9 @@ PowerShellVersion = '5.1'
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
 # Modules that must be imported into the global environment prior to importing this module
-# RequiredModules = @()
+RequiredModules = @(
+  @{ModuleName="${PSScriptRoot}\Basic.psd1"; ModuleVersion='0.1'}
+)
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 # NestedModules = @()
 

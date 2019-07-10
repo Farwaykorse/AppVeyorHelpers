@@ -40,6 +40,8 @@ function Send-Codecov {
   )
   Begin
   {
+    Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
+
     $BuildName = Correct-BuildName($BuildName)
     Write-Verbose "BuildName: $BuildName"
     if ($Flag -and ($Flag -cnotmatch '^[a-z0-9_]{1,45}$')) {
@@ -93,6 +95,8 @@ function Send-Codecov {
 function Check-Installed {
   [CmdletBinding()]
   param()
+  Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
+
   if (-not $global:CodecovInstalled) {
     Write-Verbose 'Calling Codecov Python uploader to test if installed.'
     if (Test-Command -Command `
@@ -112,6 +116,8 @@ function Check-Installed {
 function Install-Uploader {
   [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Medium')]
   param()
+  Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
+
   if ($(Check-Installed)) { return }
   if ($PSCmdlet.ShouldProcess(
     'Installing Codecov uploader ...', # Verbose/ WhatIf
@@ -162,6 +168,8 @@ function Send-Report {
     [AllowEmptyString()]
     [String]$Flag
   )
+  Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
+
   if ($PSCmdlet.ShouldProcess($FilePath, "Upload to codecov.io")) {
     if ( $Flag ) {
       $(python -m codecov -n $BuildName -f "$FilePath" -X gcov -F $Flag -t d6c1c65d-1656-4321-a080-e0a0eee9a613) 2>$null

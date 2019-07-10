@@ -50,6 +50,8 @@ function Invoke-Curl {
   )
   Begin
   {
+    Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
+
     $flags = @(
       '--location',      # -L, Follow redirects.
       '--max-redirs 15', # Maximum number of redirects allowed.

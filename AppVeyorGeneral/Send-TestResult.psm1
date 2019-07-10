@@ -24,6 +24,8 @@ function Send-TestResult {
   )
   Begin
   {
+    Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
+
     $URL = 'https://ci.appveyor.com/api/testresults/' + $Format + '/' +
       "$($env:APPVEYOR_JOB_ID)"
   }

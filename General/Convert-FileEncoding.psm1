@@ -53,6 +53,8 @@ function Convert-FileEncoding {
   )
   Begin
   {
+    Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
+
     if (-not ($SourcePath -or $MyInvocation.ExpectingInput) ) {
        throw '-SourcePath is a required parameter'
     }
@@ -128,6 +130,8 @@ function Convert-EOL {
   )
   Begin
   {
+    Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
+
     if (-not ($Text -or $MyInvocation.ExpectingInput) ) {
        throw '-Text is a required parameter'
     }

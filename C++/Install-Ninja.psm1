@@ -81,6 +81,8 @@ function Install-Ninja {
   )
   Begin
   {
+    Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
+
     if (-not $Quiet) { Write-Host "-- Install Ninja-build ${Tag} ..." }
     if ($SHA512) {
       $Hash_Type = 'SHA512'
@@ -111,9 +113,8 @@ function Install-Ninja {
         ( $input_hash -ne (Get-FileHash $Archive -Algorithm $Hash_Type).Hash )
       )
     ) {
-      if ($PSCmdlet.ShouldProcess($Url, ('download to: ' + $Archive)) ) {
-        $Err = Invoke-Curl -URL $Url -OutPath $Archive
-      } else { $Err = $null }
+      $Err = $null
+      $Err = Invoke-Curl -URL $Url -OutPath $Archive
 
       if ($Err) {
         Remove-Temporary $Temporary
@@ -134,9 +135,7 @@ function Install-Ninja {
       }
     }
 
-    if ($PSCmdlet.ShouldProcess($Archive, ('deflate in: ' + $Path)) ) {
-      Expand-Archive $Archive $Path -FlatPath
-    }
+    Expand-Archive $Archive $Path -FlatPath
   }
   End
   {

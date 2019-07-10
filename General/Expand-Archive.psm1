@@ -30,7 +30,6 @@ Set-StrictMode -Version Latest
 function Expand-Archive {
   [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Low')]
   param(
-    [ValidateScript({ Test-Path -Path "$_" })]
     [ValidateNotNullOrEmpty()]
     [SupportsWildcards()]
     # Archive to be deflated.
@@ -46,8 +45,13 @@ function Expand-Archive {
   )
   Begin
   {
+    Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
+
     if ($FlatPath -and -not $TargetDir) {
       throw '-FlatPath requires -TargetDir'
+    }
+    if (-not $WhatIfPreference -and -not (Test-Path $Archive -PathType Leaf)) {
+      throw '-Archive does not exist.'
     }
     if (-not $TargetDir) {
       $TargetDir = '.\' +

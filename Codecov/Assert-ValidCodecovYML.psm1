@@ -33,6 +33,8 @@ function Assert-ValidCodecovYML {
   )
   Begin
   {
+    Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
+
     Write-Verbose 'Validate Yaml file at codecov.io/validate'
     if (-not $Path) {
       $Path = Test-DefaultLocations
