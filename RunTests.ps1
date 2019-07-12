@@ -31,6 +31,10 @@ Resolve-Path "${PSScriptRoot}\*.psd1", "${PSScriptRoot}\*\*.psd1" |
   Send-Message -Info -Message 'Detected Modules'
 
 Import-Module "${PSScriptRoot}\AppVeyorHelpers.psd1" -Force
+(Test-ModuleManifest "${PSScriptRoot}\AppVeyorHelpers.psd1"
+  ).ExportedFunctions.Values |
+  Format-Table -Property Name -HideTableHeaders | Out-String |
+  Send-Message -Info -Message 'Exported Functions'
 
 ##====--------------------------------------------------------------------====##
 # Pester Configuration
