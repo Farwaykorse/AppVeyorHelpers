@@ -26,7 +26,7 @@ $Flag = 'ci_scripts'
 ##====--------------------------------------------------------------------====##
 Import-Module "${PSScriptRoot}\AppVeyorGeneral\Send-Message.psd1"
 
-Resolve-Path "${PSScriptRoot}\*.psd1", "${PSScriptRoot}\*\*.psd1" -Relative |
+Resolve-Path "${PSScriptRoot}\*.psd1", "${PSScriptRoot}\*\*.psd1" |
   Test-ModuleManifest | Format-Table -Wrap | Out-String |
   Send-Message -Info -Message 'Detected Modules'
 
