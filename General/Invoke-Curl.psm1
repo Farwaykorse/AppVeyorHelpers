@@ -94,7 +94,11 @@ function Invoke-Curl {
   Process
   {
     if ($PSCmdlet.ShouldProcess($OutPath, ('download from: ' + $URL)) ) {
-      $(Invoke-Expression -Command $command) 2>&1
+      try { # try-catch for AppVeyor pwsh
+        $(Invoke-Expression -Command $command) 2>&1
+      } catch {
+        Write-Output $_
+      }
     }
   }
   End
