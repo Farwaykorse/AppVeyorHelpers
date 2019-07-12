@@ -26,15 +26,17 @@ $Flag = 'ci_scripts'
 ##====--------------------------------------------------------------------====##
 Import-Module "${PSScriptRoot}\AppVeyorGeneral\Send-Message.psd1"
 
-Resolve-Path "${PSScriptRoot}\*.psd1", "${PSScriptRoot}\*\*.psd1" |
-  Test-ModuleManifest | Format-Table -Wrap | Out-String |
-  Send-Message -Info -Message 'Detected Modules'
+( Resolve-Path "${PSScriptRoot}\*.psd1", "${PSScriptRoot}\*\*.psd1" |
+    Test-ModuleManifest | Format-Table -Wrap -AutoSize | Out-String
+).Trim() -replace '[ ]*(\r?\n)','$1' |
+  Send-Message -Info -Message 'Detected Modules:'
 
 Import-Module "${PSScriptRoot}\AppVeyorHelpers.psd1" -Force
-(Test-ModuleManifest "${PSScriptRoot}\AppVeyorHelpers.psd1"
+( (Test-ModuleManifest "${PSScriptRoot}\AppVeyorHelpers.psd1"
   ).ExportedFunctions.Values |
-  Format-Table -Property Name -HideTableHeaders | Out-String |
-  Send-Message -Info -Message 'Exported Functions'
+  Format-Table -Property Name -HideTableHeaders | Out-String
+).Trim() -replace '[ ]*(\r?\n)','$1' |
+  Send-Message -Info -Message 'AppVeyorHelpers - Exported Functions:'
 
 ##====--------------------------------------------------------------------====##
 # Pester Configuration
