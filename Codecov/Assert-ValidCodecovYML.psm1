@@ -58,7 +58,7 @@ function Assert-ValidCodecovYML {
       try {
         $output = Invoke-RestMethod -Uri https://codecov.io/validate `
           -Body (Get-Content -Raw -LiteralPath ($Path[0].Path)) -Method POST
-      } catch {
+      } catch [System.Net.WebException] {
         if ($_.Exception.Response.StatusCode.value__) {
           $details = (
             $_.Exception.Response.StatusCode.value__).ToString().Trim()
