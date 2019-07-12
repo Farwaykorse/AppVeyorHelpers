@@ -36,7 +36,7 @@ for:
   - ps: Get-Module Pester -ListAvailable
   build_script:
   - ps: $BuildName = 'placeholder'
-  - ps: .\RunTests.ps1
+  - ps: .\RunTests.ps1 -Coverage
   test_script:
   - ps: Assert-ValidCodecovYML
   - ps: |
@@ -53,7 +53,7 @@ for:
   - pwsh: Get-Module Pester -ListAvailable
   build_script:
   - pwsh: $BuildName = 'placeholder'
-  - pwsh: .\RunTests.ps1
+  - pwsh: .\RunTests.ps1 -Coverage
   test_script:
   - pwsh: Assert-ValidCodecovYML
   - pwsh: |

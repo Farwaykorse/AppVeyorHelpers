@@ -1,3 +1,8 @@
+param(
+  # Enable code coverage reporting.
+  [Switch]$Coverage
+)
+
 <#
 .SYNOPSIS
   Validate the PowerShell environment and run unit tests on functions.
@@ -59,14 +64,22 @@ Import-Module "${PSScriptRoot}\AppVeyorHelpers.psd1" -Force
 # Run Unit tests
 ##====--------------------------------------------------------------------====##
 Write-Verbose 'Run Pester unit tests ...'
-$result = Invoke-Pester `
-  -Script $Script -TestName $TestName                 `
-  -Tag $Tag -ExcludeTag $ExcludeTag                   `
-  -OutputFormat $OutputFormat -OutputFile $OutputFile `
-  -CodeCoverage $CodeCoverage                         `
-  -CodeCoverageOutputFile $CodeCoverageOutputFile     `
-  -CodeCoverageOutputFileFormat $CodeCoverageOutputFileFormat `
-  -Show $Show -PassThru
+if ($Coverage) {
+  $result = Invoke-Pester `
+    -Script $Script -TestName $TestName                 `
+    -Tag $Tag -ExcludeTag $ExcludeTag                   `
+    -OutputFormat $OutputFormat -OutputFile $OutputFile `
+    -CodeCoverage $CodeCoverage                         `
+    -CodeCoverageOutputFile $CodeCoverageOutputFile     `
+    -CodeCoverageOutputFileFormat $CodeCoverageOutputFileFormat `
+    -Show $Show -PassThru
+} else {
+  $result = Invoke-Pester `
+    -Script $Script -TestName $TestName                 `
+    -Tag $Tag -ExcludeTag $ExcludeTag                   `
+    -OutputFormat $OutputFormat -OutputFile $OutputFile `
+    -Show $Show -PassThru
+}
 
 if (-not $env:AppVeyor) {
   Write-Verbose 'No AppVeyor environment detected. Uploads disabled.'
@@ -76,8 +89,10 @@ if (-not $env:AppVeyor) {
 }
 Send-TestResult -File $OutputFile -Format $OutputFormatUpload `
   -WhatIf:$UseWhatif
-Send-Codecov -File $CodeCoverageOutputFile -BuildName:$BuildName -Flag:$Flag `
-  -Whatif:$UseWhatif
+if ($Coverage) {
+  Send-Codecov -File $CodeCoverageOutputFile -BuildName:$BuildName -Flag:$Flag `
+    -Whatif:$UseWhatif
+}
 Write-Verbose 'Run Pester unit tests ... done'
 
 if ($result.FailedCount -gt 0) {
