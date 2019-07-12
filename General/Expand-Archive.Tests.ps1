@@ -86,13 +86,6 @@ Describe 'Expand-Archive' {
       { Expand-Archive -Archive "$archive" -FlatPath } |
         Should -Throw '-FlatPath requires -TargetDir'
     }
-    It 'accepts wildcard characters' {
-      Test-InconclusiveMissingFile $archive
-      In -Path "$test_drive" {
-        { Expand-Archive -Archive (Join-Path $test_drive '*.zip') `
-          -TargetDir .\ *>$null } | Should -not -Throw
-      }
-    }
   }
 
   Context 'a .zip archive' {
@@ -108,6 +101,16 @@ Describe 'Expand-Archive' {
       { 7z a -bso0 -y "$archive" "$this_file" } | Should -not -Throw
       Test-Path "$archive" -PathType Leaf | Should -Be $true `
         -Because 'Archive not in expected location.'
+    }
+
+    Context 'wildcard' {
+      It 'accepts wildcard characters' {
+        Test-InconclusiveMissingFile $archive
+        In -Path "$test_drive" {
+          { Expand-Archive -Archive (Join-Path $test_drive '*.zip') `
+            -TargetDir .\ *>$null } | Should -not -Throw
+        }
+      }
     }
 
     Context 'WhatIf' {
