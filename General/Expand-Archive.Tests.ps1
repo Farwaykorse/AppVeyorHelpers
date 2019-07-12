@@ -100,7 +100,7 @@ Describe 'Expand-Archive' {
     $archive_name = 'archive'
     $archive = Join-Path "$test_drive" "${archive_name}.zip"
     $file_1 = 'Expand-Archive.Tests.ps1'
-    $this_file = Resolve-Path (Join-Path $PSScriptRoot $file_1) -Relative
+    $this_file = Resolve-Path (Join-Path $PSScriptRoot $file_1)
 
     It 'create zip' {
       Test-Path $archive -PathType Leaf | Should -Be $false `
