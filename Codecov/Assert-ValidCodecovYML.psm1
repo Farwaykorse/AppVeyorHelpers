@@ -59,14 +59,19 @@ function Assert-ValidCodecovYML {
         $output = Invoke-RestMethod -Uri https://codecov.io/validate `
           -Body (Get-Content -Raw -LiteralPath ($Path[0].Path)) -Method POST
       } catch {
+        if ($_.Exception.Response.StatusCode.value__) {
+          $details = (
+            $_.Exception.Response.StatusCode.value__).ToString().Trim()
+        }
         if ($PSVersionTable.PSVersion.Major -lt 6) { # confirmed for v5.1
-          $details= "($(
-            $_.Exception.Response.StatusCode.value__)) $(
-            $_.Exception.Response.StatusDescription)"
+          if ($_.Exception.Response.StatusDescription) {
+            $details += (
+              $_.Exception.Response.StatusDescription).ToString().Trim()
+          }
         } else { # confirmed for v6.1.2
-          $details= "($(
-            $_.Exception.Response.StatusCode.value__)) $(
-            $_.Exception.Response.ReasonPhrase)"
+          if ($_.Exception.Response.ReasonPhrase) {
+            $details += ($_.Exception.Response.ReasonPhrase).ToString().Trim()
+          }
         }
         Send-Message -Error -Message `
           "Validation of Codecov YAML failed!" `
