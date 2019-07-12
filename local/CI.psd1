@@ -1,17 +1,17 @@
 <#
-  Module manifest for module 'Basic'.
+  Module manifest for module 'CI'.
 
   Documentation:
   https://docs.microsoft.com/powershell/developer/module/how-to-write-a-powershell-module-manifest
 #>
 @{
-RootModule = 'Basic.psm1'
-ModuleVersion = '0.1'
+RootModule = 'CI.psm1'
+ModuleVersion = '0.2'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
 # CompanyName = 'Unknown'
-Description = 'Collection of minor general helpers.'
+Description = 'Collection of minor general helpers for the CI platform.'
 # GUID = 'd0a9150d-b6a4-4b17-a325-e3a24fed0aa9'
 # HelpInfoURI = ''
 
@@ -51,13 +51,13 @@ PowerShellVersion = '5.1'
 # Export configuration
 
 # Functions to export from this module
-FunctionsToExport = '*'
+FunctionsToExport = 'Assert-CI'
 # Cmdlets to export from this module
-CmdletsToExport = '*'
+CmdletsToExport = ''
 # Variables to export from this module
-VariablesToExport = '*'
+VariablesToExport = ''
 # Aliases to export from this module
-AliasesToExport = '*'
+AliasesToExport = ''
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
 # PrivateData = ''
@@ -71,9 +71,9 @@ AliasesToExport = '*'
 
 # List of all files packaged with this module
 FileList = @(
-  'Basic.psd1',
-  'Basic.psm1',
-  'Basic.Tests.ps1'
+  'CI.psd1',
+  'CI.psm1',
+  'CI.Tests.ps1'
 )
 
 }

@@ -7,7 +7,7 @@
 @{
 ##====--------------------------------------------------------------------====##
 RootModule = 'Send-Codecov.psm1'
-ModuleVersion = '0.2'
+ModuleVersion = '0.3'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
@@ -51,7 +51,7 @@ Description = ''
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @(
   @{ModuleName="${PSScriptRoot}\..\AppVeyorGeneral\Send-Message.psd1"; ModuleVersion='0.1'},
-  @{ModuleName="${PSScriptRoot}\..\General\Basic.psd1"; ModuleVersion='0.1'},
+  @{ModuleName="${PSScriptRoot}\..\local\All.psd1"; ModuleVersion='0.1'},
   @{ModuleName="${PSScriptRoot}\..\General\Test-Command.psd1"; ModuleVersion='0.1'}
 )
 
@@ -62,13 +62,13 @@ NestedModules = @()
 # Export configuration
 
 # Functions to export from this module
-FunctionsToExport = '*'
+FunctionsToExport = 'Send-Codecov'
 # Cmdlets to export from this module
-CmdletsToExport = '*'
+CmdletsToExport = ''
 # Variables to export from this module
-VariablesToExport = '*'
+VariablesToExport = 'CodecovInstalled'
 # Aliases to export from this module
-AliasesToExport = '*'
+AliasesToExport = ''
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
 # PrivateData = ''

@@ -1,4 +1,4 @@
-Import-Module -Name "${PSScriptRoot}\Send-Codecov.psd1" -Force
+Import-Module -Name "${PSScriptRoot}\Codecov.psd1" -Force
 
 Set-StrictMode -Version Latest
 

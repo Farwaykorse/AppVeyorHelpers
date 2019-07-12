@@ -7,7 +7,7 @@
 @{
 ##====--------------------------------------------------------------------====##
 RootModule = ''
-ModuleVersion = '0.1'
+ModuleVersion = '0.2'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
@@ -48,6 +48,7 @@ PowerShellVersion = '5.1'
 # RequiredModules = @()
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 NestedModules = @(
+  "${PSScriptRoot}\CI.psd1",
   "${PSScriptRoot}\Get-CommonFlagsCaller.psm1"
 )
 
@@ -55,13 +56,16 @@ NestedModules = @(
 # Export configuration
 
 # Functions to export from this module
-FunctionsToExport = '*'
+FunctionsToExport = @(
+  'Assert-CI',
+  'Get-CommonFlagsCaller'
+)
 # Cmdlets to export from this module
-CmdletsToExport = '*'
+CmdletsToExport = ''
 # Variables to export from this module
-VariablesToExport = '*'
+VariablesToExport = ''
 # Aliases to export from this module
-AliasesToExport = '*'
+AliasesToExport = ''
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
 # PrivateData = ''
@@ -75,7 +79,7 @@ ModuleList = @()
 
 # List of all files packaged with this module
 FileList = @(
-  'Basic.psd1',
+  'All.psd1',
   'Get-CommonFlagsCaller.psm1',
   'Get-CommonFlagsCaller.Tests.ps1'
 )
