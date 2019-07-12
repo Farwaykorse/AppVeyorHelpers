@@ -16,7 +16,7 @@ Describe 'Invoke-Curl (offline)' {
   }
   It 'supports -WhatIf and -Confirm' {
     Get-Command -Name Invoke-Curl -Syntax |
-      Should -Match '-Whatif.*-Confirm'
+      Should -Match '-WhatIf.*-Confirm'
   }
 
   Context 'System Requirements' {

@@ -50,6 +50,8 @@ function Invoke-Curl {
   )
   Begin
   {
+    Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
+
     $flags = @(
       '--location',      # -L, Follow redirects.
       '--max-redirs 15', # Maximum number of redirects allowed.
@@ -91,7 +93,7 @@ function Invoke-Curl {
   }
   Process
   {
-    if ($PSCmdlet.ShouldProcess($URL, ('download to: ' + $OutPath)) ) {
+    if ($PSCmdlet.ShouldProcess($OutPath, ('download from: ' + $URL)) ) {
       $(Invoke-Expression -Command $command) 2>&1
     }
   }

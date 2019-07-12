@@ -7,7 +7,7 @@
 @{
 ##====--------------------------------------------------------------------====##
 RootModule = 'Assert-ValidCodecovYML.psm1'
-ModuleVersion = '0.1'
+ModuleVersion = '0.2'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
@@ -51,6 +51,7 @@ Description = ''
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @(
   @{ModuleName="${PSScriptRoot}\..\AppVeyorGeneral\Send-Message.psd1"; ModuleVersion='0.1'}
+  @{ModuleName="${PSScriptRoot}\..\General\Basic.psd1"; ModuleVersion='0.1'}
 )
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess

@@ -61,7 +61,7 @@ Describe 'Expand-Archive' {
     It 'throws on non-existing archive' {
       Test-InconclusiveMissingFile -not $wrong_archive
       { Expand-Archive -Archive "$wrong_archive" } |
-        Should -Throw 'validation script failed'
+        Should -Throw '-Archive does not exist'
     }
     It 'after, test-file existing created' {
       Test-Path "$archive" -PathType Leaf | Should -Be $true
@@ -89,8 +89,8 @@ Describe 'Expand-Archive' {
     It 'accepts wildcard characters' {
       Test-InconclusiveMissingFile $archive
       In -Path "$test_drive" {
-        { Expand-Archive -Archive "${test_drive}/*.zip" .\ *>$null } |
-          Should -not -Throw
+        { Expand-Archive -Archive (Join-Path $test_drive '*.zip') `
+          -TargetDir .\ *>$null } | Should -not -Throw
       }
     }
   }

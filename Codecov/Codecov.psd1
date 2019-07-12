@@ -6,8 +6,8 @@
 #>
 @{
 ##====--------------------------------------------------------------------====##
-RootModule = ''
-ModuleVersion = '0.1'
+RootModule = 'Send-Codecov.psd1'
+ModuleVersion = '0.2'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
@@ -53,8 +53,7 @@ Description = ''
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 NestedModules = @(
-  "${PSScriptRoot}\Assert-ValidCodecovYML.psd1",
-  "${PSScriptRoot}\Send-Codecov.psd1"
+  "${PSScriptRoot}\Assert-ValidCodecovYML.psd1"
 )
 
 ##====--------------------------------------------------------------------====##

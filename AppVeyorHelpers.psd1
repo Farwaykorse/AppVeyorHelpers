@@ -7,7 +7,7 @@
 @{
 ##====--------------------------------------------------------------------====##
 RootModule = ''
-ModuleVersion = '0.7'
+ModuleVersion = '0.8'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
@@ -51,6 +51,7 @@ Code coverage send to codecov.io.'
 # RequiredModules = @()
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 NestedModules = @(
+  "${PSScriptRoot}\General\Basic.psd1",
   "${PSScriptRoot}\General\Convert-FileEncoding.psd1",
   "${PSScriptRoot}\General\Expand-Archive.psd1",
   "${PSScriptRoot}\General\Invoke-Curl.psd1",
