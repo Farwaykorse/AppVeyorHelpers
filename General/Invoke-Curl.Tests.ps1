@@ -222,14 +222,24 @@ Describe 'Invoke-Curl (online)' -Tag 'online' {
         'curl: (22) The requested URL returned error: 404 Not Found'
     }
     It 'sets exit code 22' {
-      $LASTEXITCODE | Should -Be 22
+      if ($PSVersionTable.PSVersion.Major -lt 6 -or -not $(Assert-CI) ) {
+        $LASTEXITCODE | Should -Be 22
+      } else {
+        # pwsh only on AppVeyor
+        $LASTEXITCODE | Should -Be 0 -Because 'different behaviour on AppVeyor'
+      }
     }
     It 'connection refused to localhost' {
       Invoke-Curl -URL https://localhost/file -OutPath . -Retry 0 | Should -Be `
         'curl: (7) Failed to connect to localhost port 443: Connection refused'
     }
     It 'sets exit code 7' {
-      $LASTEXITCODE | Should -Be 7
+      if ($PSVersionTable.PSVersion.Major -lt 6 -or -not $(Assert-CI) ) {
+        $LASTEXITCODE | Should -Be 7
+      } else {
+        # pwsh only on AppVeyor
+        $LASTEXITCODE | Should -Be 0 -Because 'different behaviour on AppVeyor'
+      }
     }
     It 'no change in current working directory' {
       $PWD.Path | Should -Be $start_path.Path

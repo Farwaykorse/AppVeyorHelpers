@@ -178,7 +178,12 @@ Describe 'Test-Command programs on the search path' {
     Test-Command 'curl.exe' | Should -Be $false
     Test-Command 'curl.exe' -IgnoreExitCode | Should -Be $false
     Test-Command 'curl.exe 2>$null' | Should -Be $false
-    Test-Command 'curl.exe 2>$null' -IgnoreExitCode | Should -Be $true
+    if ( $PSVersionTable.PSVersion.Major -lt 6 -or -not $(Assert-CI) ) {
+      Test-Command 'curl.exe 2>$null' -IgnoreExitCode | Should -Be $true
+    } else { # pwsh only on AppVeyor
+      Test-Command 'curl.exe 2>$null' -IgnoreExitCode | Should -Be $false `
+        -Because 'different behaviour on AppVeyor with PS Core'
+    }
   }
   It '7z' {
     Test-Command '7z' | Should -Be $true
