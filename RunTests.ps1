@@ -96,8 +96,12 @@ if (-not $env:AppVeyor) {
 Send-TestResult -File $OutputFile -Format $OutputFormatUpload `
   -WhatIf:$UseWhatif
 if ($Coverage) {
-  Send-Codecov -File $CodeCoverageOutputFile -BuildName:$BuildName -Flag:$Flag `
-    -Whatif:$UseWhatif
+  try {
+    Send-Codecov -File $CodeCoverageOutputFile -BuildName:$BuildName -Flag:$Flag `
+      -Whatif:$UseWhatif
+  } catch {
+    # ignore exit-code
+  }
 }
 Write-Verbose 'Run Pester unit tests ... done'
 
