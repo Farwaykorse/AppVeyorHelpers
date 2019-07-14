@@ -97,7 +97,13 @@ Describe 'Test-Command' {
     }
     It 'Should check redirected error text' {
       Test-Command 'Write-Error something' -cMatch 'thing' | Should -BeFalse
-      Test-Command 'Write-Error something 2>&1' -cMatch 'thing' | Should -BeTrue
+      if ( $PSVersionTable.PSVersion.Major -lt 6 -or -not $(Assert-CI) ) {
+        Test-Command 'Write-Error something 2>&1' -cMatch 'thing' |
+          Should -BeTrue
+      } else { # pwsh only on AppVeyor
+        Test-Command 'Write-Error something 2>&1' -cMatch 'thing' |
+          Should -BeFalse -Because 'different behaviour on AppVeyor + pwsh'
+      }
     }
     It 'Should not leak throw' {
       { Test-Command 'throw "txt"' -cMatch 'txt' } | Should -Not -Throw
