@@ -103,4 +103,6 @@ Write-Verbose 'Run Pester unit tests ... done'
 
 if ($result.FailedCount -gt 0) {
   throw "$($result.FailedCount) tests failed."
+} else {
+  Write-Output 'RunTests: success'
 }
