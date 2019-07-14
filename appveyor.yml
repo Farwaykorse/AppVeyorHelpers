@@ -48,18 +48,15 @@ for:
     only:
     - configuration: PowerShell_Core
   install:
-  - pwsh: Import-Module -Name .\AppVeyorHelpers.psd1
   - pwsh: Install-Module Pester -Force
   - pwsh: Get-Module Pester -ListAvailable
   build_script:
   - pwsh: $BuildName = 'placeholder'
   - pwsh: .\RunTests.ps1 -Coverage
   test_script:
-  - pwsh: Assert-ValidCodecovYML
   - pwsh: |
-      if ($BuildName -ne 'placeholder') {
-        Send-Message -Error 'BuildName escaped RunTests.ps1' -Details $BuildName
-      }
+      Import-Module -Name .\AppVeyorHelpers.psd1
+      Assert-ValidCodecovYML
 
 ##====--------------------------------------------------------------------====##
 # Common Scripts
