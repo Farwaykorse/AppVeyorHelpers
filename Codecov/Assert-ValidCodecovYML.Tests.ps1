@@ -184,14 +184,22 @@ Describe 'Assert-ValidCodecovYML' {
     # valid Sample
     "coverage:`n  precision: 2" > 'TestDrive:\samples\codecov.yml'
     It 'valid sample' {
-      Assert-ValidCodecovYML -Path 'TestDrive:\samples\codecov.yml' 6>$null |
-        Should -BeTrue
+      $result = Assert-ValidCodecovYML -Path 'TestDrive:\samples\codecov.yml' `
+        6>$null
+      if ($result -eq $null) {
+        Set-ItResult -Pending -Because 'Connection failure.'
+      }
+      $result | Should -BeTrue
     }
     # invalid sample
     "coverage:`n  somethingRandom: 2" > 'TestDrive:\samples\codecov.yml'
     It 'invalid sample' {
-      Assert-ValidCodecovYML -Path 'TestDrive:\samples\codecov.yml' 6>$null |
-        Should -BeFalse
+      $result = Assert-ValidCodecovYML -Path 'TestDrive:\samples\codecov.yml' `
+        6>$null
+      if ($result -eq $null) {
+        Set-ItResult -Pending -Because 'Connection failure.'
+      }
+      $result | Should -BeFalse
     }
   }
 }
