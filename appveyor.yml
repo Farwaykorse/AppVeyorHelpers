@@ -28,6 +28,9 @@ for:
   matrix:
     only:
     - configuration: PowerShell
+  init:
+  - ps: Show-SystemInfo -PowerShell
+  - cd %APPVEYOR_BUILD_FOLDER%
   install:
   - ps: Import-Module -Name .\AppVeyorHelpers.psd1
   - ps: Install-Module Pester -Force
@@ -45,6 +48,9 @@ for:
   matrix:
     only:
     - configuration: PowerShell_Core
+  init:
+  - pwsh: Show-SystemInfo -PowerShell
+  - cd %APPVEYOR_BUILD_FOLDER%
   install:
   - pwsh: Install-Module Pester -Force
   - pwsh: Get-Module Pester -ListAvailable
@@ -55,24 +61,3 @@ for:
   - pwsh: |
       Import-Module -Name .\AppVeyorHelpers.psd1
       Assert-ValidCodecovYML
-
-##====--------------------------------------------------------------------====##
-# Common Scripts
-init:
-- ps: |
-    Write-Output ('-- CI Session Configuration --' + "`n" + 'OS / platform: ' +
-      $((Get-WmiObject Win32_OperatingSystem).Name -split "[|]" |
-        Select-Object -First 1) + ' / ' +
-      $((Get-WmiObject Win32_OperatingSystem).OSArchitecture) + "`n" +
-      'Image:         ' + $env:APPVEYOR_BUILD_WORKER_IMAGE + "`n" +
-      'Configuration: ' + $env:CONFIGURATION
-    )
-    Write-Output ('PowerShell v' + $PSVersionTable.PSVersion.ToString())
-    Write-Output ('Initial path: ' + $pwd.Path)
-    if ($env:APPVEYOR_BUILD_WORKER_IMAGE -notmatch '2013') {
-      pwsh {
-        Write-Output ('PowerShell Core v'+ $PSVersionTable.PSVersion.ToString())
-        Write-Output ('Initial path: ' + $pwd.Path)
-      }
-    }
-- cd %APPVEYOR_BUILD_FOLDER%
