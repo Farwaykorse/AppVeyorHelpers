@@ -22,8 +22,6 @@ matrix:
   exclude:
   - configuration: PowerShell_Core
     image: Visual Studio 2013
-  allow_failures:
-  - configuration: PowerShell_Core
 
 for:
 -
