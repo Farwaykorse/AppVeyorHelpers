@@ -130,7 +130,7 @@ Describe 'Internal Show-<software>Version' {
       }
       It 'return version number' {
         if (-not $available) {
-          Set-ItResult -Inconclusive -Because ('no cmake')
+          Set-ItResult -Inconclusive -Because ('no python')
         }
         Show-PythonVersion | Should -match '^([0-9]+\.)+[0-9]+$'
       }
@@ -142,7 +142,7 @@ Describe 'Internal Show-<software>Version' {
       }
       It 'return version number' {
         if (-not $available) {
-          Set-ItResult -Inconclusive -Because ('no cmake')
+          Set-ItResult -Inconclusive -Because ('no clang-cl')
         }
         Show-LLVMVersion | Should -match '^([0-9]+\.)+[0-9]$'
       }
