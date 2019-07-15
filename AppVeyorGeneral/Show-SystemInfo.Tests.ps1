@@ -42,6 +42,7 @@ Describe 'Internal Join-Info' {
     }
     Context 'Basic operation' {
       It 'align to default length of 15' {
+        $Align = 15
         Join-Info 'some' 'text' | Should -Match 'some:.*text'
         (Join-Info 'some' 'text').Length | Should -Be 19 -Because '15+4'
         Join-Info 'some' 'text' | Should -MatchExactly 'some:          text' `
@@ -49,7 +50,17 @@ Describe 'Internal Join-Info' {
         Join-Info 'some' 'text' |
           Should -not -MatchExactly 'some:    text' -Because 'test-error'
       }
+      It 'align to different inherited length of 17' {
+        $Align = 17
+        Join-Info 'some' 'text' | Should -Match 'some:.*text'
+        (Join-Info 'some' 'text').Length | Should -Be 21 -Because '17+4'
+        Join-Info 'some' 'text' | Should -MatchExactly 'some:            text' `
+          -Because '$Align = 17'
+        Join-Info 'some' 'text' |
+          Should -not -MatchExactly 'some:    text' -Because 'test-error'
+      }
       It '-Name longer than (15-2=13) characters' {
+        $Align = 15
         Join-Info '1234567890123' 'text' |
           Should -Match '1234567890123: text'
         (Join-Info '1234567890123' 'text').Length |
@@ -64,6 +75,7 @@ Describe 'Internal Join-Info' {
           Should -Be 36 -Because '30+2+4'
       }
       It 'align to different -Length' {
+        $Align = 15
         Join-Info 'some' 'text' -Length 10 | Should -Match 'some:.*text'
         (Join-Info 'some' 'text' -Length 10).Length |
           Should -Be 14 -Because '10+4'
@@ -89,7 +101,7 @@ Describe 'Internal Show-<software>Version' {
     Context 'CMake' {
       $available = $(Test-Command 'cmake --version')
       It 'no throw' {
-          { Show-CMakeVersion } | Should -not -Throw
+        { Show-CMakeVersion } | Should -not -Throw
       }
       It 'return version number' {
         if (-not $available) {
@@ -179,6 +191,21 @@ Describe 'Show-SystemInfo' {
     }
     It 'no throw on -All' {
       { Show-SystemInfo -All } | Should -not -Throw
+    }
+    It 'no throw on -Align empty or $null' {
+      { Show-SystemInfo -Align '' } | Should -not -Throw
+      { Show-SystemInfo -Align $null } | Should -not -Throw
+    }
+    It 'negative -Align' {
+      { Show-SystemInfo -Align -1 } | Should -Throw 'validation script'
+    }
+  }
+  Context 'Setting Align' {
+    It 'default alignment (15 characters)' {
+      Show-SystemInfo | Should -match '\n.{14} [^ ]'
+    }
+    It '-Align 20' {
+      Show-SystemInfo -Align 20 | Should -match '\n.{19} [^ ]'
     }
   }
   Context 'mock (not) on CI' {

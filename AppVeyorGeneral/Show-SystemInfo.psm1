@@ -46,6 +46,10 @@ Set-StrictMode -Version Latest
 #>
 function Show-SystemInfo {
   param(
+    [ValidateScript({ $_ -ge 0 })]
+    [Alias('ColumnWidth')]
+    # Alignment of data/ first column width (default 15 characters).
+    [Int]$Align = 15,
     [switch]$All,
     [switch]$CMake,
     [switch]$LLVM,
@@ -156,8 +160,12 @@ function Join-Info {
     [AllowEmptyString()]
     [String]$Data = $(throw 'Data is a required parameter'),
     [ValidateScript({ $_ -ge 0 })]
-    [Int]$Length = 15 # Characters
+    [Int]$Length = 0 # Characters
   )
+  if (-not $Length) {
+    $Length = Get-Variable -Scope 1 -Name Align -ValueOnly `
+      -ErrorAction SilentlyContinue
+  }
   if ($Name) { $Name = ($Name + ': ') }
   return ($( $Name.PadRight($Length,' ') ) + $Data)
 }
