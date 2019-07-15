@@ -69,7 +69,7 @@ function Show-SystemInfo {
       if ($env:APPVEYOR_RE_RUN_INCOMPLETE) {
         $out += ('Build started by "Re-run incomplete" button.')
       }
-      if ($env:APPVEYOR_REPO_TAG) {
+      if ($env:APPVEYOR_REPO_TAG -eq 'true') {
         $out += ('Build of tag: ' + $env:APPVEYOR_TAG_NAME)
       }
     }
