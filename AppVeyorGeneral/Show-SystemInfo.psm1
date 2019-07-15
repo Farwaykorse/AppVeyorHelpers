@@ -10,46 +10,46 @@ Set-StrictMode -Version Latest
 .EXAMPLE
   Show-SystemInfo
   -- CI Session Configuration --
-  OS / platform: Microsoft Windows Server 2019 Datacenter / 64-bit
-  Image:         Visual Studio 2019
-  Configuration: Debug
-  Platform:      x64
-  -------------------------------------------------------------
-  Initial path:  C:\projects\sampleproject
+  OS / platform:      Microsoft Windows Server 2019 Datacenter / 64-bit
+  Image:              Visual Studio 2019
+  Configuration:      Debug
+  Platform:           x64
+  ------------------------------------------------------------------------------
+  Initial path:       C:\projects\sampleproject
 .EXAMPLE
   Show-SystemInfo -PowerShell -CMake
   -- CI Session Configuration --
-  OS / platform: Microsoft Windows Server 2019 Datacenter / 64-bit
-  Image:         Visual Studio 2019
-  Configuration: Debug
-  Platform:      x64
-  PowerShell:    5.1.17763.503
-  PS Core:       6.2.0
-  CMake:         3.14.4
-  -------------------------------------------------------------
-  Initial path:  C:\projects\sampleproject
+  OS / platform:      Microsoft Windows Server 2019 Datacenter / 64-bit
+  Image:              Visual Studio 2019
+  Configuration:      Debug
+  Platform:           x64
+  PowerShell:         5.1.17763.503
+  PS Core:            6.2.0
+  CMake:              3.14.4
+  ------------------------------------------------------------------------------
+  Initial path:       C:\projects\sampleproject
 .EXAMPLE
   Show-SystemInfo -All | Send-Message 'SystemInfo' -HideDetails
   -- CI Session Configuration --
   OS / platform: Microsoft Windows Server 2019 Datacenter / 64-bit
-  Image:         Visual Studio 2019
-  Configuration: Debug
-  Platform:      x64
-  PowerShell:    5.1.17763.503
-  PS Core:       6.2.0
-  7-zip:         19.00
-  LLVM/clang:    8.0.0
-  CMake:         3.14.4
-  Python:        2.7.16
-  -------------------------------------------------------------
-  Initial path:  C:\projects\sampleproject
+  Image:              Visual Studio 2019
+  Configuration:      Debug
+  Platform:           x64
+  PowerShell:         5.1.17763.503
+  PS Core:            6.2.0
+  7-zip:              19.00
+  LLVM/clang:         8.0.0
+  CMake:              3.14.4
+  Python:             2.7.16
+  ------------------------------------------------------------------------------
+  Initial path:       C:\projects\sampleproject
 #>
 function Show-SystemInfo {
   param(
     [ValidateScript({ $_ -ge 0 })]
     [Alias('ColumnWidth')]
-    # Alignment of data/ first column width (default 15 characters).
-    [Int]$Align = 15,
+    # Alignment of data/ first column width (default 20 characters).
+    [Int]$Align = 20,
     [switch]$All,
     [switch]$CMake,
     [switch]$LLVM,
@@ -141,15 +141,15 @@ function Show-SystemInfo {
 
 <#
 .SYNOPSIS
-  Return "<Info>:   <Data>" with constant alignment.
+  Return "<Info>:        <Data>" with constant alignment.
 .EXAMPLE
   Join-Info 'Some item' 'The information regarding this item.'
-  Some item:    The information regarding this item.'
-.EXAMPLE
-  Join-Info 'Some item' 'The information regarding this item.' -Length 20
   Some item:         The information regarding this item.'
 .EXAMPLE
-  Join-Info 'Long item name' 'The information regarding this item.'
+  Join-Info 'Some item' 'The information regarding this item.' -Length 15
+  Some item:    The information regarding this item.'
+.EXAMPLE
+  Join-Info 'Long item name' 'The information regarding this item.' -Length 5
   Long item name: The information regarding this item.'
 
   A string longer then the set Length shifts the Data item out of alignment.

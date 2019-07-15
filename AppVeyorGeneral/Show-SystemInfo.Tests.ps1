@@ -41,12 +41,13 @@ Describe 'Internal Join-Info' {
       }
     }
     Context 'Basic operation' {
-      It 'align to default length of 15' {
-        $Align = 15
+      It 'align to default length of 20' {
+        $Align = 20
         Join-Info 'some' 'text' | Should -Match 'some:.*text'
-        (Join-Info 'some' 'text').Length | Should -Be 19 -Because '15+4'
-        Join-Info 'some' 'text' | Should -MatchExactly 'some:          text' `
-          -Because 'default Length = 15'
+        (Join-Info 'some' 'text').Length | Should -Be 24 -Because '20+4'
+        Join-Info 'some' 'text' |
+          Should -MatchExactly 'some:               text' `
+          -Because 'default Length = 20'
         Join-Info 'some' 'text' |
           Should -not -MatchExactly 'some:    text' -Because 'test-error'
       }
@@ -201,11 +202,11 @@ Describe 'Show-SystemInfo' {
     }
   }
   Context 'Setting Align' {
-    It 'default alignment (15 characters)' {
-      Show-SystemInfo | Should -match '\n.{14} [^ ]'
+    It 'default alignment (20 characters)' {
+      Show-SystemInfo | Should -match '\n.{19} [^ ]'
     }
-    It '-Align 20' {
-      Show-SystemInfo -Align 20 | Should -match '\n.{19} [^ ]'
+    It '-Align 25' {
+      Show-SystemInfo -Align 25 | Should -match '\n.{24} [^ ]'
     }
   }
   Context 'mock (not) on CI' {
