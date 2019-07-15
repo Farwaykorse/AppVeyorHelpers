@@ -65,13 +65,15 @@ function Show-SystemInfo {
         $((Get-WmiObject Win32_OperatingSystem).OSArchitecture)
       )
     }
-    if ($env:APPVEYOR_BUILD_WORKER_IMAGE) {
+    if (Assert-CI -and $env:APPVEYOR_BUILD_WORKER_IMAGE) {
       $out += Join-Info 'Image' $env:APPVEYOR_BUILD_WORKER_IMAGE
     }
-    if ($env:CONFIGURATION) {
+    if (Assert-CI -and $env:CONFIGURATION) {
       $out += Join-Info 'Configuration' $env:CONFIGURATION
     }
-    if ($env:PLATFORM) { $out += Join-Info 'Platform' $env:PLATFORM }
+    if (Assert-CI -and $env:PLATFORM) {
+      $out += Join-Info 'Platform' $env:PLATFORM
+    }
 
     # Information on software installed on AppVeyor.
     # Enabled by -All and a specific switch.
