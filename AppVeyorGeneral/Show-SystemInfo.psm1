@@ -81,13 +81,15 @@ function Show-SystemInfo {
     if (Assert-CI) {
       $out += ('-- CI Session Configuration --').PadRight(80,'-')
     } else { $out += ('-- Local System Configuration --').PadRight(80,'-') }
-    if (Test-Command 'Get-WmiObject Win32_OperatingSystem') { # not in PS6.1
-      $out += Join-Info 'OS / platform' (
-        $((Get-WmiObject Win32_OperatingSystem).Name -split "[|]" |
-          Select-Object -First 1) + ' / ' +
+    $out += Join-Info 'OS / platform' $(
+      if ($PSVersionTable.PSVersion.Major -lt 6) {
+        $((Get-WmiObject Win32_OperatingSystem).Caption) + ' / ' +
         $((Get-WmiObject Win32_OperatingSystem).OSArchitecture)
-      )
-    }
+      } else {
+        $((Get-CimInstance CIM_OperatingSystem).Caption) + ' / ' +
+        $((Get-CimInstance CIM_OperatingSystem).OSArchitecture)
+      }
+    )
     if (Assert-CI -and $env:APPVEYOR_BUILD_WORKER_IMAGE) {
       $out += Join-Info 'Image' $env:APPVEYOR_BUILD_WORKER_IMAGE
     }
