@@ -18,6 +18,8 @@ configuration:
 - PowerShell
 - PowerShell_Core
 
+platform: Any CPU
+
 matrix:
   exclude:
   - configuration: PowerShell_Core
@@ -30,49 +32,36 @@ for:
     - configuration: PowerShell
   install:
   - ps: Import-Module -Name .\AppVeyorHelpers.psd1
+  - ps: Show-SystemInfo -PowerShell
   - ps: Install-Module Pester -Force
-  - ps: Get-Module Pester -ListAvailable
+  - ps: >-
+      ( Get-Module Pester -ListAvailable |
+      Format-Table -HideTableHeaders -Property Name, Version |
+      Out-String).Trim()
+  before_build:
+  - cd %APPVEYOR_BUILD_FOLDER%
   build_script:
-  - ps: $BuildName = 'placeholder'
   - ps: .\RunTests.ps1 -Coverage
   test_script:
   - ps: Assert-ValidCodecovYML
-  - ps: |
-      if ($BuildName -ne 'placeholder') {
-        Send-Message -Error 'BuildName escaped RunTests.ps1' -Details $BuildName
-      }
 -
   matrix:
     only:
     - configuration: PowerShell_Core
   install:
+  - pwsh: |
+      Import-Module -Name .\AppVeyorHelpers.psd1
+      Show-SystemInfo -PowerShell
   - pwsh: Install-Module Pester -Force
-  - pwsh: Get-Module Pester -ListAvailable
+  - pwsh: >-
+      ( Get-Module Pester -ListAvailable |
+      Format-Table -HideTableHeaders -Property Name, Version |
+      Out-String).Trim()
+  before_build:
+  - cd %APPVEYOR_BUILD_FOLDER%
   build_script:
-  - pwsh: $BuildName = 'placeholder'
   - pwsh: .\RunTests.ps1 -Coverage
   test_script:
   - pwsh: |
       Import-Module -Name .\AppVeyorHelpers.psd1
       Assert-ValidCodecovYML
-
-##====--------------------------------------------------------------------====##
-# Common Scripts
-init:
-- ps: |
-    Write-Output ('-- CI Session Configuration --' + "`n" + 'OS / platform: ' +
-      $((Get-WmiObject Win32_OperatingSystem).Name -split "[|]" |
-        Select-Object -First 1) + ' / ' +
-      $((Get-WmiObject Win32_OperatingSystem).OSArchitecture) + "`n" +
-      'Image:         ' + $env:APPVEYOR_BUILD_WORKER_IMAGE + "`n" +
-      'Configuration: ' + $env:CONFIGURATION
-    )
-    Write-Output ('PowerShell v' + $PSVersionTable.PSVersion.ToString())
-    Write-Output ('Initial path: ' + $pwd.Path)
-    if ($env:APPVEYOR_BUILD_WORKER_IMAGE -notmatch '2013') {
-      pwsh {
-        Write-Output ('PowerShell Core v'+ $PSVersionTable.PSVersion.ToString())
-        Write-Output ('Initial path: ' + $pwd.Path)
-      }
-    }
-- cd %APPVEYOR_BUILD_FOLDER%
