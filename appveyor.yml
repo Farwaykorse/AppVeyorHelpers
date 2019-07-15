@@ -34,7 +34,10 @@ for:
   - ps: Import-Module -Name .\AppVeyorHelpers.psd1
   - ps: Show-SystemInfo -PowerShell
   - ps: Install-Module Pester -Force
-  - ps: Get-Module Pester -ListAvailable
+  - ps: >-
+      ( Get-Module Pester -ListAvailable |
+      Format-Table -HideTableHeaders -Property Name, Version |
+      Out-String).Trim()
   before_build:
   - cd %APPVEYOR_BUILD_FOLDER%
   build_script:
@@ -50,7 +53,10 @@ for:
       Import-Module -Name .\AppVeyorHelpers.psd1
       Show-SystemInfo -PowerShell
   - pwsh: Install-Module Pester -Force
-  - pwsh: Get-Module Pester -ListAvailable
+  - pwsh: >-
+      ( Get-Module Pester -ListAvailable |
+      Format-Table -HideTableHeaders -Property Name, Version |
+      Out-String).Trim()
   before_build:
   - cd %APPVEYOR_BUILD_FOLDER%
   build_script:
