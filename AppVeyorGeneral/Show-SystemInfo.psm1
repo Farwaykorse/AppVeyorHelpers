@@ -55,6 +55,7 @@ function Show-SystemInfo {
   )
   Begin
   {
+    $bar = ('-').PadRight(80,'-')
     $out = @()
     if (Assert-CI) {
       if ($env:APPVEYOR_SCHEDULED_BUILD) {
@@ -73,8 +74,9 @@ function Show-SystemInfo {
         $out += ('Build of tag: ' + $env:APPVEYOR_TAG_NAME)
       }
     }
-    if (Assert-CI) { $out += ('-- CI Session Configuration --') }
-    else { $out += ('-- Local System Configuration --') }
+    if (Assert-CI) {
+      $out += ('-- CI Session Configuration --').PadRight(80,'-')
+    } else { $out += ('-- Local System Configuration --').PadRight(80,'-') }
     if (Test-Command 'Get-WmiObject Win32_OperatingSystem') { # not in PS6.1
       $out += Join-Info 'OS / platform' (
         $((Get-WmiObject Win32_OperatingSystem).Name -split "[|]" |
@@ -121,7 +123,7 @@ function Show-SystemInfo {
   }
   End
   {
-    $out += ('-------------------------------------------------------------')
+    $out += $bar
     $out += Join-Info 'Initial path' $pwd.Path
     if (Assert-CI) {
       $out += Join-Info '$env:APPVEYOR_BUILD_FOLDER' $env:APPVEYOR_BUILD_FOLDER
