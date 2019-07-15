@@ -104,6 +104,9 @@ function Show-SystemInfo {
   {
     $out += ('-------------------------------------------------------------')
     $out += Join-Info 'Initial path' $pwd.Path
+    if (Assert-CI) {
+      $out += Join-Info '$env:APPVEYOR_BUILD_FOLDER' $env:APPVEYOR_BUILD_FOLDER
+    }
     Write-Output ($out -join "`n"); $out = ''
   }
 } #/ function Show-SystemInfo
