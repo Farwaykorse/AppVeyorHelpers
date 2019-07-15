@@ -203,12 +203,15 @@ function Show-7zipVersion {
 <#
 .SYNOPSIS
   Acquire the version number from the default python install.
+.NOTES
+  Python v2.7 outputs to the error stream.
 #>
 function Show-PythonVersion {
   [OutputType([String])]
   param()
-  if (Test-Command 'python --version') {
-    return ($(python --version) -split ' ' | Select-String -Pattern '^[0-9].+')
+  if (Test-Command 'python --version 2>$null') {
+    return ( ($(python --version) 2>&1) -split ' ' |
+      Select-String -Pattern '^[0-9].+' )
   } else { return ' ?' }
 }
 
