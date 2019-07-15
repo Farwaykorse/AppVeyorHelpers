@@ -56,6 +56,23 @@ function Show-SystemInfo {
   Begin
   {
     $out = @()
+    if (Assert-CI) {
+      if ($env:APPVEYOR_SCHEDULED_BUILD) {
+        $out += ('Scheduled Build.')
+      }
+      if ($env:APPVEYOR_FORCED_BUILD) {
+        $out += ('Forced Build, started by "New build" button.')
+      }
+      if ($env:APPVEYOR_RE_BUILD) {
+        $out += ('Build started by "Re-build commit/PR" button.')
+      }
+      if ($env:APPVEYOR_RE_RUN_INCOMPLETE) {
+        $out += ('Build started by "Re-run incomplete" button.')
+      }
+      if ($env:APPVEYOR_REPO_TAG) {
+        $out += ('Build of tag: ' + $env:APPVEYOR_TAG_NAME)
+      }
+    }
     if (Assert-CI) { $out += ('-- CI Session Configuration --') }
     else { $out += ('-- Local System Configuration --') }
     if (Test-Command 'Get-WmiObject Win32_OperatingSystem') { # not in PS6.1
