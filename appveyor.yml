@@ -38,14 +38,9 @@ for:
   before_build:
   - cd %APPVEYOR_BUILD_FOLDER%
   build_script:
-  - ps: $BuildName = 'placeholder'
   - ps: .\RunTests.ps1 -Coverage
   test_script:
   - ps: Assert-ValidCodecovYML
-  - ps: |
-      if ($BuildName -ne 'placeholder') {
-        Send-Message -Error 'BuildName escaped RunTests.ps1' -Details $BuildName
-      }
 -
   matrix:
     only:
@@ -59,7 +54,6 @@ for:
   before_build:
   - cd %APPVEYOR_BUILD_FOLDER%
   build_script:
-  - pwsh: $BuildName = 'placeholder'
   - pwsh: .\RunTests.ps1 -Coverage
   test_script:
   - pwsh: |
