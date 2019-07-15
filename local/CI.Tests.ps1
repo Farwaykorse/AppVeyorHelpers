@@ -1,4 +1,4 @@
-Import-Module -Name "${PSScriptRoot}\Basic.psd1" -Force
+Import-Module -Name "${PSScriptRoot}\CI.psd1" -Force
 
 Set-StrictMode -Version Latest
 

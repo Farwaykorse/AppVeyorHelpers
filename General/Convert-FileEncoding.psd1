@@ -4,7 +4,7 @@
 @{
 ##====--------------------------------------------------------------------====##
 RootModule = 'Convert-FileEncoding.psm1'
-ModuleVersion = '0.2'
+ModuleVersion = '0.3'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
@@ -32,8 +32,6 @@ PowerShellVersion = '5.1'
 ##====--------------------------------------------------------------------====##
 # Import configuration
 
-# Script files (.ps1) that are run in the caller's environment prior to importing this module
-ScriptsToProcess = @("${PSScriptRoot}\Convert-FileEncoding.SystemCheck.ps1")
 # Type files (.ps1xml) to be loaded when importing this module
 # TypesToProcess = @()
 # Format files (.ps1xml) to be loaded when importing this module
@@ -42,9 +40,11 @@ ScriptsToProcess = @("${PSScriptRoot}\Convert-FileEncoding.SystemCheck.ps1")
 # RequiredAssemblies = @()
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @(
-  @{ModuleName="${PSScriptRoot}\Basic.psd1"; ModuleVersion='0.1'},
+  @{ModuleName="${PSScriptRoot}\..\local\All.psd1"; ModuleVersion='0.1'},
   @{ModuleName="${PSScriptRoot}\Test-Command.psd1"; ModuleVersion='0.1'}
 )
+# Script files (.ps1) that are run in the caller's environment prior to importing this module
+ScriptsToProcess = @("${PSScriptRoot}\Convert-FileEncoding.SystemCheck.ps1")
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 # NestedModules = @()
 
@@ -52,13 +52,13 @@ RequiredModules = @(
 # Export configuration
 
 # Functions to export from this module
-FunctionsToExport = '*'
+FunctionsToExport = 'Convert-FileEncoding'
 # Cmdlets to export from this module
-CmdletsToExport = '*'
+CmdletsToExport = ''
 # Variables to export from this module
-VariablesToExport = '*'
+VariablesToExport = ''
 # Aliases to export from this module
-AliasesToExport = '*'
+AliasesToExport = ''
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
 # PrivateData = ''

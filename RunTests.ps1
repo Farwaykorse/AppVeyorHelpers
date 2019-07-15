@@ -1,3 +1,8 @@
+param(
+  # Enable code coverage reporting.
+  [Switch]$Coverage
+)
+
 <#
 .SYNOPSIS
   Validate the PowerShell environment and run unit tests on functions.
@@ -21,11 +26,17 @@ $Flag = 'ci_scripts'
 ##====--------------------------------------------------------------------====##
 Import-Module "${PSScriptRoot}\AppVeyorGeneral\Send-Message.psd1"
 
-Resolve-Path "${PSScriptRoot}\*.psd1", "${PSScriptRoot}\*\*.psd1" -Relative |
-  Test-ModuleManifest | Format-Table -Wrap | Out-String |
-  Send-Message -Info -Message 'Detected Modules'
+( Resolve-Path "${PSScriptRoot}\*.psd1", "${PSScriptRoot}\*\*.psd1" |
+    Test-ModuleManifest | Format-Table -Wrap -AutoSize | Out-String
+).Trim() -replace '[ ]*(\r?\n)','$1' |
+  Send-Message -Info -Message 'Detected Modules:'
 
 Import-Module "${PSScriptRoot}\AppVeyorHelpers.psd1" -Force
+( (Test-ModuleManifest "${PSScriptRoot}\AppVeyorHelpers.psd1"
+  ).ExportedFunctions.Values |
+  Format-Table -Property Name -HideTableHeaders | Out-String
+).Trim() -replace '[ ]*(\r?\n)','$1' |
+  Send-Message -Info -Message 'AppVeyorHelpers - Exported Functions:'
 
 ##====--------------------------------------------------------------------====##
 # Pester Configuration
@@ -59,14 +70,22 @@ Import-Module "${PSScriptRoot}\AppVeyorHelpers.psd1" -Force
 # Run Unit tests
 ##====--------------------------------------------------------------------====##
 Write-Verbose 'Run Pester unit tests ...'
-$result = Invoke-Pester `
-  -Script $Script -TestName $TestName                 `
-  -Tag $Tag -ExcludeTag $ExcludeTag                   `
-  -OutputFormat $OutputFormat -OutputFile $OutputFile `
-  -CodeCoverage $CodeCoverage                         `
-  -CodeCoverageOutputFile $CodeCoverageOutputFile     `
-  -CodeCoverageOutputFileFormat $CodeCoverageOutputFileFormat `
-  -Show $Show -PassThru
+if ($Coverage) {
+  $result = Invoke-Pester `
+    -Script $Script -TestName $TestName                 `
+    -Tag $Tag -ExcludeTag $ExcludeTag                   `
+    -OutputFormat $OutputFormat -OutputFile $OutputFile `
+    -CodeCoverage $CodeCoverage                         `
+    -CodeCoverageOutputFile $CodeCoverageOutputFile     `
+    -CodeCoverageOutputFileFormat $CodeCoverageOutputFileFormat `
+    -Show $Show -PassThru
+} else {
+  $result = Invoke-Pester `
+    -Script $Script -TestName $TestName                 `
+    -Tag $Tag -ExcludeTag $ExcludeTag                   `
+    -OutputFormat $OutputFormat -OutputFile $OutputFile `
+    -Show $Show -PassThru
+}
 
 if (-not $env:AppVeyor) {
   Write-Verbose 'No AppVeyor environment detected. Uploads disabled.'
@@ -76,10 +95,18 @@ if (-not $env:AppVeyor) {
 }
 Send-TestResult -File $OutputFile -Format $OutputFormatUpload `
   -WhatIf:$UseWhatif
-Send-Codecov -File $CodeCoverageOutputFile -BuildName:$BuildName -Flag:$Flag `
-  -Whatif:$UseWhatif
+if ($Coverage) {
+  try {
+    Send-Codecov -File $CodeCoverageOutputFile -BuildName:$BuildName -Flag:$Flag `
+      -Whatif:$UseWhatif
+  } catch {
+    # ignore exit-code
+  }
+}
 Write-Verbose 'Run Pester unit tests ... done'
 
 if ($result.FailedCount -gt 0) {
   throw "$($result.FailedCount) tests failed."
+} else {
+  Write-Output 'RunTests: success'
 }

@@ -7,7 +7,7 @@
 @{
 ##====--------------------------------------------------------------------====##
 RootModule = ''
-ModuleVersion = '0.8'
+ModuleVersion = '0.9'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
@@ -24,7 +24,7 @@ Code coverage send to codecov.io.'
 # Requirements
 
 # Minimum version of the Windows PowerShell engine required by this module
-# PowerShellVersion = ''
+PowerShellVersion = '5.1'
 # Name of the Windows PowerShell host required by this module
 # PowerShellHostName = ''
 # Minimum version of the Windows PowerShell host required by this module
@@ -51,12 +51,10 @@ Code coverage send to codecov.io.'
 # RequiredModules = @()
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 NestedModules = @(
-  "${PSScriptRoot}\General\Basic.psd1",
   "${PSScriptRoot}\General\Convert-FileEncoding.psd1",
   "${PSScriptRoot}\General\Expand-Archive.psd1",
   "${PSScriptRoot}\General\Invoke-Curl.psd1",
   "${PSScriptRoot}\General\Test-Command.psd1",
-  "${PSScriptRoot}\AppVeyorGeneral\Basic.psd1",
   "${PSScriptRoot}\AppVeyorGeneral\Send-Message.psd1",
   "${PSScriptRoot}\AppVeyorGeneral\Send-TestResult.psd1",
   "${PSScriptRoot}\C++\Install-Ninja.psd1",

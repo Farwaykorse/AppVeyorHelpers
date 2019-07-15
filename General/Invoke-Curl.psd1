@@ -6,7 +6,7 @@
 #>
 @{
 RootModule = 'Invoke-Curl.psm1'
-ModuleVersion = '0.2'
+ModuleVersion = '0.3'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
@@ -19,7 +19,7 @@ Description = 'Wrapper around Curl.exe'
 # Requirements
 
 # Minimum version of the Windows PowerShell engine required by this module
-# PowerShellVersion = ''
+PowerShellVersion = '5.1'
 # Name of the Windows PowerShell host required by this module
 # PowerShellHostName = ''
 # Minimum version of the Windows PowerShell host required by this module
@@ -44,7 +44,7 @@ Description = 'Wrapper around Curl.exe'
 # RequiredAssemblies = @()
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @(
-  @{ModuleName="${PSScriptRoot}\Basic.psd1"; ModuleVersion='0.1'}
+  @{ModuleName="${PSScriptRoot}\..\local\All.psd1"; ModuleVersion='0.1'}
 )
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 # NestedModules = @()
@@ -53,13 +53,13 @@ RequiredModules = @(
 # Export configuration
 
 # Functions to export from this module
-FunctionsToExport = '*'
+FunctionsToExport = 'Invoke-Curl'
 # Cmdlets to export from this module
-CmdletsToExport = '*'
+CmdletsToExport = ''
 # Variables to export from this module
-VariablesToExport = '*'
+VariablesToExport = ''
 # Aliases to export from this module
-AliasesToExport = '*'
+AliasesToExport = ''
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
 # PrivateData = ''

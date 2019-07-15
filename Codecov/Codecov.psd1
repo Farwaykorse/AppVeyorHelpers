@@ -6,8 +6,8 @@
 #>
 @{
 ##====--------------------------------------------------------------------====##
-RootModule = 'Send-Codecov.psd1'
-ModuleVersion = '0.2'
+RootModule = ''
+ModuleVersion = '0.3'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
@@ -21,7 +21,7 @@ Description = ''
 # Requirements
 
 # Minimum version of the Windows PowerShell engine required by this module
-# PowerShellVersion = '5.1'
+PowerShellVersion = '5.1'
 # Name of the Windows PowerShell host required by this module
 # PowerShellHostName = ''
 # Minimum version of the Windows PowerShell host required by this module
@@ -54,6 +54,7 @@ Description = ''
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 NestedModules = @(
   "${PSScriptRoot}\Assert-ValidCodecovYML.psd1"
+  "${PSScriptRoot}\Send-Codecov.psd1"
 )
 
 ##====--------------------------------------------------------------------====##
@@ -62,11 +63,11 @@ NestedModules = @(
 # Functions to export from this module
 FunctionsToExport = '*'
 # Cmdlets to export from this module
-CmdletsToExport = '*'
+CmdletsToExport = ''
 # Variables to export from this module
 VariablesToExport = '*'
 # Aliases to export from this module
-AliasesToExport = '*'
+AliasesToExport = ''
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
 # PrivateData = ''

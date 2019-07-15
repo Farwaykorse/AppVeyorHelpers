@@ -5,10 +5,10 @@ Set-StrictMode -Version Latest
 ##====--------------------------------------------------------------------====##
 $global:msg_documentation = 'at least 1 empty line above documentation'
 
-$PWSH_Avaiable = $false
+$PWSH_Avaiable = $true
 if ( $PSVersionTable.PSVersion.Major -lt 6 ) {
-  if ( Test-Command 'pwsh { exit 0 }' ) {
-    $PWSH_Avaiable = $true
+  if ( -not (Test-Command 'pwsh { exit 0 }') ) {
+    $PWSH_Avaiable = $false
   }
 }
 function Test-RequirePSCore {

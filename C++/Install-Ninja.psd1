@@ -6,7 +6,7 @@
 #>
 @{
 RootModule = 'Install-Ninja.psm1'
-ModuleVersion = '0.3'
+ModuleVersion = '0.4'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
@@ -48,7 +48,7 @@ PowerShellVersion = '5.1'
 
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @(
-  @{ModuleName="${PSScriptRoot}\..\General\Basic.psd1"; ModuleVersion='0.1'},
+  @{ModuleName="${PSScriptRoot}\..\local\All.psd1"; ModuleVersion='0.1'},
   @{ModuleName="${PSScriptRoot}\..\General\Test-Command.psd1"; ModuleVersion='0.1'},
   @{ModuleName="${PSScriptRoot}\..\General\Expand-Archive.psd1"; ModuleVersion='0.2'},
   @{ModuleName="${PSScriptRoot}\..\General\Invoke-Curl.psd1"; ModuleVersion='0.2'},
@@ -62,13 +62,13 @@ NestedModules = @()
 # Export configuration
 
 # Functions to export from this module
-FunctionsToExport = '*'
+FunctionsToExport = 'Install-Ninja'
 # Cmdlets to export from this module
-CmdletsToExport = '*'
+CmdletsToExport = ''
 # Variables to export from this module
-VariablesToExport = '*'
+VariablesToExport = ''
 # Aliases to export from this module
-AliasesToExport = '*'
+AliasesToExport = ''
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
 # PrivateData = ''

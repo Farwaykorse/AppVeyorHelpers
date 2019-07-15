@@ -18,6 +18,10 @@ Set-StrictMode -Version Latest
   INFO: Validated Codecov yml
 
   Use a path relative to the current directory.
+.OUTPUTS
+  $true when validation succeeded
+  $false when validation failed
+  $null in case of a connection error
 #>
 function Assert-ValidCodecovYML {
   [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Medium')]
@@ -57,28 +61,54 @@ function Assert-ValidCodecovYML {
   Process
   {
     if ($PSCmdlet.ShouldProcess($Path[0].Path, "Upload to $Uri")) {
-      try {
-        $output = Invoke-RestMethod -Uri https://codecov.io/validate `
-          -Body (Get-Content -Raw -LiteralPath ($Path[0].Path)) -Method POST
-      } catch [System.Net.WebException] {
-        if ($_.Exception.Response.StatusCode.value__) {
-          $details = (
+      if ($PSVersionTable.PSVersion.Major -lt 6) {
+        try {
+          $output = Invoke-RestMethod -Uri $Uri `
+            -Body (Get-Content -Raw -LiteralPath ($Path[0].Path)) -Method POST
+        } catch [System.Net.WebException] {
+          if ($_.Exception.Response -eq $null) {
+            Send-Message -Warning ('Failed to connect to "' + $Uri + '"!') `
+              -Details ($_).ToString().Trim()
+            return $null
+          } else {
+            if ($_.Exception.Response.StatusCode.value__) {
+              $details = (
+              $_.Exception.Response.StatusCode.value__).ToString().Trim()
+            }
+            if ($_.Exception.Response.StatusDescription) {
+              $details += (' ' + (
+                $_.Exception.Response.StatusDescription).ToString().Trim() )
+            }
+          }
+          Send-Message -Error -Message `
+            "Validation of Codecov YAML failed!" `
+            -Details $details, ($_).ToString().Trim() -ContinueOnError
+          return $false
+        }
+      } else { # PS v6+
+        try {
+          try {
+            $output = Invoke-RestMethod -Uri $Uri `
+              -Body (Get-Content -Raw -LiteralPath ($Path[0].Path)) -Method POST
+          } catch [System.Net.Sockets.SocketException] { # PS v6+
+            Send-Message -Warning ('Socket: Failed to connect to "' + $Uri +
+              '"!') -Details ($_).ToString().Trim()
+            return $null
+          }
+        } catch [System.Net.Http.HttpRequestException] {
+          if ($_.Exception.Response.StatusCode.value__) {
+            $details = (
             $_.Exception.Response.StatusCode.value__).ToString().Trim()
-        }
-        if ($PSVersionTable.PSVersion.Major -lt 6) { # confirmed for v5.1
-          if ($_.Exception.Response.StatusDescription) {
-            $details += (
-              $_.Exception.Response.StatusDescription).ToString().Trim()
-          }
-        } else { # confirmed for v6.1.2
+          } else { $details = '' }
           if ($_.Exception.Response.ReasonPhrase) {
-            $details += ($_.Exception.Response.ReasonPhrase).ToString().Trim()
+            $details += (' ' + (
+              $_.Exception.Response.ReasonPhrase).ToString().Trim() + "`n")
           }
+          Send-Message -Error -Message `
+            "Validation of Codecov YAML failed!" `
+            -Details ($details + ($_).ToString().Trim()) -ContinueOnError
+          return $false
         }
-        Send-Message -Error -Message `
-          "Validation of Codecov YAML failed!" `
-          -ContinueOnError -Details $details, $_.ErrorDetails
-        return $false
       }
       Send-Message -Info -Message `
         "Validated Codecov yml" `

@@ -99,9 +99,7 @@ function Check-Installed {
 
   if (-not $global:CodecovInstalled) {
     Write-Verbose 'Calling Codecov Python uploader to test if installed.'
-    if (Test-Command -Command `
-      'python -m codecov' -cMatch 'Detecting CI provider'
-    ) {
+    if ( Test-Command -Command 'python -c "import codecov"' ) {
       Set-Variable -Name CodecovInstalled -Value $true -Scope Global
     } else { return $false }
   } 

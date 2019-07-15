@@ -86,13 +86,6 @@ Describe 'Expand-Archive' {
       { Expand-Archive -Archive "$archive" -FlatPath } |
         Should -Throw '-FlatPath requires -TargetDir'
     }
-    It 'accepts wildcard characters' {
-      Test-InconclusiveMissingFile $archive
-      In -Path "$test_drive" {
-        { Expand-Archive -Archive (Join-Path $test_drive '*.zip') `
-          -TargetDir .\ *>$null } | Should -not -Throw
-      }
-    }
   }
 
   Context 'a .zip archive' {
@@ -100,7 +93,7 @@ Describe 'Expand-Archive' {
     $archive_name = 'archive'
     $archive = Join-Path "$test_drive" "${archive_name}.zip"
     $file_1 = 'Expand-Archive.Tests.ps1'
-    $this_file = Resolve-Path (Join-Path $PSScriptRoot $file_1) -Relative
+    $this_file = Resolve-Path (Join-Path $PSScriptRoot $file_1)
 
     It 'create zip' {
       Test-Path $archive -PathType Leaf | Should -Be $false `
@@ -108,6 +101,16 @@ Describe 'Expand-Archive' {
       { 7z a -bso0 -y "$archive" "$this_file" } | Should -not -Throw
       Test-Path "$archive" -PathType Leaf | Should -Be $true `
         -Because 'Archive not in expected location.'
+    }
+
+    Context 'wildcard' {
+      It 'accepts wildcard characters' {
+        Test-InconclusiveMissingFile $archive
+        In -Path "$test_drive" {
+          { Expand-Archive -Archive (Join-Path $test_drive '*.zip') `
+            -TargetDir .\ *>$null } | Should -not -Throw
+        }
+      }
     }
 
     Context 'WhatIf' {
