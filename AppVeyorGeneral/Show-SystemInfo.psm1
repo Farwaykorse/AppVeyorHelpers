@@ -55,7 +55,8 @@ function Show-SystemInfo {
     [switch]$LLVM,
     [switch]$PowerShell,
     [switch]$Python,
-    [switch]$SevenZip
+    [switch]$SevenZip,
+    [switch]$Curl
   )
   Begin
   {
@@ -81,6 +82,7 @@ function Show-SystemInfo {
     if (Assert-CI) {
       $out += ('-- CI Session Configuration --').PadRight(80,'-')
     } else { $out += ('-- Local System Configuration --').PadRight(80,'-') }
+    # System
     $out += Join-Info 'OS / platform' $(
       if ($PSVersionTable.PSVersion.Major -lt 6) {
         $((Get-WmiObject Win32_OperatingSystem).Caption) + ' / ' +
@@ -90,6 +92,7 @@ function Show-SystemInfo {
         $((Get-CimInstance CIM_OperatingSystem).OSArchitecture)
       }
     )
+    # AppVeyor default matrix 
     if (Assert-CI -and $env:APPVEYOR_BUILD_WORKER_IMAGE) {
       $out += Join-Info 'Image' $env:APPVEYOR_BUILD_WORKER_IMAGE
     }
@@ -123,6 +126,7 @@ function Show-SystemInfo {
     if ($LLVM -or $All)     { $out += Join-Info LLVM/clang $(Show-LLVMVersion) }
     if ($CMake -or $All)    { $out += Join-Info CMake $(Show-CMakeVersion) }
     if ($Python -or $All)   { $out += Join-Info Python $(Show-PythonVersion) }
+    if ($Curl -or $All)     { $out += Join-Info Curl $(Show-CurlVersion) }
   }
   Process
   {
@@ -226,6 +230,21 @@ function Show-LLVMVersion {
     return (
       ($(clang-cl --version) | Select-String -Pattern version) -split ' ' |
         Select-String -Pattern '^[0-9].+'
+    )
+  } else { return ' ?' }
+}
+
+<#
+.SYNOPSIS
+  Acquire the version number from Curl.
+#>
+function Show-CurlVersion {
+  [OutputType([String])]
+  param()
+  if (Test-Command 'curl.exe -V') {
+    return (
+      $(curl.exe -V) -split ' ' |
+        Select-String -Pattern '^([0-9]+\.)+[0-9]+.*'
     )
   } else { return ' ?' }
 }

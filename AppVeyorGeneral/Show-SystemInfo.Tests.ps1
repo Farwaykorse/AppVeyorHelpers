@@ -147,6 +147,18 @@ Describe 'Internal Show-<software>Version' {
         Show-LLVMVersion | Should -match '^([0-9]+\.)+[0-9]+$'
       }
     }
+    Context 'Curl' {
+      $available = $(Test-Command 'curl.exe -V')
+      It 'no throw' {
+          { Show-CurlVersion } | Should -not -Throw
+      }
+      It 'return version number' {
+        if (-not $available) {
+          Set-ItResult -Inconclusive -Because ('no Curl')
+        }
+        Show-CurlVersion | Should -match '^([0-9]+\.)+[0-9]+$'
+      }
+    }
     Context 'mock software unavailable' {
       Mock Test-Command { return $false } -ModuleName Show-SystemInfo
       It 'CMake' {
@@ -160,6 +172,9 @@ Describe 'Internal Show-<software>Version' {
       }
       It 'LLVM' {
         Show-LLVMVersion | Should -MatchExactly ' ?'
+      }
+      It 'Curl' {
+        Show-CurlVersion | Should -MatchExactly ' ?'
       }
     }
   }
@@ -189,6 +204,9 @@ Describe 'Show-SystemInfo' {
     }
     It 'no throw on -SevenZip' {
       { Show-SystemInfo -SevenZip } | Should -not -Throw
+    }
+    It 'no throw on -Curl' {
+      { Show-SystemInfo -Curl } | Should -not -Throw
     }
     It 'no throw on -All' {
       { Show-SystemInfo -All } | Should -not -Throw
