@@ -124,7 +124,8 @@ Describe 'Internal Show-<software>Version' {
       }
     }
     Context 'Python' {
-      $available = $(Test-Command 'python --version')
+      # Note: Python v2.7 writes to error stream:
+      $available = $(Test-Command 'python --version 2>$null')
       It 'no throw' {
           { Show-PythonVersion } | Should -not -Throw
       }
