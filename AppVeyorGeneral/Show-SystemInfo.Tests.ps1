@@ -41,12 +41,13 @@ Describe 'Internal Join-Info' {
       }
     }
     Context 'Basic operation' {
-      It 'align to default length of 15' {
-        $Align = 15
+      It 'align to default length of 20' {
+        $Align = 20
         Join-Info 'some' 'text' | Should -Match 'some:.*text'
-        (Join-Info 'some' 'text').Length | Should -Be 19 -Because '15+4'
-        Join-Info 'some' 'text' | Should -MatchExactly 'some:          text' `
-          -Because 'default Length = 15'
+        (Join-Info 'some' 'text').Length | Should -Be 24 -Because '20+4'
+        Join-Info 'some' 'text' |
+          Should -MatchExactly 'some:               text' `
+          -Because 'default Length = 20'
         Join-Info 'some' 'text' |
           Should -not -MatchExactly 'some:    text' -Because 'test-error'
       }
@@ -105,7 +106,7 @@ Describe 'Internal Show-<software>Version' {
       }
       It 'return version number' {
         if (-not $available) {
-          Set-ItResult -Inconclusive -Because ('no cmake')
+          Set-ItResult -Inconclusive -Because ('no CMake')
         }
         Show-CMakeVersion | Should -match '^([0-9]+\.)+[0-9]+(-rc)?$'
       }
@@ -123,13 +124,14 @@ Describe 'Internal Show-<software>Version' {
       }
     }
     Context 'Python' {
-      $available = $(Test-Command 'python --version')
+      # Note: Python v2.7 writes to error stream:
+      $available = $(Test-Command 'python --version 2>$null')
       It 'no throw' {
           { Show-PythonVersion } | Should -not -Throw
       }
       It 'return version number' {
         if (-not $available) {
-          Set-ItResult -Inconclusive -Because ('no cmake')
+          Set-ItResult -Inconclusive -Because ('no python')
         }
         Show-PythonVersion | Should -match '^([0-9]+\.)+[0-9]+$'
       }
@@ -141,9 +143,21 @@ Describe 'Internal Show-<software>Version' {
       }
       It 'return version number' {
         if (-not $available) {
-          Set-ItResult -Inconclusive -Because ('no cmake')
+          Set-ItResult -Inconclusive -Because ('no clang-cl')
         }
-        Show-LLVMVersion | Should -match '^([0-9]+\.)+[0-9]$'
+        Show-LLVMVersion | Should -match '^([0-9]+\.)+[0-9]+$'
+      }
+    }
+    Context 'Curl' {
+      $available = $(Test-Command 'curl.exe -V')
+      It 'no throw' {
+          { Show-CurlVersion } | Should -not -Throw
+      }
+      It 'return version number' {
+        if (-not $available) {
+          Set-ItResult -Inconclusive -Because ('no Curl')
+        }
+        Show-CurlVersion | Should -match '^([0-9]+\.)+[0-9]+$'
       }
     }
     Context 'mock software unavailable' {
@@ -159,6 +173,9 @@ Describe 'Internal Show-<software>Version' {
       }
       It 'LLVM' {
         Show-LLVMVersion | Should -MatchExactly ' ?'
+      }
+      It 'Curl' {
+        Show-CurlVersion | Should -MatchExactly ' ?'
       }
     }
   }
@@ -189,6 +206,9 @@ Describe 'Show-SystemInfo' {
     It 'no throw on -SevenZip' {
       { Show-SystemInfo -SevenZip } | Should -not -Throw
     }
+    It 'no throw on -Curl' {
+      { Show-SystemInfo -Curl } | Should -not -Throw
+    }
     It 'no throw on -All' {
       { Show-SystemInfo -All } | Should -not -Throw
     }
@@ -201,11 +221,11 @@ Describe 'Show-SystemInfo' {
     }
   }
   Context 'Setting Align' {
-    It 'default alignment (15 characters)' {
-      Show-SystemInfo | Should -match '\n.{14} [^ ]'
+    It 'default alignment (20 characters)' {
+      Show-SystemInfo | Should -match '\n.{19} [^ ]'
     }
-    It '-Align 20' {
-      Show-SystemInfo -Align 20 | Should -match '\n.{19} [^ ]'
+    It '-Align 25' {
+      Show-SystemInfo -Align 25 | Should -match '\n.{24} [^ ]'
     }
   }
   Context 'mock (not) on CI' {

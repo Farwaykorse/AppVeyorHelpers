@@ -10,52 +10,53 @@ Set-StrictMode -Version Latest
 .EXAMPLE
   Show-SystemInfo
   -- CI Session Configuration --
-  OS / platform: Microsoft Windows Server 2019 Datacenter / 64-bit
-  Image:         Visual Studio 2019
-  Configuration: Debug
-  Platform:      x64
-  -------------------------------------------------------------
-  Initial path:  C:\projects\sampleproject
+  OS / platform:      Microsoft Windows Server 2019 Datacenter / 64-bit
+  Image:              Visual Studio 2019
+  Configuration:      Debug
+  Platform:           x64
+  ------------------------------------------------------------------------------
+  Initial path:       C:\projects\sampleproject
 .EXAMPLE
   Show-SystemInfo -PowerShell -CMake
   -- CI Session Configuration --
-  OS / platform: Microsoft Windows Server 2019 Datacenter / 64-bit
-  Image:         Visual Studio 2019
-  Configuration: Debug
-  Platform:      x64
-  PowerShell:    5.1.17763.503
-  PS Core:       6.2.0
-  CMake:         3.14.4
-  -------------------------------------------------------------
-  Initial path:  C:\projects\sampleproject
+  OS / platform:      Microsoft Windows Server 2019 Datacenter / 64-bit
+  Image:              Visual Studio 2019
+  Configuration:      Debug
+  Platform:           x64
+  PowerShell:         5.1.17763.503
+  PS Core:            6.2.0
+  CMake:              3.14.4
+  ------------------------------------------------------------------------------
+  Initial path:       C:\projects\sampleproject
 .EXAMPLE
   Show-SystemInfo -All | Send-Message 'SystemInfo' -HideDetails
   -- CI Session Configuration --
   OS / platform: Microsoft Windows Server 2019 Datacenter / 64-bit
-  Image:         Visual Studio 2019
-  Configuration: Debug
-  Platform:      x64
-  PowerShell:    5.1.17763.503
-  PS Core:       6.2.0
-  7-zip:         19.00
-  LLVM/clang:    8.0.0
-  CMake:         3.14.4
-  Python:        2.7.16
-  -------------------------------------------------------------
-  Initial path:  C:\projects\sampleproject
+  Image:              Visual Studio 2019
+  Configuration:      Debug
+  Platform:           x64
+  PowerShell:         5.1.17763.503
+  PS Core:            6.2.0
+  7-zip:              19.00
+  LLVM/clang:         8.0.0
+  CMake:              3.14.4
+  Python:             2.7.16
+  ------------------------------------------------------------------------------
+  Initial path:       C:\projects\sampleproject
 #>
 function Show-SystemInfo {
   param(
     [ValidateScript({ $_ -ge 0 })]
     [Alias('ColumnWidth')]
-    # Alignment of data/ first column width (default 15 characters).
-    [Int]$Align = 15,
+    # Alignment of data/ first column width (default 20 characters).
+    [Int]$Align = 20,
     [switch]$All,
     [switch]$CMake,
     [switch]$LLVM,
     [switch]$PowerShell,
     [switch]$Python,
-    [switch]$SevenZip
+    [switch]$SevenZip,
+    [switch]$Curl
   )
   Begin
   {
@@ -81,6 +82,7 @@ function Show-SystemInfo {
     if (Assert-CI) {
       $out += ('-- CI Session Configuration --').PadRight(80,'-')
     } else { $out += ('-- Local System Configuration --').PadRight(80,'-') }
+    # System
     $out += Join-Info 'OS / platform' $(
       if ($PSVersionTable.PSVersion.Major -lt 6) {
         $((Get-WmiObject Win32_OperatingSystem).Caption) + ' / ' +
@@ -90,6 +92,7 @@ function Show-SystemInfo {
         $((Get-CimInstance CIM_OperatingSystem).OSArchitecture)
       }
     )
+    # AppVeyor default matrix 
     if (Assert-CI -and $env:APPVEYOR_BUILD_WORKER_IMAGE) {
       $out += Join-Info 'Image' $env:APPVEYOR_BUILD_WORKER_IMAGE
     }
@@ -123,6 +126,7 @@ function Show-SystemInfo {
     if ($LLVM -or $All)     { $out += Join-Info LLVM/clang $(Show-LLVMVersion) }
     if ($CMake -or $All)    { $out += Join-Info CMake $(Show-CMakeVersion) }
     if ($Python -or $All)   { $out += Join-Info Python $(Show-PythonVersion) }
+    if ($Curl -or $All)     { $out += Join-Info Curl $(Show-CurlVersion) }
   }
   Process
   {
@@ -141,15 +145,15 @@ function Show-SystemInfo {
 
 <#
 .SYNOPSIS
-  Return "<Info>:   <Data>" with constant alignment.
+  Return "<Info>:        <Data>" with constant alignment.
 .EXAMPLE
   Join-Info 'Some item' 'The information regarding this item.'
-  Some item:    The information regarding this item.'
-.EXAMPLE
-  Join-Info 'Some item' 'The information regarding this item.' -Length 20
   Some item:         The information regarding this item.'
 .EXAMPLE
-  Join-Info 'Long item name' 'The information regarding this item.'
+  Join-Info 'Some item' 'The information regarding this item.' -Length 15
+  Some item:    The information regarding this item.'
+.EXAMPLE
+  Join-Info 'Long item name' 'The information regarding this item.' -Length 5
   Long item name: The information regarding this item.'
 
   A string longer then the set Length shifts the Data item out of alignment.
@@ -203,12 +207,15 @@ function Show-7zipVersion {
 <#
 .SYNOPSIS
   Acquire the version number from the default python install.
+.NOTES
+  Python v2.7 outputs to the error stream.
 #>
 function Show-PythonVersion {
   [OutputType([String])]
   param()
-  if (Test-Command 'python --version') {
-    return ($(python --version) -split ' ' | Select-String -Pattern '^[0-9].+')
+  if (Test-Command 'python --version 2>$null') {
+    return ( ($(python --version) 2>&1) -split ' ' |
+      Select-String -Pattern '^[0-9].+' )
   } else { return ' ?' }
 }
 
@@ -223,6 +230,21 @@ function Show-LLVMVersion {
     return (
       ($(clang-cl --version) | Select-String -Pattern version) -split ' ' |
         Select-String -Pattern '^[0-9].+'
+    )
+  } else { return ' ?' }
+}
+
+<#
+.SYNOPSIS
+  Acquire the version number from Curl.
+#>
+function Show-CurlVersion {
+  [OutputType([String])]
+  param()
+  if (Test-Command 'curl.exe -V') {
+    return (
+      $(curl.exe -V) -split ' ' |
+        Select-String -Pattern '^([0-9]+\.)+[0-9]+.*'
     )
   } else { return ' ?' }
 }
