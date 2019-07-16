@@ -164,12 +164,12 @@ function Install-Ninja {
     }
 
     $Path = Join-Path $Path 'ninja.exe'
-    if (Test-Path $Path) {
-      return (Resolve-Path -LiteralPath $Path)
-    } else { return $null }
     if (-not $Quiet) {
       Write-Host "-- Install Ninja-build ${Tag} ... done"
     }
+    if (Test-Path $Path) {
+      return (Resolve-Path -LiteralPath $Path)
+    } else { return $null }
   }
 } #/ function Install-Ninja
 ##====--------------------------------------------------------------------====##
