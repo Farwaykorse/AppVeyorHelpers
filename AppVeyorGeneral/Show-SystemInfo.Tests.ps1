@@ -106,7 +106,7 @@ Describe 'Internal Show-<software>Version' {
       }
       It 'return version number' {
         if (-not $available) {
-          Set-ItResult -Inconclusive -Because ('no cmake')
+          Set-ItResult -Inconclusive -Because ('no CMake')
         }
         Show-CMakeVersion | Should -match '^([0-9]+\.)+[0-9]+(-rc)?$'
       }
@@ -144,7 +144,7 @@ Describe 'Internal Show-<software>Version' {
         if (-not $available) {
           Set-ItResult -Inconclusive -Because ('no clang-cl')
         }
-        Show-LLVMVersion | Should -match '^([0-9]+\.)+[0-9]$'
+        Show-LLVMVersion | Should -match '^([0-9]+\.)+[0-9]+$'
       }
     }
     Context 'mock software unavailable' {
