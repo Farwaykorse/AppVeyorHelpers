@@ -382,14 +382,38 @@ Describe 'Install-Ninja (online)' -Tag 'online' {
     Mock Assert-CI { return $false } -ModuleName Send-Message
     $start_path = $PWD
     $Temporary = Join-Path $env:TEMP 'ninja-v1.8.2'
+    $test_drive = (Resolve-Path 'TestDrive:').ProviderPath
 
     It 'Invalid tag = invalid url' {
-      { Install-Ninja -Tag 'v1.X' -InstallDir 'TestDrive:\' 3>$null 6>$null `
+      { Install-Ninja -Tag 'v1.X' -InstallDir $test_drive 3>$null 6>$null `
       } | Should -Throw 'Download failed'
     }
     It 'wrong/ changed hash (SHA512)' {
-      { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\' -SHA512 `
-        '0000E248240665FCD6404B989F3B3C27ED9682838225E6DC9B67B551774F251E4FF8A207504F941E7C811E7A8BE1945E7BCB94472A335EF15E23A0200A32E6D5' `
+      { Install-Ninja -Tag 'v1.8.2' -InstallDir $test_drive -SHA512 `
+        'XB9CE248240665FCD6404B989F3B3C27ED9682838225E6DC9B67B551774F251E4FF8A207504F941E7C811E7A8BE1945E7BCB94472A335EF15E23A0200A32E6D5' `
+        6>$null
+      } | Should -Throw 'download hash changed'
+    }
+    It 'wrong/ changed hash (SHA384)' {
+      { Install-Ninja -Tag 'v1.8.2' -InstallDir $test_drive -Hash `
+        'X802130CDAB6055D88A8A2A67D854F68D21E1A0223150A1B6FF0B6FED4A4A77C62C90E0BC8A6925268D50DF12C8DEFF6' `
+        6>$null
+      } | Should -Throw 'download hash changed'
+    }
+    It 'wrong/ changed hash (SHA256)' {
+      { Install-Ninja -Tag 'v1.8.2' -InstallDir $test_drive -Hash `
+        'X80313E6C26C0B9E0C241504718E2D8BBC2798B73429933ADF03FDC6D84F0E70' `
+        6>$null
+      } | Should -Throw 'download hash changed'
+    }
+    It 'wrong/ changed hash (SHA1)' {
+      { Install-Ninja -Tag 'v1.8.2' -InstallDir $test_drive -Hash `
+        'X37CC6E144F5CC7C6388A30F3C32AD81B2E0442E' 6>$null
+      } | Should -Throw 'download hash changed'
+    }
+    It 'wrong/ changed hash (MD5)' {
+      { Install-Ninja -Tag 'v1.8.2' -InstallDir $test_drive -Hash `
+        'XAC14A8126E9E3716700EFD274F4EFC7' 6>$null
         6>$null
       } | Should -Throw 'download hash changed'
     }
