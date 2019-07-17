@@ -378,8 +378,6 @@ Describe 'Install-Ninja (online)' -Tag 'online' {
   Mock Assert-CI { return $false } -ModuleName Send-Message
 
   Context 'install ninja' {
-    # Suppress output to the Appveyor Message API.
-    Mock Assert-CI { return $false } -ModuleName Send-Message
     $start_path = $PWD
     $Temporary = Join-Path $env:TEMP 'ninja-v1.8.2'
     $test_drive = (Resolve-Path 'TestDrive:').ProviderPath
@@ -387,6 +385,8 @@ Describe 'Install-Ninja (online)' -Tag 'online' {
     It 'Invalid tag = invalid url' {
       { Install-Ninja -Tag 'v1.X' -InstallDir $test_drive 3>$null 6>$null `
       } | Should -Throw 'Download failed'
+      Assert-MockCalled Assert-CI -ModuleName Send-Message -Times 3 -Exactly `
+        -Scope It
     }
     It 'wrong/ changed hash (SHA512)' {
       { Install-Ninja -Tag 'v1.8.2' -InstallDir $test_drive -SHA512 `
