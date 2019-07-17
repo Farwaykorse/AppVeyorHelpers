@@ -7,7 +7,7 @@
 @{
 ##====--------------------------------------------------------------------====##
 RootModule = ''
-ModuleVersion = '0.10.3'
+ModuleVersion = '0.10.4'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
@@ -51,13 +51,11 @@ PowerShellVersion = '5.1'
 # RequiredModules = @()
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 NestedModules = @(
+  "${PSScriptRoot}\AppVeyor\AppVeyor.psd1",
   "${PSScriptRoot}\General\Convert-FileEncoding.psd1",
   "${PSScriptRoot}\General\Expand-Archive.psd1",
   "${PSScriptRoot}\General\Invoke-Curl.psd1",
   "${PSScriptRoot}\General\Test-Command.psd1",
-  "${PSScriptRoot}\AppVeyor\Send-Message.psd1",
-  "${PSScriptRoot}\AppVeyor\Send-TestResult.psd1",
-  "${PSScriptRoot}\AppVeyor\Show-SystemInfo.psd1",
   "${PSScriptRoot}\C++\C++.psd1",
   "${PSScriptRoot}\Codecov\Codecov.psd1"
 )
