@@ -53,7 +53,7 @@ PowerShellVersion = '5.1'
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 NestedModules = @(
-  "${PSScriptRoot}\Assert-ValidCodecovYML.psd1"
+  "${PSScriptRoot}\Assert-ValidCodecovYML.psd1",
   "${PSScriptRoot}\Send-Codecov.psd1"
 )
 
