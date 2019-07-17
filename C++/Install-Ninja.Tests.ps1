@@ -98,62 +98,81 @@ Describe 'Install-Ninja' {
   Context 'WhatIf' {
     New-Item 'TestDrive:\dir' -ItemType Directory -Force
     $start_path = $PWD
-
-    It 'before: no archive present' {
-      $Temporary = Join-Path $env:TEMP 'ninja-v1.8.2'
-      Test-Path -LiteralPath "$(Join-Path $Temporary 'ninja-win.zip')" |
-        Should -Be $false
-      Test-Path -LiteralPath "$Temporary" | Should -Be $false
-    }
-    It 'before: no executable present' {
-      Test-Path -LiteralPath 'TestDrive:\dir\ninja-v1.8.2\ninja.exe' |
-        Should -Be $false
-    }
-    It 'Call with -WhatIf' {
-      { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\dir' `
-        -SHA512 CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E `
-        -WhatIf 6>$null } | Should -not -Throw
-    }
-    It 'after: no archive present' {
-      $Temporary = Join-Path $env:TEMP 'ninja-v1.8.2'
-      Test-Path -LiteralPath "$(Join-Path $Temporary 'ninja-win.zip')" |
-        Should -Be $false
-      Test-Path -LiteralPath "$Temporary" | Should -Be $false
-    }
-    It 'after: no executable present' {
-      Test-Path -LiteralPath 'TestDrive:\dir\ninja-v1.8.2\ninja.exe' |
-        Should -Be $false
-    }
-    It 'no change in current working directory' {
-      $PWD.Path | Should -Be $start_path.Path
-    }
-    if ($PWD -ne $start_path) { cd $start_path }
-
     $original_path = $env:path
-    It 'Call with -WhatIf and -AddToPath' {
-      { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\dir' `
-        -SHA512 CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E `
-        -WhatIf -AddToPath 6>$null } | Should -not -Throw
+
+    Context 'Clean system' {
+      It 'before: no archive present' {
+        $Temporary = Join-Path $env:TEMP 'ninja-v1.8.2'
+        Test-Path -LiteralPath "$(Join-Path $Temporary 'ninja-win.zip')" |
+          Should -Be $false
+        Test-Path -LiteralPath "$Temporary" | Should -Be $false
+      }
+      It 'before: no executable present' {
+        Test-Path -LiteralPath 'TestDrive:\dir\ninja-v1.8.2\ninja.exe' |
+          Should -Be $false
+      }
+       It 'Call with -WhatIf' {
+         { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\dir' `
+           -SHA512 CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E `
+           -WhatIf 6>$null } | Should -not -Throw
+         Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\dir' -Hash `
+           CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E `
+           -WhatIf | Should -Be $null
+       }
+       It 'after: no archive present' {
+         $Temporary = Join-Path $env:TEMP 'ninja-v1.8.2'
+         Test-Path -LiteralPath "$(Join-Path $Temporary 'ninja-win.zip')" |
+           Should -Be $false
+         Test-Path -LiteralPath "$Temporary" | Should -Be $false
+       }
+       It 'after: no executable present' {
+         Test-Path -LiteralPath 'TestDrive:\dir\ninja-v1.8.2\ninja.exe' |
+           Should -Be $false
+       }
+       It 'no change in current working directory' {
+         $PWD.Path | Should -Be $start_path.Path
+       }
+       if ($PWD -ne $start_path) { cd $start_path }
     }
-    It 'after: no archive present' {
-      $Temporary = Join-Path $env:TEMP 'ninja-v1.8.2'
-      Test-Path -LiteralPath "$(Join-Path $Temporary 'ninja-win.zip')" |
-        Should -Be $false
-      Test-Path -LiteralPath "$Temporary" | Should -Be $false
-    }
-    It 'after: no executable present' {
-      Test-Path -LiteralPath 'TestDrive:\dir\ninja-v1.8.2\ninja.exe' |
-        Should -Be $false
-    }
-    It 'no change in current working directory' {
-      $PWD.Path | Should -Be $start_path.Path
-    }
-    if ($PWD -ne $start_path) { cd $start_path }
-    It 'no change in search path' {
-      $env:Path | Should -Be $original_path
-    }
-    if ($env:Path -ne $original_path) { $env:Path = $original_path }
-  }
+    Context 'AddToPath' {
+      It 'Call with -WhatIf and -AddToPath' {
+        $Temporary = Join-Path $env:TEMP 'ninja-v1.8.2'
+        if (Test-Path -LiteralPath 'TestDrive:\dir\ninja-v1.8.2\ninja.exe') {
+          Set-ItResult -Inconclusive -Because 'ninja.exe is already present'
+        } elseif (
+          Test-Path -LiteralPath "$(Join-Path $Temporary 'ninja-win.zip')"
+        ) {
+          Set-ItResult -Inconclusive -Because 'archive present'
+        } elseif ( Test-Path -LiteralPath "$Temporary" ) {
+          Set-ItResult -Inconclusive -Because 'download directory present'
+        }
+        { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\dir' -Hash `
+          CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E `
+          -WhatIf -AddToPath 6>$null } | Should -not -Throw
+        Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\dir' -Hash `
+          CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E `
+          -WhatIf -AddToPath | Should -Be $null
+      }
+      It 'after: no archive present' {
+        $Temporary = Join-Path $env:TEMP 'ninja-v1.8.2'
+        Test-Path -LiteralPath "$(Join-Path $Temporary 'ninja-win.zip')" |
+          Should -Be $false
+        Test-Path -LiteralPath "$Temporary" | Should -Be $false
+      }
+      It 'after: no executable present' {
+        Test-Path -LiteralPath 'TestDrive:\dir\ninja-v1.8.2\ninja.exe' |
+          Should -Be $false
+      }
+      It 'no change in current working directory' {
+        $PWD.Path | Should -Be $start_path.Path
+      }
+      if ($PWD -ne $start_path) { cd $start_path }
+      It 'no change in search path' {
+        $env:Path | Should -Be $original_path
+      }
+      if ($env:Path -ne $original_path) { $env:Path = $original_path }
+     }
+   }
 
   Context 'mock download failure' {
     Mock Invoke-Curl {
@@ -182,10 +201,12 @@ Describe 'Install-Ninja' {
     Mock Invoke-Curl -ModuleName Install-Ninja
     Mock Expand-Archive -ModuleName Install-Ninja
 
-    It 'skip download and extraction' {
+    It 'return path to ninja.exe' {
       { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\' `
         3>$null 6>$null
       } | Should -not -Throw
+      (Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\' `
+        3>$null 6>$null)[1] | Should -Match '.*ninja-v1.8.2[\\\/]ninja.exe'
       Assert-MockCalled Invoke-Curl -ModuleName Install-Ninja -Times 0 `
         -Exactly
       Assert-MockCalled Expand-Archive -ModuleName Install-Ninja -Times 0 `
@@ -196,6 +217,7 @@ Describe 'Install-Ninja' {
       Test-Path $Path -PathType Container | Should -Be $true
       Test-Path ($Path + '\ninja.exe') -PathType Leaf | Should -Be $true
     }
+    New-Item $Temporary -Name 'ninja-win.zip' -Force
     It 'Verbose' {
       (Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\' -Verbose `
         3>$null 6>$null 1>$null) 4>&1 |
@@ -207,11 +229,31 @@ Describe 'Install-Ninja' {
     }
     It 'WhatIf' {
       { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\' -WhatIf `
+        -Hash E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855 `
         3>$null 6>$null
       } | Should -not -Throw
       Assert-MockCalled Invoke-Curl -ModuleName Install-Ninja -Times 0 `
         -Exactly -Scope It
       Assert-MockCalled Expand-Archive -ModuleName Install-Ninja -Times 0 `
+        -Exactly -Scope It
+    }
+    It 'Force' {
+      New-Item $Temporary -Name 'ninja-win.zip' -Force
+      { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\' -Force `
+        -Hash E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855 `
+        3>$null 6>$null
+      } | Should -not -Throw
+      New-Item $Temporary -Name 'ninja-win.zip' -Force
+      ( Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\' -Force `
+        -Hash E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855 `
+        1>$null 6>$null ) 3>&1 | Should -match 'Overwriting existing files'
+      New-Item $Temporary -Name 'ninja-win.zip' -Force
+      Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\' -Force `
+        -Hash E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855 `
+        3>$null 6>$null | Should -match '.*ninja-v1.8.2[\\\/]ninja.exe'
+      Assert-MockCalled Invoke-Curl -ModuleName Install-Ninja -Times 0 `
+        -Exactly -Scope It
+      Assert-MockCalled Expand-Archive -ModuleName Install-Ninja -Times 3 `
         -Exactly -Scope It
     }
   }

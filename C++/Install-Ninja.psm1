@@ -108,7 +108,8 @@ function Install-Ninja {
   {
     if (Test-Path (Join-Path $Path 'ninja.exe')) {
       if ($Force) {
-        Send-Message -Warning 'Overwriting existing files' -Details $Path
+        Join-Path $Path 'ninja.exe' |
+          Send-Message -Warning 'Overwriting existing files'
       } else {
         Write-Verbose `
           'Skip download and extraction. Already present in install location.'
@@ -134,7 +135,7 @@ function Install-Ninja {
       if ($Hash -and -not $WhatIfPreference ) {
         $NewHash = (Get-FileHash $Archive -Algorithm $HashType).Hash
         if ($Hash -ne $NewHash) {
-          if (-not $Force) { Remove-Temporary $Temporary }
+          Remove-Temporary $Temporary
           Send-Message -Error (
             ($MyInvocation.MyCommand).ToString() + ': download hash changed!') `
             -ContinueOnError:$Force -HideDetails:$Quiet `
@@ -167,7 +168,7 @@ function Install-Ninja {
       if (-not (Test-Command 'ninja --version') ) {
         '-- $env:Path --', ($env:Path -replace ';',"`n") |
           Send-Message -Error 'Failed to find Ninja on the search path.' `
-            -HideDetails:$Quiet
+            -HideDetails:$Quiet -ContinueOnError:$Force
       }
     }
 
