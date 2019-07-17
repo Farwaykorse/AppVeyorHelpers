@@ -24,7 +24,7 @@ $Flag = 'ci_scripts'
 ##====--------------------------------------------------------------------====##
 # Check manifest files
 ##====--------------------------------------------------------------------====##
-Import-Module "${PSScriptRoot}\AppVeyorGeneral\Send-Message.psd1"
+Import-Module "${PSScriptRoot}\AppVeyor\Send-Message.psd1"
 
 ( Resolve-Path "${PSScriptRoot}\*.psd1", "${PSScriptRoot}\*\*.psd1" |
     Test-ModuleManifest | Format-Table -Wrap -AutoSize | Out-String
