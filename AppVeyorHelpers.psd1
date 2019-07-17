@@ -87,6 +87,7 @@ ModuleList = @()
 # List of all files packaged with this module
 FileList = @(
   'AppVeyorHelpers.psd1',
+  'LICENSE',
   'RunTests.ps1'
 )
 }
