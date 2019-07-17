@@ -7,7 +7,7 @@
 @{
 ##====--------------------------------------------------------------------====##
 RootModule = ''
-ModuleVersion = '0.10.4'
+ModuleVersion = '0.11.0'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
