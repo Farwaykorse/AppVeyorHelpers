@@ -5,7 +5,7 @@
 
 if ( $PSVersionTable.PSVersion.Major -lt 6 ) {
   if ( -not (Test-Command 'pwsh { exit 0 }') ) {
-    Import-Module -Name "${PSScriptRoot}\..\AppVeyorGeneral\Send-Message.psd1"
+    Import-Module -Name "${PSScriptRoot}\..\AppVeyor\Send-Message.psd1"
     Send-Message -Warning `
       -Message 'Convert-FileEncoding default encoding not supported.' `
       -Details ('The default encoding setting UTF8noBOM requires PowerShell ' +

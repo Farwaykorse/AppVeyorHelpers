@@ -1,12 +1,13 @@
 @{
 ##====--------------------------------------------------------------------====##
 RootModule = ''
-ModuleVersion = '0.2'
+ModuleVersion = '0.1'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
 # CompanyName = 'Unknown'
-Description = 'Internal helper functions.'
+Description = 'Functionality specific to CI for C++ projects.'
+# ID used to uniquely identify this module
 # GUID = 'd0a9150d-b6a4-4b17-a325-e3a24fed0aa9'
 # HelpInfoURI = ''
 
@@ -20,18 +21,14 @@ PowerShellVersion = '5.1'
 # Import configuration
 
 NestedModules = @(
-  "${PSScriptRoot}\CI.psd1",
-  "${PSScriptRoot}\Get-CommonFlagsCaller.psm1"
+  "${PSScriptRoot}\Install-Ninja.psd1"
 )
 
 ##====--------------------------------------------------------------------====##
 # Export configuration
 
 # Functions to export from this module
-FunctionsToExport = @(
-  'Assert-CI',
-  'Get-CommonFlagsCaller'
-)
+FunctionsToExport = '*'
 # Cmdlets to export from this module
 CmdletsToExport = ''
 # Variables to export from this module
@@ -41,11 +38,8 @@ AliasesToExport = ''
 
 ##====--------------------------------------------------------------------====##
 # List of all modules packaged with this module
-ModuleList = @()
+# ModuleList = @()
 # List of all files packaged with this module
-FileList = @(
-  'All.psd1',
-  'Get-CommonFlagsCaller.psm1',
-  'Get-CommonFlagsCaller.Tests.ps1'
-)
+# FileList = @()
+
 }

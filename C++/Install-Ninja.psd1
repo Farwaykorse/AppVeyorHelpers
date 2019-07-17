@@ -52,7 +52,7 @@ RequiredModules = @(
   @{ModuleName="${PSScriptRoot}\..\General\Test-Command.psd1"; ModuleVersion='0.1'},
   @{ModuleName="${PSScriptRoot}\..\General\Expand-Archive.psd1"; ModuleVersion='0.2'},
   @{ModuleName="${PSScriptRoot}\..\General\Invoke-Curl.psd1"; ModuleVersion='0.2'},
-  @{ModuleName="${PSScriptRoot}\..\AppVeyorGeneral\Send-Message.psd1"; ModuleVersion='0.1'}
+  @{ModuleName="${PSScriptRoot}\..\AppVeyor\Send-Message.psd1"; ModuleVersion='0.1'}
 )
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
