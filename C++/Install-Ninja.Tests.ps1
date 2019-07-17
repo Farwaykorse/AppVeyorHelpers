@@ -531,5 +531,31 @@ Describe 'Install-Ninja (online)' -Tag 'online' {
     }
   }
   $env:Path = $original_path
+
+  Context 'Overwrite with -Force' {
+    ($Path, $Temporary) = Join-Path ('TestDrive:\', $env:TEMP) 'ninja-v1.8.2'
+    $InstallDir = (Resolve-Path 'TestDrive:\').ProviderPath
+    New-Item $Temporary -Name 'ninja-win.zip' -Force
+    New-Item $Path -ItemType Directory -Force
+    New-Item $Path -Name 'ninja.exe' -Force
+    $zip_hash = (
+      Get-FileHash (Join-Path $Temporary 'ninja-win.zip') -Algorithm SHA512
+    ).Hash
+    $exe_hash = (
+      Get-FileHash (Join-Path $Path 'ninja.exe') -Algorithm SHA512
+    ).Hash
+
+    It 'run with -Force' {
+      $valid_hash = '9B9CE248240665FCD6404B989F3B3C27ED9682838225E6DC9B67B551774F251E4FF8A207504F941E7C811E7A8BE1945E7BCB94472A335EF15E23A0200A32E6D5'
+      $zip_hash | Should -not -Be $valid_hash
+      { Install-Ninja -Tag v1.8.2 -InstallDir "$InstallDir" -Hash $valid_hash `
+        -Force 3>$null 6>$null
+      } | Should -not -Throw
+    }
+    It 'executable was replaced' {
+      (Get-FileHash (Join-Path $Path 'ninja.exe') -Algorithm SHA512).Hash |
+        Should -not -Be $exe_hash
+    }
+  }
 }
 ##====--------------------------------------------------------------------====##
