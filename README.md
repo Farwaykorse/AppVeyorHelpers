@@ -46,7 +46,7 @@ init:
 Unit tests are implemented with [Pester][Pester-link].
 To run all unit-tests (and code coverage) for this module call:
 ```
-`.\RunTests.ps1 -Coverage`
+.\RunTests.ps1 -Coverage
 ```
 or [run Invoke-Pester][Invoke-Pester-link] for an individual sub-module:
 ```
