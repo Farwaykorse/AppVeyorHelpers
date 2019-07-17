@@ -370,12 +370,20 @@ Describe 'Install-Ninja' {
         { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\dir' -Quiet `
           3>$null 6>$null
         } | Should -not -Throw
+        Assert-MockCalled Invoke-Curl -ModuleName Install-Ninja -Times 1 `
+          -Exactly -Scope It
+        Assert-MockCalled Expand-Archive -ModuleName Install-Ninja -Times 1 `
+          -Exactly -Scope It
       }
       It 'success (SHA512)' {
         { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\dir' `
           -SHA512 CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E `
           6>$null
         } | Should -not -Throw
+        Assert-MockCalled Invoke-Curl -ModuleName Install-Ninja -Times 1 `
+          -Exactly -Scope It
+        Assert-MockCalled Expand-Archive -ModuleName Install-Ninja -Times 1 `
+          -Exactly -Scope It
       }
       It 'success (SHA256)' {
         { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\dir' `
@@ -398,12 +406,20 @@ Describe 'Install-Ninja' {
           -SHA512 0000E248240665FCD6404B989F3B3C27ED9682838225E6DC9B67B551774F251E4FF8A207504F941E7C811E7A8BE1945E7BCB94472A335EF15E23A0200A32E6D5 `
           6>$null
         } | Should -Throw 'download hash changed'
+        Assert-MockCalled Invoke-Curl -ModuleName Install-Ninja -Times 1 `
+          -Exactly -Scope It
+        Assert-MockCalled Expand-Archive -ModuleName Install-Ninja -Times 0 `
+          -Exactly -Scope It
       }
       It 'wrong/ changed hash (SHA256)' {
         { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\dir' `
           -SHA256 4FF8A207504F941E7C811E7A8BE1945E7BCB94472A335EF15E23A0200A32E6D5 `
           6>$null
         } | Should -Throw 'download hash changed'
+        Assert-MockCalled Invoke-Curl -ModuleName Install-Ninja -Times 1 `
+          -Exactly -Scope It
+        Assert-MockCalled Expand-Archive -ModuleName Install-Ninja -Times 0 `
+          -Exactly -Scope It
       }
       It 'no archive remaining' {
         Test-Path -LiteralPath "$(Join-Path $Temporary 'ninja-win.zip')" |
