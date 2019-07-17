@@ -16,6 +16,7 @@ Windows.
 <!-- TOC -->
 - [Features](#features)
 - [Usage](#usage)
+- [Development](#dev)
 - [License](#license)
 
 <!--------------------------------------------------------><a id="features"></a>
@@ -41,7 +42,7 @@ init:
 ````
 
 <!-------------------------------------------------------------><a id="dev"></a>
-### Development
+## Development
 <!----------------------------------------------------------------------------->
 Unit tests are implemented with [Pester][Pester-link].
 To run all unit-tests (and code coverage) for this module call:
