@@ -269,6 +269,10 @@ Describe 'Send-Message' {
       Send-Message -Error -Message 'text' -ContinueOnError 6>&1 |
         Should -Be 'ERROR: text'
     }
+    It 'Details (channel 6 only) -ContinueOnError' {
+      Send-Message -Error -Message 'text' -Details 'more text' `
+        -ContinueOnError 6>&1 | Should -Be @('ERROR: text', 'more text')
+    }
   }
   Context 'Call to Add-AppveyorMessage' {
     # Enable output to Message console.
