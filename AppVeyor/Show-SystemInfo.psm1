@@ -56,7 +56,8 @@ function Show-SystemInfo {
     [switch]$PowerShell,
     [switch]$Python,
     [switch]$SevenZip,
-    [switch]$Curl
+    [switch]$Curl,
+    [switch]$Vcpkg
   )
   Begin
   {
@@ -127,6 +128,7 @@ function Show-SystemInfo {
     if ($CMake -or $All)    { $out += Join-Info CMake $(Show-CMakeVersion) }
     if ($Python -or $All)   { $out += Join-Info Python $(Show-PythonVersion) }
     if ($Curl -or $All)     { $out += Join-Info Curl $(Show-CurlVersion) }
+    if ($Vcpkg -or $All)    { $out += Join-Info vcpkg $(Show-VcpkgVersion) }
   }
   Process
   {
@@ -245,6 +247,21 @@ function Show-CurlVersion {
     return (
       $(curl.exe -V) -split ' ' |
         Select-String -Pattern '^([0-9]+\.)+[0-9]+.*'
+    )
+  } else { return ' ?' }
+}
+
+<#
+.SYNOPSIS
+  Acquire the version number from vcpkg.
+#>
+function Show-VcpkgVersion {
+  [OutputType([String])]
+  param()
+  if (Test-Command 'vcpkg version') {
+    return (
+      (vcpkg version | Select-String -Pattern 'version [0-9]') -split ' ' |
+        Select-String -Pattern '^[0-9].+'
     )
   } else { return ' ?' }
 }
