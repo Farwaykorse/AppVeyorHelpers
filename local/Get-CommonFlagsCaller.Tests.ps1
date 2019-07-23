@@ -30,12 +30,12 @@ function Test-Calling {
 ##====--------------------------------------------------------------------====##
 Describe 'Get-CommonFlagsCaller' {
   It 'has documentation' {
-    Get-Help Invoke-Curl | Out-String |
+    Get-Help Get-CommonFlagsCaller | Out-String |
       Should -MatchExactly 'SYNOPSIS' -Because $msg_documentation
   }
-  It 'supports -WhatIf and -Confirm' {
-    Get-Command -Name Invoke-Curl -Syntax |
-      Should -Match '-WhatIf.*-Confirm'
+  It 'no support for -WhatIf and -Confirm' {
+    Get-Command -Name Get-CommonFlagsCaller -Syntax |
+      Should -not -Match '-WhatIf.*-Confirm'
   }
 
   Context 'Input Errors' {
