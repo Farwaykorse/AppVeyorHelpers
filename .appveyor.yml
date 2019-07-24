@@ -32,7 +32,7 @@ for:
     - configuration: PowerShell
   install:
   - ps: Import-Module -Name .\AppVeyorHelpers.psd1
-  - ps: Show-SystemInfo -All
+  - ps: Show-SystemInfo -Path -All
   - ps: Install-Module Pester -Force
   - ps: >-
       ( Get-Module Pester -ListAvailable |
@@ -51,7 +51,7 @@ for:
   install:
   - pwsh: |
       Import-Module -Name .\AppVeyorHelpers.psd1
-      Show-SystemInfo -All
+      Show-SystemInfo -Path -All
   - pwsh: Install-Module Pester -Force
   - pwsh: >-
       ( Get-Module Pester -ListAvailable |

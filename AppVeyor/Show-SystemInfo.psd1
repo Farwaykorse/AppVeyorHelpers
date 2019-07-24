@@ -6,7 +6,7 @@
 #>
 @{
 RootModule = 'Show-SystemInfo.psm1'
-ModuleVersion = '0.3'
+ModuleVersion = '0.3.1'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
@@ -46,7 +46,8 @@ PowerShellVersion = '5.1'
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @(
   @{ModuleName="${PSScriptRoot}\..\local\All.psd1"; ModuleVersion='0.2'},
-  @{ModuleName="${PSScriptRoot}\..\General\Test-Command.psd1"; ModuleVersion='0.3'}
+  @{ModuleName="${PSScriptRoot}\..\General\Test-Command.psd1"; ModuleVersion='0.3'},
+  @{ModuleName="${PSScriptRoot}\Send-Message.psd1"; ModuleVersion='0.4'}
 )
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 # NestedModules = @()

@@ -198,6 +198,9 @@ Describe 'Internal Show-<software>Version' {
 ##====--------------------------------------------------------------------====##
 
 Describe 'Show-SystemInfo' {
+  # Suppress output to the Appveyor Message API.
+  Mock Assert-CI { return $false } -ModuleName Send-Message
+
   It 'has documentation' {
     Get-Help Show-SystemInfo | Out-String |
       Should -MatchExactly 'SYNOPSIS' -Because $msg_documentation
@@ -205,6 +208,9 @@ Describe 'Show-SystemInfo' {
   Context 'Basic operation' {
     It 'no throw' {
       { Show-SystemInfo } | Should -not -Throw
+    }
+    It 'no throw on -Path' {
+      { Show-SystemInfo -Path } | Should -not -Throw
     }
     It 'no throw on -PowerShell' {
       { Show-SystemInfo -PowerShell } | Should -not -Throw

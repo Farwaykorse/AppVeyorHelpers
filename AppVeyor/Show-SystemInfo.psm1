@@ -50,6 +50,7 @@ function Show-SystemInfo {
     [Alias('ColumnWidth')]
     # Alignment of data/ first column width (default 20 characters).
     [Int]$Align = 20,
+    [Switch]$Path,
     [switch]$All,
     [switch]$CMake,
     [switch]$LLVM,
@@ -129,6 +130,8 @@ function Show-SystemInfo {
     if ($Python -or $All)   { $out += Join-Info Python $(Show-PythonVersion) }
     if ($Curl -or $All)     { $out += Join-Info Curl $(Show-CurlVersion) }
     if ($Vcpkg -or $All)    { $out += Join-Info vcpkg $(Show-VcpkgVersion) }
+
+    if ($Path) { Show-EnvPath }
   }
   Process
   {
@@ -176,6 +179,18 @@ function Join-Info {
   }
   if ($Name) { $Name = ($Name + ': ') }
   return ($( $Name.PadRight($Length,' ') ) + $Data)
+}
+##====--------------------------------------------------------------------====##
+
+function Show-EnvPath {
+  $UserPath = `
+    [Environment]::GetEnvironmentVariable('PATH', 'User') -replace ';',"`n"
+  $MachinePath = `
+    [Environment]::GetEnvironmentVariable('PATH', 'Machine') `
+    -replace ';',"`n"
+  Send-Message -Info 'Environment PATH' -Details (
+    'User PATH', $UserPath, ("`n"+'Machine PATH'), $MachinePath
+  ) -LogOnly
 }
 ##====--------------------------------------------------------------------====##
 
