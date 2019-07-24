@@ -5,6 +5,12 @@ Set-StrictMode -Version Latest
 ##====--------------------------------------------------------------------====##
 $global:msg_documentation = 'at least 1 empty line above documentation'
 
+if (Assert-CI) {
+  # Prevent warnings on AppVeyor.
+  git config --global user.name "BuildServer"
+  git config --global user.email "farwaykorse@example.com"
+}
+
 ##====--------------------------------------------------------------------====##
 Describe 'Internal Select-VcpkgLocation' {
   InModuleScope Update-Vcpkg {
@@ -187,7 +193,7 @@ Describe 'Internal Test-ChangedVcpkgSource' {
         'some text' > .\toolsrc\something.cpp 
         git add *
         git commit -m 'initial' --quiet
-      # no changes: do not create the .hash file.
+        # no changes: do not create the .hash file.
         It 'WhatIf' {
           if (Test-Path $hash_file -PathType Leaf) { Remove-Item $hash_file }
           { Test-ChangedVcpkgSource -WhatIf 3>$null } | Should -not -Throw
