@@ -787,12 +787,22 @@ Describe 'Update-Vcpkg' {
       1>$null) 3>&1 | should -Match 'Update-Repository: vcpkg not installed'
       Test-Path (Join-Path $vcpkg_dir '*') | Should -Be $false
     }
+
+    # Work-around issue with asynchronous file IO on Windows.
+    $capture = Join-Path 'TestDrive:\' '*'
+    while ($true) {
+      if ((Remove-Item $capture -Recurse -Force -ErrorAction Continue *>&1
+      ) -ne $null) {
+        Start-Sleep -Seconds 0.5
+      } else { break }
+    }
+    # /Work-around
   }
   Context 'WhatIf & Latest; mock Location' {
     Mock Assert-CI { return $false } -ModuleName Update-Vcpkg
     Mock Select-VcpkgLocation { (Join-Path 'TestDrive:\' 'loc').ToString() } `
       -ModuleName Update-Vcpkg
-    New-Item -Path 'TestDrive:\' -Name 'loc' -ItemType Directory
+    $vcpkg_dir = New-Item -Path 'TestDrive:\' -Name 'loc' -ItemType Directory
 
     It 'no changes with -Latest -WhatIf' {
       if (-not (Test-Command 'vcpkg version')) {
@@ -804,6 +814,15 @@ Describe 'Update-Vcpkg' {
       Update-Vcpkg -Latest -Quiet -WhatIf 3>&1 |
         Should -Match 'Update-Repository: vcpkg not installed'
     }
+
+    # Work-around issue with asynchronous file IO on Windows.
+    while ($true) {
+      if ((Remove-Item $vcpkg_dir -Recurse -Force -ErrorAction Continue *>&1
+      ) -ne $null) {
+        Start-Sleep -Seconds 0.5
+      } else { break }
+    }
+    # /Work-around
   }
   Context 'WhatIf: build after retrieval from cache (mocked)' {
     Mock Update-Repository { return $null } -ModuleName Update-Vcpkg
@@ -837,6 +856,15 @@ Describe 'Update-Vcpkg' {
       Assert-MockCalled -CommandName Test-IfReleaseWithIssues `
         -ModuleName update-Vcpkg -Times 1 -Exactly -Scope It
     }
+
+    # Work-around issue with asynchronous file IO on Windows.
+    while ($true) {
+      if ((Remove-Item $vcpkg_dir -Recurse -Force -ErrorAction Continue *>&1
+      ) -ne $null) {
+        Start-Sleep -Seconds 0.5
+      } else { break }
+    }
+    # /Work-around
   }
 
   Context 'WhatIf: no cache needed' {
@@ -867,6 +895,16 @@ Describe 'Update-Vcpkg' {
       Assert-MockCalled -CommandName Remove-Item `
         -ModuleName update-Vcpkg -Times 1 -Exactly -Scope It
     }
+
+    # Work-around issue with asynchronous file IO on Windows.
+    while ($true) {
+      if ((Remove-Item $vcpkg_dir -Recurse -Force -ErrorAction Continue *>&1
+      ) -ne $null) {
+        Start-Sleep -Seconds 0.5
+      } else { break }
+    }
+    # /Work-around
   }
+
 } # /Describe 'Update-Vcpkg'
 ##====--------------------------------------------------------------------====##
