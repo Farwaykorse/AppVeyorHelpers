@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-[A clear and concise description of what the issue is. Bug or unexpected behaviour.]
+[A clear and concise description of what the issue, bug or unexpected behaviour is.]
 
 **Environment** (Please describe the environment showing the issue.)
 When on AppVeyor.
