@@ -90,6 +90,30 @@ function Update-Vcpkg {
     # Default cache directory, for controlled cache application.
     $cache_dir = Join-Path (Join-Path (Join-Path $HOME 'Tools') 'cache') 'vcpkg'
 
+    # Temporary fix ----------------------------------------
+    if ($env:CI_WINDOWS -eq $null) {
+      Send-Message -Warning 'CI_WINDOWS and CI_LINUX not yet defined' -LogOnly
+      if ($PSVersionTable.PSVersion.Major -lt 6) {
+        if ((Get-WmiObject Win32_OperatingSystem).Caption -match 'Windows') {
+          $env:CI_WINDOWS = 'true'
+        }
+      } else {
+        if ((Get-CimInstance CIM_OperatingSystem).Caption -match 'Windows') {
+          $env:CI_WINDOWS = 'true'
+        }
+      }
+    } else {
+      Send-Message -Warning ('Remove unnecessary code from ' +
+        $MyInvocation.MyCommand) -LogOnly
+    }
+    # /Temporary fix ---------------------------------------
+
+    if ($env:CI_WINDOWS -eq 'true') {
+      $vcpkg = 'vcpkg.exe' # Windows
+    } else {
+      $vcpkg = 'vcpkg' # Linux
+    }
+
     # Set installation location
     if ($Path) {
       $Location = $Path
@@ -114,7 +138,7 @@ function Update-Vcpkg {
         if (Test-ChangedVcpkgSource) {
           $build = $true
         }
-      } elseif (-not (Test-Path 'vcpkg' -PathType Leaf) -or # no vcpkg installed
+      } elseif (-not (Test-Path $vcpkg -PathType Leaf) -or # no vcpkg installed
         (Test-Command './vcpkg update' `
           -match 'different source is available for vcpkg') -or
         (Test-IfReleaseWithIssues)
@@ -126,7 +150,7 @@ function Update-Vcpkg {
           )
         } else { $build = $true }
       } elseif ( (Assert-CI) -and
-        (Test-Path (Join-Path $cache_dir 'vcpkg') -PathType Leaf)
+        (Test-Path (Join-Path $cache_dir $vcpkg) -PathType Leaf)
       ) {
         Write-Verbose 'Installed vcpkg is up-to-date.'
         Remove-Item (Join-Path $cache_dir 'vcpkg')
@@ -149,7 +173,7 @@ function Update-Vcpkg {
         Add-EnvironmentPath -Path $Location
       }
     } finally {
-      if (Assert-CI -and -not (Test-Path 'vcpkg' -PathType Leaf) ) {
+      if (Assert-CI -and -not (Test-Path $vcpkg -PathType Leaf) ) {
         Write-Verbose 'Disabling cache update. Building vcpkg failed.'
         $env:APPVEYOR_CACHE_SKIP_SAVE = 'true'
       }
