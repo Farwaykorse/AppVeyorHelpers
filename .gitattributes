@@ -1,11 +1,18 @@
-# Set default behaviour to automatically normalize line endings.
+# Git file configuration.
 #------------------------------------------------------------------------------#
+[attr]markdown text eol=lf whitespace=-black-at-eol,blank-at-eof,tab-in-indent,tabwidth=4
+[attr]pwsh     csharp eol=lf whitespace=trailing-space,tab-in-indent,tabwidth=4
+[attr]yaml     text eol=lf whitespace=trailing-space,tab-in-indent,tabwidth=4
+# Normalize line-endings.
 *              text=auto
+# Except for:
 .gitignore     -text
-
+# Set defaults.
 .gitattributes eol=lf
-*.md           eol=lf
-*.ps1          eol=lf
-*.psd1         eol=lf
-*.psm1         eol=lf
-*.yml          eol=lf
+.yamllint      yaml
+*.markdown     markdown
+*.md           markdown
+*.ps1          pwsh
+*.psd1         pwsh
+*.psm1         pwsh
+*.yml          yaml
