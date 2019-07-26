@@ -16,6 +16,7 @@ Windows.
 <!-- TOC -->
 - [Features](#features)
 - [Usage](#usage)
+- [Notes](#notes)
 - [Development](#dev)
 - [License](#license)
 
@@ -26,33 +27,66 @@ Windows.
   - Send notifications and detailed reports to the AppVeyor message API.
   - Upload test results to the AppVeyor Test API.
   - Encapsulate common complex commands in function calls.
+- For use on [AppVeyor][AppVeyor-link] and local systems.  
+  __Minimum required: PowerShell v5.1, tested on AppVeyor Windows images.__
+- Support more build configurations.
+  - Use Ninja for faster builds (with CMake projects).
+- *\[C++\]* Improved vcpkg usage.
 
 <!-----------------------------------------------------------><a id="usage"></a>
 ## 💻 Usage
 <!----------------------------------------------------------------------------->
-Usage on AppVeyor.<br />
-`appveyor.yml`:
-````
+Usage on AppVeyor. (appveyor.yml)
+
+Import the PowerShell module at the start of the build session:
+````YAML
 init:
 - ps: |
-    New-Item -ItemType Directory -Force ~\tools | pushd
+    New-Item -ItemType Directory -Force ~/Tools | pushd
     git clone https://github.com/Farwaykorse/AppVeyorHelpers.git --quiet
     Import-Module -Name .\AppVeyorHelpers
     popd
 ````
+
+__A few usage examples:__  
+Display the build configuration and the installed CMake version:
+```YAML
+- ps: Show-SystemInfo -CMake
+```
+
+Install tools:
+`````YAML
+install:
+- ps: Install-Ninja -Tag v1.9.0 -AddToPath
+`````
+
+Install libraries:
+````YAML
+- ps: Update-Vcpkg
+- ps: vcpkg install ms-gsl:x64-Windows
+````
+
+<!-----------------------------------------------------------><a id="notes"></a>
+## 📝 Notes
+<!----------------------------------------------------------------------------->
+These modules can create persistent files in the file-system.
+These are primarily the `Install-*` functions.
+With the exception of installers that install software in their default location
+or update software present on the system (notably 
+`Update-Vcpkg`) these files are all located in `~/Tools`.
 
 <!-------------------------------------------------------------><a id="dev"></a>
 ## 🏗 Development
 <!----------------------------------------------------------------------------->
 Unit tests are implemented with [Pester][Pester-link].
 To run all unit-tests (and code coverage) for this module call:
-```
+```PowerShell
 .\RunTests.ps1 -Coverage
 ```
 or [run Invoke-Pester][Invoke-Pester-link] for an individual sub-module:
-```
+`````PowerShell
 Invoke-Pester -Script .\<script>.Tests.ps1 -CodeCoverage .\<script>.psm1
-```
+`````
 
 <!---------------------------------------------------------><a id="license"></a>
 ## ⚖ License
