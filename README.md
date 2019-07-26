@@ -1,5 +1,5 @@
 <!-------------------------------------------------------------><a id="top"></a>
-# AppVeyorHelpers
+# 🔧 AppVeyorHelpers
 <!----------------------------------------------------------------------------->
 <!-- Badges -->
 [![Build status][AppVeyor-badge]][AppVeyor-link]
@@ -20,7 +20,7 @@ Windows.
 - [License](#license)
 
 <!--------------------------------------------------------><a id="features"></a>
-## Features
+## 🏱 Features
 <!----------------------------------------------------------------------------->
 - Keep the build-log clean and informative.
   - Send notifications and detailed reports to the AppVeyor message API.
@@ -28,7 +28,7 @@ Windows.
   - Encapsulate common complex commands in function calls.
 
 <!-----------------------------------------------------------><a id="usage"></a>
-## Usage
+## 💻 Usage
 <!----------------------------------------------------------------------------->
 Usage on AppVeyor.<br />
 `appveyor.yml`:
@@ -42,7 +42,7 @@ init:
 ````
 
 <!-------------------------------------------------------------><a id="dev"></a>
-## Development
+## 🏗 Development
 <!----------------------------------------------------------------------------->
 Unit tests are implemented with [Pester][Pester-link].
 To run all unit-tests (and code coverage) for this module call:
@@ -55,7 +55,7 @@ Invoke-Pester -Script .\<script>.Tests.ps1 -CodeCoverage .\<script>.psm1
 ```
 
 <!---------------------------------------------------------><a id="license"></a>
-## License
+## ⚖ License
 <!----------------------------------------------------------------------------->
 Code licensed under the [MIT License](./LICENSE).
 
