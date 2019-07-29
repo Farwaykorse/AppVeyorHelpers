@@ -5,7 +5,7 @@ Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
 # CompanyName = 'Unknown'
-Description = ''
+Description = 'Install the most recent release of vcpkg and update cached packages.'
 # GUID = 'd0a9150d-b6a4-4b17-a325-e3a24fed0aa9'
 # HelpInfoURI = ''
 

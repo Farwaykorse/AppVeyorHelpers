@@ -51,6 +51,8 @@ Set-StrictMode -Version Latest
 .EXAMPLE
   Update-Vcpkg -Path .\
 
+  Use a custom install directory for vcpkg, or point in to an installed version.
+  Can be used to create separate install directories, usable with CMake.
 .NOTES
   - `-Path <...> -WhatIf` always creates the target folder.
   - Caching on AppVeyor.
