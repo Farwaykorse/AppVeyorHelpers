@@ -75,7 +75,7 @@ function Send-Codecov {
             "$($MyInvocation.MyCommand): Skip, empty file: ${FilePath}"
           continue
         }
-        Send-Report -FilePath:$FilePath -BuildName:$BuildName -Flag:$Flag
+        Send-Report -FilePath:$FilePath -BuildName:$BuildName -Flags:$Flag
       }
     }
   }
@@ -164,17 +164,36 @@ function Send-Report {
     [String]$BuildName = $(throw '-BuildName is required'),
     [AllowNull()]
     [AllowEmptyString()]
-    [String]$Flag
+    [Alias('Flag')]
+    [String[]]$Flags
   )
-  Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
+  Begin
+  {
+    Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
 
-  if ($PSCmdlet.ShouldProcess($FilePath, "Upload to codecov.io")) {
-    if ( $Flag ) {
-      $(python -m codecov -n $BuildName -f "$FilePath" -X gcov -F $Flag -t d6c1c65d-1656-4321-a080-e0a0eee9a613) 2>$null
-    } else { # no Flag
-      $(python -m codecov -n $BuildName -f "$FilePath" -X gcov) 2>$null
+    $codecov_flags = @()
+    $disable = @()
+    if (-not (Assert-CI)) { $disable += 'detect' }
+    if ($BuildName) { $codecov_flags += ('--name ' + $BuildName) }
+    if ($FilePath) {
+      $codecov_flags += ('--file "' + $FilePath + '"')
+      $disable += 'gcov'
+    }
+    if ( $Flags ) {
+      $codecov_flags += ('--flags ' + ($Flags -join ' '))
+    }
+    if ( $disable ) { $codecov_flags += ('-X ' + ($disable -join ' ')) }
+  }
+  Process
+  {
+    Write-Verbose ('codecov ' + ($codecov_flags -join ' '))
+    if ($PSCmdlet.ShouldProcess($FilePath, "Upload to codecov.io")) {
+      Invoke-Expression (
+        'python -m codecov ' + ($codecov_flags -join ' ')
+      ) 2>$null
     }
   }
+  End {}
 }
 ##====--------------------------------------------------------------------====##
 
