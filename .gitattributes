@@ -1,18 +1,30 @@
-# Git file configuration.
+# Set git behaviour for files.
+# Verify application using: `git check-attr --all -- <pathname>`
 #------------------------------------------------------------------------------#
-[attr]markdown text eol=lf whitespace=-black-at-eol,blank-at-eof,tab-in-indent,tabwidth=4
-[attr]pwsh     csharp eol=lf whitespace=trailing-space,tab-in-indent,tabwidth=4
-[attr]yaml     text eol=lf whitespace=trailing-space,tab-in-indent,tabwidth=4
-# Normalize line-endings.
-*              text=auto
-# Except for:
-.gitignore     -text
-# Set defaults.
-.gitattributes eol=lf
-.yamllint      yaml
-*.markdown     markdown
-*.md           markdown
-*.ps1          pwsh
-*.psd1         pwsh
-*.psm1         pwsh
-*.yml          yaml
+# Macro attributes
+[attr]markdown  eol=lf whitespace=-blank-at-eol,blank-at-eof,tab-in-indent,tabwidth=4
+[attr]pwsh      eol=lf diff=csharp whitespace=trailing-space,tab-in-indent,tabwidth=4
+[attr]yaml      eol=lf whitespace=trailing-space,tab-in-indent,tabwidth=4
+#------------------------------------------------------------------------------#
+# Normalize line-endings (disable with -text)
+*   text=auto
+#------------------------------------------------------------------------------#
+# Per file-extension settings
+*.markdown  markdown
+*.md        markdown
+*.ps1       pwsh
+*.ps[dm]1   pwsh
+*.yaml      yaml
+*.yml       yaml
+# Per file settings
+.gitattributes  eol=lf whitespace=trailing-space
+.gitignore      -text whitespace=trailing-space
+.yamllint       yaml
+
+#------------------------------------------------------------------------------#
+# Image files (treat as binary)
+*.gif   binary
+*.jpg   binary
+*.png   binary
+
+#------------------------------------------------------------------------------#
