@@ -238,6 +238,18 @@ function Import-CachedVcpkg {
         ForEach-Object -Process { Copy-Item "$_" -Force }
       return $true
     }
+    # Add message log entry with instructions
+    ('Vcpkg has been rebuild, but their was no cache available.',"`n",
+    'Add the following to your AppVeyor configuration:',"`n`n",
+    'cache:',"`n- '${Path}'`n`n",
+    'Optionally, enable cacheing on failed builds to reduce build time ',
+    'for repeatedly failing jobs. Add in your AppVeyor configuration:',"`n`n",
+    'environment:', "`n",
+    '  global:',"`n",
+    '    APPVEYOR_SAVE_CACHE_ON_ERROR: true'
+    ) -join '' |
+      Send-Message -Info 'Update-Vcpkg: No Cache Found' -NoNewLine -HideDetails
+
     return $false
   }
   End {}
@@ -396,20 +408,24 @@ function Test-ChangedVcpkgSource {
     }
 
     # Add message log entry with instructions
+    if ($loc_1) {
+      $cache_txt = $loc_1
+    } else {
+      $cache_txt = (
+        (Join-Path $PWD.ProviderPath $executable),"`n- '${hash_file}'"
+      )
+    }
     ('The use of `Update-Vcpkg -Latest` without caching, results in a full ',
-    'rebuild of vcpkg for each build job.', "`n",
-    'Add the following to your AppVeyor configuration:',"`n`n",
-    'cache:',"`n",
-    "- '$(Join-Path $PWD.ProviderPath $executable)'`n",
-    "- '${hash_file}'`n`n",
-    'Optionally, enable cache updating on failed builds to reduce build time ',
-    'for repeatedly failing jobs. Add in your AppVeyor configuration:',"`n`n",
-    'environment:', "`n",
-    '  global:',"`n",
-    '    APPVEYOR_SAVE_CACHE_ON_ERROR: true'
-    ) -join '' |
-    Send-Message -Warning 'No Cache Found (Update-Vcpkg -Latest)' `
-      -NoNewLine -HideDetails
+      'rebuild of vcpkg for each build job.',"`n",
+      'Add the following to your AppVeyor configuration:',"`n`n",
+      'cache:',"`n- '${cache_txt}'`n`n",
+      'Optionally, enable cacheing on failed builds to reduce build time ',
+      'for repeatedly failing jobs. Add in your AppVeyor configuration:',"`n`n",
+      'environment:', "`n",
+      '  global:',"`n",
+      '    APPVEYOR_SAVE_CACHE_ON_ERROR: true'
+    ) -join '' | Send-Message -Warning 'Update-Vcpkg -Latest: No Cache Found' `
+        -NoNewLine -HideDetails
 
     return $true # unknown assume change
   }

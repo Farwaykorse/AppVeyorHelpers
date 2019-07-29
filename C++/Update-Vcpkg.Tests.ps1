@@ -331,6 +331,9 @@ Describe 'Internal Test-ChangedVcpkgSource' {
 
 ##====--------------------------------------------------------------------====##
 Describe 'Internal Import-CachedVcpkg' {
+  # Suppress output to the Appveyor Message API.
+  Mock Assert-CI { return $false } -ModuleName Send-Message
+
   InModuleScope Update-Vcpkg {
     It 'has documentation' {
       Get-Help Import-CachedVcpkg | Out-String |
@@ -392,13 +395,13 @@ Describe 'Internal Import-CachedVcpkg' {
       }
       In -Path $target_dir {
         It 'non-existing directory' {
-          { Invoke-Import } | Should -not -Throw
-          Invoke-Import | Should -Be $false
+          { Invoke-Import 6>$null } | Should -not -Throw
+          Invoke-Import 6>$null | Should -Be $false
         }
         It 'empty existing directory' {
           New-Item -Path $cache_dir -ItemType Directory
-          { Invoke-Import } | Should -not -Throw
-          Invoke-Import | Should -Be $false
+          { Invoke-Import 6>$null } | Should -not -Throw
+          Invoke-Import 6>$null | Should -Be $false
         }
         It 'copy vcpkg' {
           New-Item -Path $cache_dir -Name 'vcpkg' -ItemType File
@@ -437,7 +440,8 @@ Describe 'Internal Import-CachedVcpkg' {
           New-Item -Path $cache_dir -Name 'dir'-ItemType Directory
           New-Item -Path (Join-Path $cache_dir 'dir') -Name 'vcpkg.exe' `
             -ItemType File
-          { Invoke-Import } | Should -not -Throw
+          { Invoke-Import 6>$null } | Should -not -Throw
+          (Invoke-Import 1>$null) 6>&1 | Should -Match 'No Cache Found'
           Test-Path 'vcpkg.exe' -PathType Leaf | Should -Be $false
           Test-Path 'dir' -PathType Container | Should -Be $false
         }
@@ -445,8 +449,7 @@ Describe 'Internal Import-CachedVcpkg' {
           New-Item -Path $cache_dir -Name 'vcpkg' -ItemType File -Force
           New-Item -Path $cache_dir -Name 'vcpkg.exe' -ItemType File -Force
           Remove-Item -Path * -Recurse -Force
-          { Invoke-Import } | Should -not -Throw
-          
+          { Invoke-Import 6>$null } | Should -not -Throw
           Test-Path 'vcpkg' -PathType Leaf | Should -Be $true
           Test-Path 'vcpkg.exe' -PathType Leaf | Should -Be $true
         }
@@ -454,16 +457,16 @@ Describe 'Internal Import-CachedVcpkg' {
           Remove-Item -Path $cache_dir -Recurse -Force
           Remove-Item -Path * -Force
           New-Item -Path $cache_dir -ItemType File
-          { Invoke-Import } | Should -not -Throw
-          Invoke-Import | Should -Be $false
+          { Invoke-Import 6>$null } | Should -not -Throw
+          Invoke-Import 6>$null | Should -Be $false
           Test-Path 'vcpkg' -PathType Leaf | Should -Be $false
         }
         It 'not a file' {
           Remove-Item -Path $cache_dir
           New-Item -Path $cache_dir -ItemType Directory
           New-Item -Path $cache_dir -Name 'vcpkg' -ItemType Directory
-          { Invoke-Import } | Should -not -Throw
-          Invoke-Import | Should -Be $false
+          { Invoke-Import 6>$null } | Should -not -Throw
+          Invoke-Import 6>$null | Should -Be $false
           Test-Path 'vcpkg' | Should -Be $false
         }
         It 'a folder and a file' {
@@ -662,7 +665,7 @@ Describe 'Internal Update-Repository' {
       $dir = New-Item 'TestDrive:\dir2' -ItemType Directory
       In -Path $dir {
         It 'clone & merge' {
-          { Update-Repository } | Should -not -Throw
+          { Update-Repository 3>$null } | Should -not -Throw
         }
         It 'fetch & checkout' {
           { Update-Repository -Commit ea9d29c05b110f203184eb4602b23325557de9c3 `
@@ -725,7 +728,7 @@ Describe 'Update-Vcpkg' {
       Mock Select-VcpkgLocation { throw 'unexpected' } -ModuleName Update-Vcpkg
       In -Path 'TestDrive:\' {
         It 'invalid path' {
-#          { Update-vcpkg -Path '/../..' } | Should -Throw 'validation script'
+          #{ Update-vcpkg -Path '/../..' } | Should -Throw 'validation script'
           { Update-vcpkg -Path './*' } | Should -Throw 'validation script'
           { Update-vcpkg -Path './?' } | Should -Throw 'validation script'
         }
@@ -758,7 +761,7 @@ Describe 'Update-Vcpkg' {
       $path = Join-Path $vcpkg_dir 'vcpkg'
       { Update-Vcpkg -Path $vcpkg_dir -WhatIf *>$null } |
         Should -not -Throw
-      (Update-Vcpkg -Path $vcpkg_dir -Quiet -WhatIf 1>$null) 3>&1 |
+      (Update-Vcpkg -Path $vcpkg_dir -Quiet -WhatIf 1>$null) 3>&1 6>$null |
         Should -Match 'Update-Repository: vcpkg not installed'
       Test-Path (Join-Path $vcpkg_dir '*') | Should -Be $false
       Test-Path -Path (Join-Path $PSScriptRoot 'vcpkg_source.hash') |
@@ -769,7 +772,7 @@ Describe 'Update-Vcpkg' {
       $path = Join-Path $vcpkg_dir 'vcpkg'
       { Update-Vcpkg -Path $vcpkg_dir -Quiet -WhatIf *>$null } |
         Should -not -Throw
-      (Update-Vcpkg -Path $vcpkg_dir -Quiet -WhatIf 1>$null) 3>&1 |
+      (Update-Vcpkg -Path $vcpkg_dir -Quiet -WhatIf 1>$null) 3>&1 6>$null |
         Should -Match 'Update-Repository: vcpkg not installed'
       Test-Path (Join-Path $vcpkg_dir '*') | Should -Be $false
       Test-Path -Path $vcpkg_dir -PathType Container | Should -Be $true
@@ -784,7 +787,8 @@ Describe 'Update-Vcpkg' {
       } | Should -not -Throw
       (Update-Vcpkg -Path $vcpkg_dir `
         -FixedCommit CF83E1357000000DF1542850D66D8007D620E405 -Quiet -WhatIf `
-      1>$null) 3>&1 | should -Match 'Update-Repository: vcpkg not installed'
+        1>$null) 3>&1 6>$null |
+        Should -Match 'Update-Repository: vcpkg not installed'
       Test-Path (Join-Path $vcpkg_dir '*') | Should -Be $false
     }
 
@@ -808,10 +812,11 @@ Describe 'Update-Vcpkg' {
       if (-not (Test-Command 'vcpkg version')) {
         Set-ItResult -Skipped -Because 'requires installed vcpkg'
       }
-      { Update-Vcpkg -Latest -Quiet -WhatIf 3>$null } | Should -not -Throw
+      { Update-Vcpkg -Latest -Quiet -WhatIf 3>$null 6>$null } |
+        Should -not -Throw
       Test-Path -Path (Join-Path $PSScriptRoot 'vcpkg_source.hash') |
         Should -Be $false
-      Update-Vcpkg -Latest -Quiet -WhatIf 3>&1 |
+      Update-Vcpkg -Latest -Quiet -WhatIf 3>&1 6>$null |
         Should -Match 'Update-Repository: vcpkg not installed'
     }
 
@@ -874,7 +879,6 @@ Describe 'Update-Vcpkg' {
     Mock Assert-CI { return $true } -ModuleName Update-Vcpkg
     Mock Test-Path { return $true } -ModuleName Update-Vcpkg
     Mock Remove-Item { return $null } -ModuleName Update-Vcpkg
-#    Mock Remove-Item { return $null } -ModuleName Update-Vcpkg
     $vcpkg_dir = New-Item -Path 'TestDrive:\' -Name 'vc 5' -ItemType Directory
     # Mock vcpkg
     ( 'param([String]$input)' +
