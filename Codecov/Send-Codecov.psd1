@@ -7,12 +7,12 @@
 @{
 ##====--------------------------------------------------------------------====##
 RootModule = 'Send-Codecov.psm1'
-ModuleVersion = '0.3'
+ModuleVersion = '0.4'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
 # CompanyName = 'Unknown'
-Description = ''
+Description = 'Single command coverage to codecov.io'
 # ID used to uniquely identify this module
 # GUID = 'd0a9150d-b6a4-4b17-a325-e3a24fed0aa9'
 # HelpInfoURI = ''

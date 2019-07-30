@@ -20,6 +20,19 @@ Set-StrictMode -Version Latest
   Setting the optional Flag parameter specifies the report within the build.
   Note that codecov.io supports a limited set of characters for flags.
   Only lower-case letters, numbers and the underscore.
+.EXAMPLE
+  Send-Codecov '.\report.xml' -BuildName 'VS2019 C++17 x64 Debug' -Token a2d1c71d-2565-4321-a080-e0b0eee3c529
+ 
+  Token is not required for public repositories uploading from Travis, CircleCI
+  or AppVeyor.
+  The "Repository Upload Token" for your project can be found on the Settings
+  page for the repository at https://codecov.io
+.EXAMPLE
+  Send-Codecov '.\*.xml' -BuildName 'VS2019 C++17 x64' -Token @token_file
+
+  Alternatively the token can be saved in a file and supplied using a @ path.
+.NOTES
+  Expects execution inside a git worktree or on AppVeyor.
 #>
 function Send-Codecov {
   [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Low')]
@@ -36,7 +49,12 @@ function Send-Codecov {
     [String]$BuildName = $(throw '-BuildName is required'),
     [ValidateNotNullOrEmpty()]
     # Flag used on codecov.io, to identify the content.
-    [String]$Flag
+    [String]$Flag,
+    [ValidateNotNullOrEmpty()]
+    # Codecov Repository Upload Token, for private repositories.
+    # You can also set it in the environment variable "CODECOV_TOKEN".
+    # Or supply the path to an token file.
+    [String]$Token
   )
   Begin
   {
@@ -49,6 +67,22 @@ function Send-Codecov {
         "$($MyInvocation.MyCommand): Invalid flag name for codecov.io" `
         -Details $Flag 
     }
+
+    if ($Token) {
+      if ($Token -match '^@.+') {
+        if (-not (Test-Path -Path ($Token -replace '@','') -PathType Leaf) ) {
+          Send-Message -Error -Message `
+            "$($MyInvocation.MyCommand): Invalid file path for Codecov token" `
+            -Details "${Token}"
+        }
+      } elseif ($Token -notmatch '^[a-z0-9-]{36}$') {
+        Send-Message -Error -Message `
+          "$($MyInvocation.MyCommand): Invalid Codecov token format" `
+            -Details "'${Token}' does not match '^[a-z0-9-]{36}$'",
+              'You can set the token in the environment variable: CODECOV_TOKEN'
+      }
+    }
+
     Install-Uploader -Verbose
   }
   Process
@@ -75,7 +109,8 @@ function Send-Codecov {
             "$($MyInvocation.MyCommand): Skip, empty file: ${FilePath}"
           continue
         }
-        Send-Report -FilePath:$FilePath -BuildName:$BuildName -Flags:$Flag
+        Send-Report -FilePath:$FilePath -BuildName:$BuildName -Flags:$Flag `
+          -Token:$Token
       }
     }
   }
@@ -154,6 +189,11 @@ function Correct-BuildName {
 <#
 .SYNOPSIS
   Upload the coverage report to codecov.io.
+.NOTES
+  Expects execution inside a git worktree, with the exception of usage with
+  AppVeyor's `shallow_clone: true` setting. Then $env:APPVEYOR_REPO_COMMIT is
+  expected and acquired by Codecov.
+  For usage see the help: `python -m codecov --help`.
 #>
 function Send-Report {
   [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Medium')]
@@ -165,7 +205,10 @@ function Send-Report {
     [AllowNull()]
     [AllowEmptyString()]
     [Alias('Flag')]
-    [String[]]$Flags
+    [String[]]$Flags,
+    [AllowEmptyString()]
+    # Codecov Token or @filename for file containing the token.
+    [String]$Token
   )
   Begin
   {
@@ -173,7 +216,10 @@ function Send-Report {
 
     $codecov_flags = @()
     $disable = @()
-    if (-not (Assert-CI)) { $disable += 'detect' }
+    if (-not (Assert-CI)) {
+      $disable += 'detect'
+      if ($Token) { $codecov_flags += ('--token ' + $Token) }
+    }
     if ($BuildName) { $codecov_flags += ('--name ' + $BuildName) }
     if ($FilePath) {
       $codecov_flags += ('--file "' + $FilePath + '"')
