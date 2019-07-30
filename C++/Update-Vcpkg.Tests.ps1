@@ -190,7 +190,7 @@ Describe 'Internal Test-ChangedVcpkgSource' {
           '2019.06.26-nohash' + '`n`nSee LICENSE.txt for license information."'
         ) > vcpkg.ps1
         New-Item .\toolsrc -ItemType Directory
-        'some text' > .\toolsrc\something.cpp 
+        'some text' > .\toolsrc\something.cpp
         git add *
         git commit -m 'initial' --quiet
         # no changes: do not create the .hash file.
@@ -228,7 +228,7 @@ Describe 'Internal Test-ChangedVcpkgSource' {
           '2019.06.26-nohash' + '`n`nSee LICENSE.txt for license information."'
         ) > vcpkg.ps1
         New-Item .\toolsrc -ItemType Directory
-        'some text' > .\toolsrc\something.cpp 
+        'some text' > .\toolsrc\something.cpp
         git add *
         git commit -m 'initial' --quiet
         # Verify operation.
@@ -304,7 +304,7 @@ Describe 'Internal Test-ChangedVcpkgSource' {
           '2019.06.26-nohash' + '`n`nSee LICENSE.txt for license information."'
         ) > vcpkg.ps1
         New-Item .\toolsrc -ItemType Directory
-        'some text' > .\toolsrc\something.cpp 
+        'some text' > .\toolsrc\something.cpp
         git add *
         git commit -m 'initial' --quiet
         It 'initial run - create vcpkg_source.hash' {

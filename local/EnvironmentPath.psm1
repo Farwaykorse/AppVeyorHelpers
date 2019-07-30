@@ -11,7 +11,7 @@ function Add-EnvironmentPath {
     [ValidateScript({ Test-Path -LiteralPath "$_" -PathType 'Container' })]
     [ValidateNotNullOrEmpty()]
     [String]$Path = $(throw 'Path is a required parameter'),
-	[Switch]$Front
+    [Switch]$Front
   )
   Begin
   {

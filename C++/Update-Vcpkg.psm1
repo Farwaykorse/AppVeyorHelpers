@@ -28,7 +28,7 @@ Set-StrictMode -Version Latest
   INFO: vcpkg update
   -- Using local portfile versions. To update the local portfiles, use `git pull
   -- No packages need updating.
-  -- Update vcpkg ... done 
+  -- Update vcpkg ... done
 
   Default operation. Use the latest versions of all packages and rebuild the
   vcpkg tools only on version number changes.
@@ -370,7 +370,7 @@ function Test-ChangedVcpkgSource {
   [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Medium')]
   [OutputType([Bool])]
   param()
-  Begin 
+  Begin
   {
     Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
 

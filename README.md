@@ -72,7 +72,7 @@ Install libraries:
 These modules can create persistent files in the file-system.
 These are primarily the `Install-*` functions.
 With the exception of installers that install software in their default location
-or update software present on the system (notably 
+or update software present on the system (notably
 `Update-Vcpkg`) these files are all located in `~/Tools`.
 
 <!-------------------------------------------------------------><a id="dev"></a>
