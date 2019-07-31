@@ -162,7 +162,7 @@ function Update-Vcpkg {
         (Test-Path (Join-Path $cache_dir $vcpkg) -PathType Leaf)
       ) {
         Write-Verbose 'Installed vcpkg is up-to-date.'
-        Remove-Item (Join-Path $cache_dir 'vcpkg')
+        Remove-Item (Join-Path $cache_dir $vcpkg)
       }
       # Build vcpkg
       if ($build) {
