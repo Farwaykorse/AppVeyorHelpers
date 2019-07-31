@@ -752,7 +752,7 @@ Describe 'Update-Vcpkg' {
           { Update-vcpkg -Path $path 6>$null } |
             Should -Throw 'not empty and not a git working directory'
           Assert-MockCalled -CommandName Assert-CI -ModuleName Send-Message `
-            -Scope It -Times 3 -Exactly
+            -Scope It -Times 2 -Exactly
         }
       }
     }

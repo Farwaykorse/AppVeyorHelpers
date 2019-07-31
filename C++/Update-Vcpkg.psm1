@@ -92,28 +92,10 @@ function Update-Vcpkg {
     # Default cache directory, for controlled cache application.
     $cache_dir = Join-Path (Join-Path (Join-Path $HOME 'Tools') 'cache') 'vcpkg'
 
-    # Temporary fix ----------------------------------------
-    if ($env:CI_WINDOWS -eq $null) {
-      Send-Message -Warning 'CI_WINDOWS and CI_LINUX not yet defined' -LogOnly
-      if ($PSVersionTable.PSVersion.Major -lt 6) {
-        if ((Get-WmiObject Win32_OperatingSystem).Caption -match 'Windows') {
-          $env:CI_WINDOWS = 'true'
-        }
-      } else {
-        if ((Get-CimInstance CIM_OperatingSystem).Caption -match 'Windows') {
-          $env:CI_WINDOWS = 'true'
-        }
-      }
+    if (Assert-Windows) {
+      $vcpkg = 'vcpkg.exe'
     } else {
-      Send-Message -Warning ('Remove unnecessary code from ' +
-        $MyInvocation.MyCommand) -LogOnly
-    }
-    # /Temporary fix ---------------------------------------
-
-    if ($env:CI_WINDOWS -eq 'true') {
-      $vcpkg = 'vcpkg.exe' # Windows
-    } else {
-      $vcpkg = 'vcpkg' # Linux
+      $vcpkg = 'vcpkg'
     }
 
     # Set installation location

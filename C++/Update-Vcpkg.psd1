@@ -20,7 +20,7 @@ PowerShellVersion = '5.1'
 
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @(
-  @{ModuleName="${PSScriptRoot}\..\local\All.psd1"; ModuleVersion='0.3'},
+  @{ModuleName="${PSScriptRoot}\..\local\All.psd1"; ModuleVersion='0.4'},
   @{ModuleName="${PSScriptRoot}\..\General\Test-Command.psd1"; ModuleVersion='0.3'},
   @{ModuleName="${PSScriptRoot}\..\AppVeyor\Send-Message.psd1"; ModuleVersion='0.4'}
 )
