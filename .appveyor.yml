@@ -38,6 +38,7 @@ for:
       ( Get-Module Pester -ListAvailable |
       Format-Table -HideTableHeaders -Property Name, Version |
       Out-String).Trim()
+  - ps: Update-Vcpkg
   before_build:
   - cd %APPVEYOR_BUILD_FOLDER%
   build_script:
@@ -52,6 +53,7 @@ for:
   - pwsh: |
       Import-Module -Name .\AppVeyorHelpers.psd1
       Show-SystemInfo -Path -All
+      Update-Vcpkg
   - pwsh: Install-Module Pester -Force
   - pwsh: >-
       ( Get-Module Pester -ListAvailable |
