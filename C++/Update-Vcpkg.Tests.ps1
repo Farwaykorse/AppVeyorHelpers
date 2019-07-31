@@ -686,6 +686,9 @@ function Assert-VcpkgRequirements {
 Describe 'Update-Vcpkg' {
   # Suppress output to the Appveyor Message API.
   Mock Assert-CI { return $false } -ModuleName Send-Message
+  AfterEach {
+    $env:APPVEYOR_CACHE_SKIP_SAVE = ''
+  }
 
   It 'has documentation' {
     Get-Help Update-Vcpkg | Out-String |
@@ -749,10 +752,17 @@ Describe 'Update-Vcpkg' {
         New-Item -Path $path -Name 'somefile.txt' -ItemType File
         It 'throw: non-empty, not a git working directory' {
           Assert-VcpkgRequirements
-          { Update-vcpkg -Path $path 6>$null } |
+          { Update-vcpkg -Path $path 3>$null 6>$null } |
             Should -Throw 'not empty and not a git working directory'
-          Assert-MockCalled -CommandName Assert-CI -ModuleName Send-Message `
-            -Scope It -Times 2 -Exactly
+          if (Assert-CI) {
+            $env:APPVEYOR_CACHE_SKIP_SAVE | Should -Be $true
+            Assert-MockCalled -CommandName Assert-CI -ModuleName Send-Message `
+              -Scope It -Times 3 -Exactly
+          } else {
+            $env:APPVEYOR_CACHE_SKIP_SAVE | Should -Be $null
+            Assert-MockCalled -CommandName Assert-CI -ModuleName Send-Message `
+              -Scope It -Times 2 -Exactly
+          }
         }
       }
     }
@@ -774,6 +784,7 @@ Describe 'Update-Vcpkg' {
       Test-Path (Join-Path $vcpkg_dir '*') | Should -Be $false
       Test-Path -Path (Join-Path $PSScriptRoot 'vcpkg_source.hash') |
         Should -Be $false
+      $env:APPVEYOR_CACHE_SKIP_SAVE | Should -Be $null
     }
     $vcpkg_dir = Join-Path (Join-Path 'TestDrive:\' 'vc 2') 'vcpkg'
     It '-Path (non-existing) - creates directory' {
@@ -785,6 +796,7 @@ Describe 'Update-Vcpkg' {
         Should -Match 'Update-Repository: vcpkg not installed'
       Test-Path (Join-Path $vcpkg_dir '*') | Should -Be $false
       Test-Path -Path $vcpkg_dir -PathType Container | Should -Be $true
+      $env:APPVEYOR_CACHE_SKIP_SAVE | Should -Be $null
     }
     # clone / checkout
     $vcpkg_dir = New-Item -Path 'TestDrive:\' -Name 'vc 3' -ItemType Directory
@@ -800,6 +812,7 @@ Describe 'Update-Vcpkg' {
         1>$null) 3>&1 6>$null |
         Should -Match 'Update-Repository: vcpkg not installed'
       Test-Path (Join-Path $vcpkg_dir '*') | Should -Be $false
+      $env:APPVEYOR_CACHE_SKIP_SAVE | Should -Be $null
     }
 
     # Work-around issue with asynchronous file IO on Windows.
@@ -829,8 +842,8 @@ Describe 'Update-Vcpkg' {
         Should -Be $false
       Update-Vcpkg -Latest -Quiet -WhatIf 3>&1 6>$null |
         Should -Match 'Update-Repository: vcpkg not installed'
+      $env:APPVEYOR_CACHE_SKIP_SAVE | Should -Be $null
     }
-
     # Work-around issue with asynchronous file IO on Windows.
     while ($true) {
       if ((Remove-Item $vcpkg_dir -Recurse -Force -ErrorAction Continue *>&1
@@ -855,26 +868,29 @@ Describe 'Update-Vcpkg' {
 
     It 'build after retrieval from cache (mocked)' {
       Assert-VcpkgRequirements
-      { Update-Vcpkg -Path $vcpkg_dir -Quiet -WhatIf } | Should -not -Throw
+      { Update-Vcpkg -Path $vcpkg_dir -Quiet -WhatIf 3>$null } |
+        Should -not -Throw
       Assert-MockCalled -CommandName Update-Repository `
         -ModuleName update-Vcpkg -Times 1 -Exactly -Scope It
       Assert-MockCalled -CommandName Import-CachedVcpkg `
         -ModuleName update-Vcpkg -Times 1 -Exactly -Scope It
       Assert-MockCalled -CommandName Test-IfReleaseWithIssues `
         -ModuleName update-Vcpkg -Times 1 -Exactly -Scope It
+      $env:APPVEYOR_CACHE_SKIP_SAVE | Should -Be $null
     }
     Mock Test-IfReleaseWithIssues { return $false } -ModuleName Update-Vcpkg
     It 'no build after retrieval from cache (mocked)' {
       Assert-VcpkgRequirements
-      { Update-Vcpkg -Path $vcpkg_dir -Quiet -WhatIf } | Should -not -Throw
+      { Update-Vcpkg -Path $vcpkg_dir -Quiet -WhatIf 3>$null } |
+        Should -not -Throw
       Assert-MockCalled -CommandName Update-Repository `
         -ModuleName update-Vcpkg -Times 1 -Exactly -Scope It
       Assert-MockCalled -CommandName Import-CachedVcpkg `
         -ModuleName update-Vcpkg -Times 1 -Exactly -Scope It
       Assert-MockCalled -CommandName Test-IfReleaseWithIssues `
         -ModuleName update-Vcpkg -Times 1 -Exactly -Scope It
+      $env:APPVEYOR_CACHE_SKIP_SAVE | Should -Be $null
     }
-
     # Work-around issue with asynchronous file IO on Windows.
     while ($true) {
       if ((Remove-Item $vcpkg_dir -Recurse -Force -ErrorAction Continue *>&1
@@ -913,6 +929,7 @@ Describe 'Update-Vcpkg' {
         -ModuleName Update-Vcpkg -Times 1 -Exactly -Scope It
       Assert-MockCalled -CommandName Remove-Item `
         -ModuleName Update-Vcpkg -Times 1 -Exactly -Scope It
+      $env:APPVEYOR_CACHE_SKIP_SAVE | Should -Be $null
     }
     # Work-around issue with asynchronous file IO on Windows.
     while ($true) {
@@ -922,6 +939,23 @@ Describe 'Update-Vcpkg' {
       } else { break }
     }
     # /Work-around
+  }
+  Context 'failed install' {
+    Mock Push-Location { throw 'something' } -ModuleName Update-vcpkg
+    Mock Assert-CI { return $true } -ModuleName Update-vcpkg
+    Mock Test-Path { return $false } -ModuleName Update-vcpkg
+    # should not be called
+    Mock Update-Repository { throw 'do not call' } -ModuleName Update-Vcpkg
+    Mock Import-CachedVcpkg { throw 'do not call' } -ModuleName Update-Vcpkg
+    Mock Export-CachedVcpkg { throw 'do not call' } -ModuleName Update-Vcpkg
+    Mock Test-IfReleaseWithIssues { throw 'do not' } -ModuleName Update-Vcpkg
+    Mock Add-EnvironmentPath { throw 'do not call' } -ModuleName Update-Vcpkg
+
+    It 'failed build' {
+      Assert-VcpkgRequirements
+      { Update-Vcpkg 6>$null 3>&1 } | Should -Throw 'something'
+      $env:APPVEYOR_CACHE_SKIP_SAVE | Should -Be $true
+    }
   }
 
   $original_image = $env:APPVEYOR_BUILD_WORKER_IMAGE
@@ -933,7 +967,9 @@ Describe 'Update-Vcpkg' {
     # should not be called
     Mock Update-Repository { throw 'do not call' } -ModuleName Update-Vcpkg
     Mock Import-CachedVcpkg { throw 'do not call' } -ModuleName Update-Vcpkg
+    Mock Export-CachedVcpkg { throw 'do not call' } -ModuleName Update-Vcpkg
     Mock Test-IfReleaseWithIssues { throw 'do not' } -ModuleName Update-Vcpkg
+    Mock Add-EnvironmentPath { throw 'do not call' } -ModuleName Update-Vcpkg
 
     It 'vcpkg requires minimally VS2015 on Windows' {
       { Update-Vcpkg *>$null } | Should -not -Throw
@@ -945,6 +981,7 @@ Describe 'Update-Vcpkg' {
       $out[0] | Should -Match 'Vcpkg requires minimally Visual Studio 2015'
       Assert-MockCalled -CommandName Test-Command `
         -ModuleName update-Vcpkg -Times 2 -Exactly -Scope It
+      $env:APPVEYOR_CACHE_SKIP_SAVE | Should -Be $null
     }
   }
   $env:APPVEYOR_BUILD_WORKER_IMAGE = $original_image

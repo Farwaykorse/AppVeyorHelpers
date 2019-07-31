@@ -164,9 +164,14 @@ function Update-Vcpkg {
         Add-EnvironmentPath -Path $Location
       }
     } finally {
-      if (Assert-CI -and -not (Test-Path $vcpkg -PathType Leaf) ) {
-        Write-Verbose 'Disabling cache update. Building vcpkg failed.'
-        $env:APPVEYOR_CACHE_SKIP_SAVE = 'true'
+      if ( (Assert-CI) -and -not (Test-Path $vcpkg -PathType Leaf) ) {
+        Send-Message -Warning 'Building vcpkg failed. Disabling cache update.' `
+          -Details (Join-Path $Location $vcpkg)
+        if ($PSCmdlet.ShouldProcess('APPVEYOR_CACHE_SKIP_SAVE',
+          'disable caching')
+        ) {
+          $env:APPVEYOR_CACHE_SKIP_SAVE = 'true'
+        }
       }
       Pop-Location
     }
