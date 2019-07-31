@@ -8,6 +8,13 @@ skip_commits:
   - LICENSE
   - '**/*.md'
 
+cache:
+- 'C:\Users\appveyor\Tools\cache\vcpkg'
+
+environment:
+  global:
+    APPVEYOR_SAVE_CACHE_ON_ERROR: true
+
 image:
 - Visual Studio 2019
 - Visual Studio 2017
