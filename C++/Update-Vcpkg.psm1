@@ -230,12 +230,13 @@ function Import-CachedVcpkg {
       return $true
     }
     # Add message log entry with instructions
-    ('Vcpkg has been rebuild, but their was no cache available.',"`n",
+    ('Vcpkg has been rebuild, but there was no cache available.',"`n",
     'Add the following to your AppVeyor configuration:',"`n`n",
     'cache:',"`n- '${Path}'`n`n",
     'Optionally, enable cacheing on failed builds to reduce build time ',
-    'for repeatedly failing jobs. Add in your AppVeyor configuration:',"`n`n",
-    'environment:', "`n",
+    'for repeatedly failing jobs.',"`n",
+    'Add in your AppVeyor configuration:',"`n`n",
+    'environment:',"`n",
     '  global:',"`n",
     '    APPVEYOR_SAVE_CACHE_ON_ERROR: true'
     ) -join '' |
@@ -411,7 +412,8 @@ function Test-ChangedVcpkgSource {
       'Add the following to your AppVeyor configuration:',"`n`n",
       'cache:',"`n- '${cache_txt}'`n`n",
       'Optionally, enable cacheing on failed builds to reduce build time ',
-      'for repeatedly failing jobs. Add in your AppVeyor configuration:',"`n`n",
+      'for repeatedly failing jobs.',"`n",
+      'Add in your AppVeyor configuration:',"`n`n",
       'environment:', "`n",
       '  global:',"`n",
       '    APPVEYOR_SAVE_CACHE_ON_ERROR: true'
