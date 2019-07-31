@@ -53,6 +53,11 @@ Set-StrictMode -Version Latest
 
   Use a custom install directory for vcpkg, or point in to an installed version.
   Can be used to create separate install directories, usable with CMake.
+.EXAMPLE
+  Update-Vcpkg -CachePath ~\custom\cache
+
+  Use a custom location for caching the vcpkg tool on AppVeyor.
+  This must be an existing directory.
 .NOTES
   - `-Path <...> -WhatIf` always creates the target folder.
   - Caching on AppVeyor.
@@ -79,6 +84,10 @@ function Update-Vcpkg {
     [ValidateNotNullOrEmpty()]
     # Custom directory to find or install vcpkg.
     [String]$Path,
+    [ValidateScript({ Test-Path "$_" -PathType Container })]
+    [ValidateNotNullOrEmpty()]
+    # Define a custom directory to cache vcpkg on AppVeyor.
+    [String]$CachePath,
     [Alias('q')]
     # Reduce console output.
     [Switch]$Quiet
@@ -88,9 +97,17 @@ function Update-Vcpkg {
     Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
 
     if (-not $Quiet) { Write-Host "-- Update vcpkg ..." }
-
-    # Default cache directory, for controlled cache application.
-    $cache_dir = Join-Path (Join-Path (Join-Path $HOME 'Tools') 'cache') 'vcpkg'
+    if ($CachePath) {
+      if (-not (Assert-CI)) {
+        Send-Message '-CachePath has no use outside the AppVeyor environment' `
+          -Warning -LogOnly:$Quiet
+      }
+      $cache_dir = $CachePath
+    } else {
+      # Default cache directory, for controlled cache application.
+      $cache_dir = Join-Path (Join-Path (Join-Path $HOME 'Tools') 'cache'
+        ) 'vcpkg'
+    }
 
     if (Assert-Windows) {
       $vcpkg = 'vcpkg.exe'

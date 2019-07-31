@@ -4,6 +4,8 @@ Set-StrictMode -Version Latest
 
 ##====--------------------------------------------------------------------====##
 $global:msg_documentation = 'at least 1 empty line above documentation'
+$default_cache_dir = Join-Path (Join-Path (Join-Path $HOME 'Tools') 'cache'
+  ) 'vcpkg'
 
 if (Assert-CI) {
   # Prevent warnings on AppVeyor.
@@ -20,7 +22,7 @@ Describe 'Internal Select-VcpkgLocation' {
     }
     It 'supports -WhatIf and -Confirm' {
       Get-Command -Name Select-VcpkgLocation -Syntax |
-        Should -Match '-Whatif.*-Confirm'
+        Should -Match '-WhatIf.*-Confirm'
     }
 
     Context 'find from executable' {
@@ -110,7 +112,7 @@ Describe 'Internal Test-IfReleaseWithIssues' {
     }
     It 'no support for -WhatIf and -Confirm' {
       Get-Command -Name Test-IfReleaseWithIssues -Syntax |
-        Should -not -Match '-Whatif.*-Confirm'
+        Should -not -Match '-WhatIf.*-Confirm'
     }
 
     Context 'mock calling vcpkg' {
@@ -170,7 +172,7 @@ Describe 'Internal Test-ChangedVcpkgSource' {
     }
     It 'supports -WhatIf and -Confirm' {
       Get-Command -Name Test-ChangedVcpkgSource -Syntax |
-        Should -Match '-Whatif.*-Confirm'
+        Should -Match '-WhatIf.*-Confirm'
     }
 
     Context 'WhatIf' {
@@ -343,7 +345,7 @@ Describe 'Internal Import-CachedVcpkg' {
     }
     It 'supports -WhatIf and -Confirm' {
       Get-Command -Name Import-CachedVcpkg -Syntax |
-        Should -Match '-Whatif.*-Confirm'
+        Should -Match '-WhatIf.*-Confirm'
     }
 
     Context '$cached_dir not defined' {
@@ -489,7 +491,7 @@ Describe 'Internal Export-CachedVcpkg' {
     }
     It 'supports -WhatIf and -Confirm' {
       Get-Command -Name Export-CachedVcpkg -Syntax |
-        Should -Match '-Whatif.*-Confirm'
+        Should -Match '-WhatIf.*-Confirm'
     }
 
     Context '$cache_dir not defined' {
@@ -618,7 +620,7 @@ Describe 'Internal Update-Repository' {
     }
     It 'supports -WhatIf and -Confirm' {
       Get-Command -Name Update-Repository -Syntax |
-        Should -Match '-Whatif.*-Confirm'
+        Should -Match '-WhatIf.*-Confirm'
     }
 
     Context 'Input Validation' {
@@ -696,7 +698,7 @@ Describe 'Update-Vcpkg' {
   }
   It 'supports -WhatIf and -Confirm' {
     Get-Command -Name Update-Vcpkg -Syntax |
-      Should -Match '-Whatif.*-Confirm'
+      Should -Match '-WhatIf.*-Confirm'
   }
 
   Context 'Input Validation' {
@@ -766,8 +768,38 @@ Describe 'Update-Vcpkg' {
         }
       }
     }
+    It 'throws on empty -CachePath' {
+      { Update-Vcpkg -CachePath } | Should -Throw 'missing an argument'
+    }
+    It 'throws on empty string -CachePath' {
+      { Update-Vcpkg -CachePath '' } | Should -Throw 'argument is null or empty'
+    }
+    It 'throws on $null -CachePath' {
+      { Update-Vcpkg -CachePath $null } |
+        Should -Throw 'argument is null or empty'
+    }
+    It 'throws on non-existing -CachePath' {
+      { Update-Vcpkg -CachePath 'TestDrive:\non-existing\location' } |
+        Should -Throw 'validation script'
+    }
+    It 'throws when -CachePath points to a file' {
+      New-Item -Path TestDrive:\ -Name file.txt -ItemType File -Force
+      { Update-Vcpkg -CachePath 'TestDrive:\file.txt' } |
+        Should -Throw 'validation script'
+    }
+    $cache = New-Item -Path 'TestDrive:\' -name 'some_cache' -ItemType Container
+    It 'warning from -CachePath' {
+      Assert-VcpkgRequirements
+      Mock Assert-CI { return $false } -ModuleName Update-Vcpkg
+      (Update-Vcpkg -CachePath $cache -WhatIf 6>$null) 3>&1 |
+        Should -Match 'CachePath has no use outside the AppVeyor environment'
+      (Update-Vcpkg -CachePath 'TestDrive:\some_cache' -Quiet -WhatIf `
+        6>$null) 3>&1 | Should -Be $null
+    }
+
   } # /Context: Input Validation
   Context 'WhatIf & Path' {
+    Mock Test-Command { return $false } -ModuleName Update-Vcpkg
     Mock Add-EnvironmentPath { return $null } -ModuleName Update-Vcpkg
     Mock Assert-CI { return $false } -ModuleName Update-Vcpkg
     Mock Select-VcpkgLocation { throw 'unexpected' } -ModuleName Update-Vcpkg
@@ -940,7 +972,9 @@ Describe 'Update-Vcpkg' {
     }
     # /Work-around
   }
-  Context 'failed install' {
+  $original_CI_WINDOWS = $env:CI_WINDOWS
+  It 'failed build' {
+    Assert-VcpkgRequirements # not for image: Visual Studio 2013
     Mock Push-Location { throw 'something' } -ModuleName Update-vcpkg
     Mock Assert-CI { return $true } -ModuleName Update-vcpkg
     Mock Test-Path { return $false } -ModuleName Update-vcpkg
@@ -951,12 +985,13 @@ Describe 'Update-Vcpkg' {
     Mock Test-IfReleaseWithIssues { throw 'do not' } -ModuleName Update-Vcpkg
     Mock Add-EnvironmentPath { throw 'do not call' } -ModuleName Update-Vcpkg
 
-    It 'failed build' {
-      Assert-VcpkgRequirements
-      { Update-Vcpkg 6>$null 3>&1 } | Should -Throw 'something'
-      $env:APPVEYOR_CACHE_SKIP_SAVE | Should -Be $true
-    }
+    $env:CI_WINDOWS = 'True'
+    { Update-Vcpkg 6>$null 3>$null } | Should -Throw 'something'
+    $env:APPVEYOR_CACHE_SKIP_SAVE | Should -Be $true
+    $env:CI_WINDOWS = 'False'
+    { Update-Vcpkg 6>$null 3>$null } | Should -Throw 'something'
   }
+  $env:CI_WINDOWS = $original_CI_WINDOWS
 
   $original_image = $env:APPVEYOR_BUILD_WORKER_IMAGE
   Context 'Visual Studio 2013' {
