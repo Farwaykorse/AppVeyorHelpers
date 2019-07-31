@@ -39,7 +39,7 @@ Set-StrictMode -Version Latest
   True
 .OUTPUTS
   A Boolean value is returned. True when execution succeeds without errors or
-  the output sting matches. 
+  the output sting matches.
   $LASTEXITCODE is always 0 after execution in Mode 1 (non-matching).
 .NOTES
   Not capable of containing $Hosts.SetShouldExit().

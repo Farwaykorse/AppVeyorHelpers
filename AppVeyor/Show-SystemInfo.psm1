@@ -92,7 +92,7 @@ function Show-SystemInfo {
         $((Get-CimInstance CIM_OperatingSystem).OSArchitecture)
       }
     )
-    # AppVeyor default matrix 
+    # AppVeyor default matrix
     if (Assert-CI -and $env:APPVEYOR_BUILD_WORKER_IMAGE) {
       $out += Join-Info 'Image' $env:APPVEYOR_BUILD_WORKER_IMAGE
     }
