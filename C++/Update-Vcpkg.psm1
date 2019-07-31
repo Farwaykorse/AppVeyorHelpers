@@ -125,6 +125,13 @@ function Update-Vcpkg {
   }
   Process
   {
+    if ( (Assert-CI) -and
+      ($env:APPVEYOR_BUILD_WORKER_IMAGE -match 'Visual Studio 2013')
+    ) {
+      Send-Message -Error 'Vcpkg requires minimally Visual Studio 2015.' `
+        -ContinueOnError
+      return $null
+    }
     try {
       Push-Location $Location
 
@@ -187,7 +194,9 @@ function Update-Vcpkg {
     if (-not (Test-Command 'vcpkg version') ) {
       if (-not $Quiet) { Write-Host "-- Update vcpkg ... failed" }
       Send-Message -Error 'vcpkg install failed' `
-        -ContinueOnError:$WhatIfPreference
+        -ContinueOnError:$($WhatIfPreference -or
+          ($env:APPVEYOR_BUILD_WORKER_IMAGE -match 'Visual Studio 2013')
+        )
       return $null
     }
     # Update packages
