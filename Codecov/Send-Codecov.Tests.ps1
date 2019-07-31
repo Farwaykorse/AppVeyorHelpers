@@ -338,13 +338,17 @@ Describe 'Send-Codecov' {
           Should -Match '.*[\\/]report\.xml$'
       }
     } # In TestDrive:\
-    It 'throws on $null or empty Flag' {
-      { Send-Codecov '.\*.xml' -BuildName build -Flag } |
+    It 'throws on $null or empty Flags' {
+      { Send-Codecov '.\*.xml' -BuildName build -Flags } |
         Should -Throw 'missing an argument'
-      { Send-Codecov '.\*.xml' -BuildName build -Flag '' } |
+      { Send-Codecov '.\*.xml' -BuildName build -Flags '' } |
+        Should -Throw 'argument is null'
+      { Send-Codecov '.\*.xml' -BuildName build -Flags $null } |
         Should -Throw 'argument is null or empty'
-      { Send-Codecov '.\*.xml' -BuildName build -Flag $null } |
-        Should -Throw 'argument is null or empty'
+      { Send-Codecov '.\*.xml' -BuildName build -Flags @('aa', $null) } |
+        Should -Throw 'argument is null'
+      { Send-Codecov '.\*.xml' -BuildName build -Flags @('aa', '') } |
+        Should -Throw 'argument is null'
     }
     It 'throws on an $null or empty Token' {
       { Send-Codecov -Path 'report.xml' -BuildName build -Token } |
@@ -394,39 +398,46 @@ Describe 'Send-Codecov' {
   Context 'Input Validation, Flag' {
     # Suppress output to the Appveyor Message API.
     Mock Assert-CI { return $false } -ModuleName Send-Message
-    Mock Send-Report { return $Flag } -ModuleName Send-Codecov
+    Mock Send-Report { return $Flags } -ModuleName Send-Codecov
     New-Item -Path TestDrive: -Name report.xml
     'text' > TestDrive:\report.xml
 
-    It 'Flag takes no upper-case characters' {
-      { Send-Codecov '.\*.xml' -BuildName build -Flag 'ABC' 6>$null } |
+    It 'Flags takes no upper-case characters' {
+      { Send-Codecov '.\*.xml' -BuildName build -Flags 'ABC' 6>$null } |
         Should -Throw 'invalid flag name'
     }
-    It 'Flag takes no "-"' {
-      { Send-Codecov '.\*.xml' -BuildName build -Flag 'a-c' 6>$null } |
+    It 'Flags takes no "-"' {
+      { Send-Codecov '.\*.xml' -BuildName build -Flags 'a-c' 6>$null } |
         Should -Throw 'invalid flag name'
     }
-    It 'Flag takes no special characters' {
+    It 'Flags takes no special characters' {
       { Send-Codecov '.\*.xml' -BuildName build -Flag '#abc' 6>$null } |
         Should -Throw 'invalid flag name'
     }
     Assert-MockCalled Send-Report -ModuleName Send-Codecov -Exactly 0 `
       -Scope Context
-    It 'Flag has a maximum length of 45 characters' {
+    It 'space separates Flags' {
+      { Send-Codecov 'TestDrive:\report.xml' -BuildName build `
+        -Flag 'abc more' 6>$null } | Should -not -Throw
+      { Send-Codecov 'TestDrive:\report.xml' -BuildName build `
+        -Flags 'abcdefghijklmnopqrstuvwxyz0123456789 abcdefghi' 6>$null
+      } | Should -not -Throw
+    }
+    It 'Flags has a maximum length of 45 characters' {
       Require-CodecovInstalled
       { Send-Codecov 'TestDrive:\report.xml' -BuildName build `
-        -Flag 'abcdefghijklmnopqrstuvwxyz0123456789_abcdefgh'
+        -Flags 'abcdefghijklmnopqrstuvwxyz0123456789_abcdefgh'
       } | Should -Not -Throw
       { Send-Codecov 'TestDrive:\report.xml' -BuildName build `
-        -Flag 'abcdefghijklmnopqrstuvwxyz0123456789_abcdefghi' 6>$null
+        -Flags 'abcdefghijklmnopqrstuvwxyz0123456789_abcdefghi' 6>$null
       } | Should -Throw 'invalid flag name'
       Assert-MockCalled Send-Report -ModuleName Send-Codecov -Exactly 1 `
         -Scope It
     }
     It 'valid call' {
       Require-CodecovInstalled
-      Send-Codecov 'TestDrive:\report.xml' -BuildName build -Flag unit_tests_2 |
-        Should -MatchExactly 'unit_tests_2'
+      Send-Codecov 'TestDrive:\report.xml' -BuildName build `
+        -Flags unit_tests_2 | Should -MatchExactly 'unit_tests_2'
       Assert-MockCalled Send-Report -ModuleName Send-Codecov -Exactly 1 `
         -Scope It
     }

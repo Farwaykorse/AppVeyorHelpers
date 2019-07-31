@@ -11,18 +11,25 @@ Set-StrictMode -Version Latest
   Supplying a name for the build is mandatory to identify the configuration.
 .EXAMPLE
   Send-Codecov '.\report.xml' -BuildName 'VS2019 C++17 x64 Debug'
-  
+
   Report to be combined with any others matching the build name.
   Spaces in the BuildName are replaced with underscores "_".
 .EXAMPLE
   Send-Codecov '.\coverage\*.xml' -BuildName build -Flag unittests
-  
-  Setting the optional Flag parameter specifies the report within the build.
+
+  Setting the optional Flags parameter specifies the report within the build.
   Note that codecov.io supports a limited set of characters for flags.
   Only lower-case letters, numbers and the underscore.
 .EXAMPLE
+  Send-Codecov '.\coverage\*.xml' -BuildName build -Flag @('unittests','flag2')
+
+  Multiple flags can be specified.
+  Equivalent to:
+  Send-Codecov '.\coverage\*.xml' -BuildName build -Flag 'unittests flag2'
+  (Using a space to separate flags.)
+.EXAMPLE
   Send-Codecov '.\report.xml' -BuildName 'VS2019 C++17 x64 Debug' -Token a2d1c71d-2565-4321-a080-e0b0eee3c529
- 
+
   Token is not required for public repositories uploading from Travis, CircleCI
   or AppVeyor.
   The "Repository Upload Token" for your project can be found on the Settings
@@ -48,8 +55,9 @@ function Send-Codecov {
     [ValidateNotNullOrEmpty()]
     [String]$BuildName = $(throw '-BuildName is required'),
     [ValidateNotNullOrEmpty()]
-    # Flag used on codecov.io, to identify the content.
-    [String]$Flag,
+    [Alias('Flag')]
+    # Flags used on codecov.io, to identify the content. e.g. unittests
+    [String[]]$Flags,
     [ValidateNotNullOrEmpty()]
     # Codecov Repository Upload Token, for private repositories.
     # You can also set it in the environment variable "CODECOV_TOKEN".
@@ -62,10 +70,18 @@ function Send-Codecov {
 
     $BuildName = Correct-BuildName($BuildName)
     Write-Verbose "BuildName: $BuildName"
-    if ($Flag -and ($Flag -cnotmatch '^[a-z0-9_]{1,45}$')) {
-      Send-Message -Error -Message `
-        "$($MyInvocation.MyCommand): Invalid flag name for codecov.io" `
-        -Details $Flag 
+    if ($Flags) {
+      $wrong = @()
+      foreach ($item in $Flags) {
+        $wrong = $item -split ' ' |
+          Select-String -CaseSensitive -NotMatch '^[a-z0-9_]{1,45}$'
+      }
+      if ($wrong) {
+        ('Flags: ' + $Flags -join '; ' + "`n" +
+          'Wrong flags: ' + $wrong -join '; '
+        ) | Send-Message -Error -Message `
+          "$($MyInvocation.MyCommand): Invalid flag name for codecov.io" `
+      }
     }
 
     if ($Token) {
@@ -109,7 +125,7 @@ function Send-Codecov {
             "$($MyInvocation.MyCommand): Skip, empty file: ${FilePath}"
           continue
         }
-        Send-Report -FilePath:$FilePath -BuildName:$BuildName -Flags:$Flag `
+        Send-Report -FilePath:$FilePath -BuildName:$BuildName -Flags:$Flags `
           -Token:$Token
       }
     }
