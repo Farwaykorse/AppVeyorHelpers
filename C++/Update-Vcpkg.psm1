@@ -274,7 +274,7 @@ function Export-CachedVcpkg {
   Process
   {
     if (Assert-CI) {
-      New-Item -Path $Destination -ItemType Directory -Force
+      New-Item -Path $Destination -ItemType Directory -Force 1>$null
       Resolve-Path -Path 'vcpkg*' |
         Select-String -Pattern '[\\\/]vcpkg(\.exe)?$' |
         ForEach-Object -Process {
