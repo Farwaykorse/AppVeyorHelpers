@@ -1,11 +1,30 @@
-# Set default behaviour to automatically normalize line endings.
+# Set git behaviour for files.
+# Verify application using: `git check-attr --all -- <pathname>`
 #------------------------------------------------------------------------------#
-*              text=auto
-.gitignore     -text
+# Macro attributes
+[attr]markdown  eol=lf whitespace=-blank-at-eol,blank-at-eof,tab-in-indent,tabwidth=4
+[attr]pwsh      eol=lf diff=csharp whitespace=trailing-space,tab-in-indent,tabwidth=4
+[attr]yaml      eol=lf whitespace=trailing-space,tab-in-indent,tabwidth=4
+#------------------------------------------------------------------------------#
+# Normalize line-endings (disable with -text)
+*   text=auto
+#------------------------------------------------------------------------------#
+# Per file-extension settings
+*.markdown  markdown
+*.md        markdown
+*.ps1       pwsh
+*.ps[dm]1   pwsh
+*.yaml      yaml
+*.yml       yaml
+# Per file settings
+.gitattributes  eol=lf whitespace=trailing-space
+.gitignore      -text whitespace=trailing-space
+.yamllint       yaml
 
-.gitattributes eol=lf
-*.md           eol=lf
-*.ps1          eol=lf
-*.psd1         eol=lf
-*.psm1         eol=lf
-*.yml          eol=lf
+#------------------------------------------------------------------------------#
+# Image files (treat as binary)
+*.gif   binary
+*.jpg   binary
+*.png   binary
+
+#------------------------------------------------------------------------------#

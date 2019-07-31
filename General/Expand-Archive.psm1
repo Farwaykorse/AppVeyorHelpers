@@ -23,7 +23,7 @@ Set-StrictMode -Version Latest
   Ignoring any internal directory structures.
 .EXAMPLE
   Expand-Archive large-archive.zip .\ -ShowProgress
-  
+
   For very large archives, taking a long time to extract, it is useful to
   display the progress indicator to prevent job cancellation due to inactivity.
 #>
