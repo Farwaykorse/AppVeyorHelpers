@@ -160,6 +160,18 @@ Describe 'Internal Show-<software>Version' {
         Show-CurlVersion | Should -match '^([0-9]+\.)+[0-9]+$'
       }
     }
+    Context 'vcpkg' {
+      $available = $(Test-Command 'vcpkg version')
+      It 'no throw' {
+          { Show-VcpkgVersion } | Should -not -Throw
+      }
+      It 'return version number' {
+        if (-not $available) {
+          Set-ItResult -Inconclusive -Because ('no vcpkg')
+        }
+        Show-VcpkgVersion | Should -match '^([0-9]+\.)+[0-9]+'
+      }
+    }
     Context 'mock software unavailable' {
       Mock Test-Command { return $false } -ModuleName Show-SystemInfo
       It 'CMake' {
@@ -177,12 +189,18 @@ Describe 'Internal Show-<software>Version' {
       It 'Curl' {
         Show-CurlVersion | Should -MatchExactly ' ?'
       }
+      It 'vcpkg' {
+        Show-VcpkgVersion | Should -MatchExactly ' ?'
+      }
     }
   }
 }
 ##====--------------------------------------------------------------------====##
 
 Describe 'Show-SystemInfo' {
+  # Suppress output to the Appveyor Message API.
+  Mock Assert-CI { return $false } -ModuleName Send-Message
+
   It 'has documentation' {
     Get-Help Show-SystemInfo | Out-String |
       Should -MatchExactly 'SYNOPSIS' -Because $msg_documentation
@@ -190,6 +208,9 @@ Describe 'Show-SystemInfo' {
   Context 'Basic operation' {
     It 'no throw' {
       { Show-SystemInfo } | Should -not -Throw
+    }
+    It 'no throw on -Path' {
+      { Show-SystemInfo -Path } | Should -not -Throw
     }
     It 'no throw on -PowerShell' {
       { Show-SystemInfo -PowerShell } | Should -not -Throw
@@ -208,6 +229,9 @@ Describe 'Show-SystemInfo' {
     }
     It 'no throw on -Curl' {
       { Show-SystemInfo -Curl } | Should -not -Throw
+    }
+    It 'no throw on -Vcpkg' {
+      { Show-SystemInfo -Vcpkg } | Should -not -Throw
     }
     It 'no throw on -All' {
       { Show-SystemInfo -All } | Should -not -Throw

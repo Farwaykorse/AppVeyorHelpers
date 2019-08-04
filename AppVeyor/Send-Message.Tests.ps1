@@ -225,6 +225,10 @@ Describe 'Send-Message' {
       Send-Message -Warning 'text' -Details 'more text' -HideDetails 3>&1 |
         Should -Be 'text'
     }
+    It 'Log Only' {
+      Send-Message -Warning 'text' -Details 'more text' -LogOnly 3>&1 |
+        Should -Be $null
+    }
     It 'NoNewLine' {
       Send-Message -Warning -Message 'text' -Details 'more text' 3>&1 |
         Should -Be "text`nmore text"
@@ -240,6 +244,10 @@ Describe 'Send-Message' {
     It 'piped Details, HideDetails' {
       'a','b','c' | Send-Message -Warning 'title' -HideDetails 3>&1 |
         Should -Be "title"
+    }
+    It 'piped Details, LogOnly' {
+      'a','b','c' | Send-Message -Warning 'title' -LogOnly 3>&1 |
+        Should -Be $null
     }
   }
   Context 'Error' {
@@ -260,6 +268,10 @@ Describe 'Send-Message' {
     It 'Title only (channel 6 only) -ContinueOnError' {
       Send-Message -Error -Message 'text' -ContinueOnError 6>&1 |
         Should -Be 'ERROR: text'
+    }
+    It 'Details (channel 6 only) -ContinueOnError' {
+      Send-Message -Error -Message 'text' -Details 'more text' `
+        -ContinueOnError 6>&1 | Should -Be @('ERROR: text', 'more text')
     }
   }
   Context 'Call to Add-AppveyorMessage' {

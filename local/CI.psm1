@@ -13,4 +13,19 @@ function Assert-CI {
 }
 ##====--------------------------------------------------------------------====##
 
-Export-ModuleMember -Function Assert-CI
+<#
+.SYNOPSIS
+  Checks if executed on the Microsoft Windows Platform.
+#>
+function Assert-Windows {
+  if ($env:CI_WINDOWS -ne $null) {
+    return ($env:CI_WINDOWS -ceq 'True')
+  }
+  return (
+    ($PSVersionTable.PSVersion.Major -lt 6) -or
+    ((Get-CimInstance CIM_OperatingSystem).Caption -match 'Windows')
+  )
+}
+##====--------------------------------------------------------------------====##
+
+Export-ModuleMember -Function Assert-CI, Assert-Windows

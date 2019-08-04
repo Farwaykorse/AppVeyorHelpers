@@ -110,6 +110,9 @@ function Send-Message {
     [alias('Hide','h')]
     # Don't show Details on the console, only in the Message log.
     [Switch]$HideDetails,
+    # Only display in the Message log, no message on the build console.
+    # This is only useful on AppVeyor. Implies -HideDetails.
+    [Switch]$LogOnly,
     # Concatenate all inputs to Details into a single string.
     [parameter(ParameterSetName='Details')]
     [parameter(ParameterSetName='ErrorDetails')]
@@ -147,23 +150,25 @@ function Send-Message {
       if ($intDetails) { $AppVeyor += ' -Details $intDetails' }
       Invoke-Expression -Command $AppVeyor
     }
-    if ($Error) {
-      Write-Host "ERROR: $Message" -ForegroundColor White -BackgroundColor Red
-      if ($intDetails -and -not $HideDetails) {
-        Write-Host $intDetails -ForegroundColor Red
+    if (-not $LogOnly) {
+      if ($Error) {
+        Write-Host "ERROR: $Message" -ForegroundColor White -BackgroundColor Red
+        if ($intDetails -and -not $HideDetails) {
+          Write-Host $intDetails -ForegroundColor Red
+        }
+        if (-not $ContinueOnError) {
+          if (Assert-CI) { $Host.SetShouldExit(1) }
+          throw $Message
+        }
+      } elseif ($Warning) {
+        if ($intDetails -and -not $HideDetails) { $Message += "`n${intDetails}" }
+        Write-Warning $Message
+      } else {
+        if ($intDetails -and -not $HideDetails) {
+          $Message += "`n$("-- $intDetails" -replace "`n", "`n-- ")"
+        }
+        Write-Host "INFO: $Message"
       }
-      if (-not $ContinueOnError) {
-        if (Assert-CI) { $Host.SetShouldExit(1) }
-        throw $Message
-      }
-    } elseif ($Warning) {
-      if ($intDetails -and -not $HideDetails) { $Message += "`n${intDetails}" }
-      Write-Warning $Message
-    } else {
-      if ($intDetails -and -not $HideDetails) {
-        $Message += "`n$("-- $intDetails" -replace "`n", "`n-- ")"
-      }
-      Write-Host "INFO: $Message"
     }
   }
 } # /function Send-Message

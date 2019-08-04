@@ -1,13 +1,11 @@
 @{
-##====--------------------------------------------------------------------====##
-RootModule = ''
-ModuleVersion = '0.2'
+RootModule = 'Update-Vcpkg.psm1'
+ModuleVersion = '0.1.1'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
 # CompanyName = 'Unknown'
-Description = 'Functionality specific to CI for C++ projects.'
-# ID used to uniquely identify this module
+Description = 'Install the most recent release of vcpkg and update cached packages.'
 # GUID = 'd0a9150d-b6a4-4b17-a325-e3a24fed0aa9'
 # HelpInfoURI = ''
 
@@ -20,16 +18,18 @@ PowerShellVersion = '5.1'
 ##====--------------------------------------------------------------------====##
 # Import configuration
 
-NestedModules = @(
-  "${PSScriptRoot}\Install-Ninja.psd1",
-  "${PSScriptRoot}\Update-Vcpkg.psd1"
+# Modules that must be imported into the global environment prior to importing this module
+RequiredModules = @(
+  @{ModuleName="${PSScriptRoot}\..\local\All.psd1"; ModuleVersion='0.4'},
+  @{ModuleName="${PSScriptRoot}\..\General\Test-Command.psd1"; ModuleVersion='0.3'},
+  @{ModuleName="${PSScriptRoot}\..\AppVeyor\Send-Message.psd1"; ModuleVersion='0.4'}
 )
 
 ##====--------------------------------------------------------------------====##
 # Export configuration
 
 # Functions to export from this module
-FunctionsToExport = '*'
+FunctionsToExport = 'Update-Vcpkg'
 # Cmdlets to export from this module
 CmdletsToExport = ''
 # Variables to export from this module
@@ -38,9 +38,10 @@ VariablesToExport = ''
 AliasesToExport = ''
 
 ##====--------------------------------------------------------------------====##
-# List of all modules packaged with this module
-# ModuleList = @()
 # List of all files packaged with this module
-# FileList = @()
-
+FileList = @(
+  'Update-Vcpkg.psd1',
+  'Update-Vcpkg.psm1',
+  'Update-Vcpkg.Tests.ps1'
+)
 }

@@ -6,7 +6,7 @@
 #>
 @{
 RootModule = 'CI.psm1'
-ModuleVersion = '0.2'
+ModuleVersion = '0.3'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
@@ -51,7 +51,7 @@ PowerShellVersion = '5.1'
 # Export configuration
 
 # Functions to export from this module
-FunctionsToExport = 'Assert-CI'
+FunctionsToExport = @('Assert-CI', 'Assert-Windows')
 # Cmdlets to export from this module
 CmdletsToExport = ''
 # Variables to export from this module

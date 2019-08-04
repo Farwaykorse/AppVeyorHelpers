@@ -526,8 +526,17 @@ Describe 'Install-Ninja (online)' -Tag 'online' {
       It 'throw path info' {
         { Install-Ninja -Tag 'v1.8.2' -InstallDir "$InstallDir" `
           -AddToPath 3>$null 6>$null
-      } | Should -Throw 'Failed to find Ninja on the search path.'
+        } | Should -Throw 'Failed to find Ninja on the search path.'
       }
+      # Work-around issue with asynchronous files IO on Windows.
+      $capture = Join-Path 'TestDrive:\' '*'
+      while ($true) {
+        if ((Remove-Item $capture -Recurse -Force -ErrorAction Continue *>&1
+        ) -ne $null) {
+          Start-Sleep -Seconds 0.5
+        } else { break }
+      }
+      # /Work-around
     }
   }
   $env:Path = $original_path

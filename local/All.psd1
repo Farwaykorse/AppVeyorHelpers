@@ -1,7 +1,7 @@
 @{
 ##====--------------------------------------------------------------------====##
 RootModule = ''
-ModuleVersion = '0.2'
+ModuleVersion = '0.4'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
@@ -21,7 +21,8 @@ PowerShellVersion = '5.1'
 
 NestedModules = @(
   "${PSScriptRoot}\CI.psd1",
-  "${PSScriptRoot}\Get-CommonFlagsCaller.psm1"
+  "${PSScriptRoot}\Get-CommonFlagsCaller.psm1",
+  "${PSScriptRoot}\EnvironmentPath.psd1"
 )
 
 ##====--------------------------------------------------------------------====##
@@ -29,7 +30,9 @@ NestedModules = @(
 
 # Functions to export from this module
 FunctionsToExport = @(
+  'Add-EnvironmentPath',
   'Assert-CI',
+  'Assert-Windows',
   'Get-CommonFlagsCaller'
 )
 # Cmdlets to export from this module

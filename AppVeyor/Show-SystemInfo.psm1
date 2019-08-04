@@ -50,13 +50,15 @@ function Show-SystemInfo {
     [Alias('ColumnWidth')]
     # Alignment of data/ first column width (default 20 characters).
     [Int]$Align = 20,
+    [Switch]$Path,
     [switch]$All,
     [switch]$CMake,
     [switch]$LLVM,
     [switch]$PowerShell,
     [switch]$Python,
     [switch]$SevenZip,
-    [switch]$Curl
+    [switch]$Curl,
+    [switch]$Vcpkg
   )
   Begin
   {
@@ -127,6 +129,9 @@ function Show-SystemInfo {
     if ($CMake -or $All)    { $out += Join-Info CMake $(Show-CMakeVersion) }
     if ($Python -or $All)   { $out += Join-Info Python $(Show-PythonVersion) }
     if ($Curl -or $All)     { $out += Join-Info Curl $(Show-CurlVersion) }
+    if ($Vcpkg -or $All)    { $out += Join-Info vcpkg $(Show-VcpkgVersion) }
+
+    if ($Path) { Show-EnvPath }
   }
   Process
   {
@@ -174,6 +179,18 @@ function Join-Info {
   }
   if ($Name) { $Name = ($Name + ': ') }
   return ($( $Name.PadRight($Length,' ') ) + $Data)
+}
+##====--------------------------------------------------------------------====##
+
+function Show-EnvPath {
+  $UserPath = `
+    [Environment]::GetEnvironmentVariable('PATH', 'User') -replace ';',"`n"
+  $MachinePath = `
+    [Environment]::GetEnvironmentVariable('PATH', 'Machine') `
+    -replace ';',"`n"
+  Send-Message -Info 'Environment PATH' -Details (
+    'User PATH', $UserPath, ("`n"+'Machine PATH'), $MachinePath
+  ) -LogOnly
 }
 ##====--------------------------------------------------------------------====##
 
@@ -245,6 +262,21 @@ function Show-CurlVersion {
     return (
       $(curl.exe -V) -split ' ' |
         Select-String -Pattern '^([0-9]+\.)+[0-9]+.*'
+    )
+  } else { return ' ?' }
+}
+
+<#
+.SYNOPSIS
+  Acquire the version number from vcpkg.
+#>
+function Show-VcpkgVersion {
+  [OutputType([String])]
+  param()
+  if (Test-Command 'vcpkg version') {
+    return (
+      (vcpkg version | Select-String -Pattern 'version [0-9]') -split ' ' |
+        Select-String -Pattern '^[0-9].+'
     )
   } else { return ' ?' }
 }

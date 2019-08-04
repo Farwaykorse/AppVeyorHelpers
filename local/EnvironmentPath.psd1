@@ -1,18 +1,11 @@
-<#
-  Module manifest for module 'Show-SystemInfo'.
-
-  Documentation:
-  https://docs.microsoft.com/powershell/developer/module/how-to-write-a-powershell-module-manifest
-#>
 @{
-RootModule = 'Show-SystemInfo.psm1'
-ModuleVersion = '0.3.1'
+RootModule = 'EnvironmentPath.psm1'
+ModuleVersion = '0.1'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
 # CompanyName = 'Unknown'
-Description = 'Print out basic system and configuration information relevant to
-the AppVeyor build environment.'
+Description = '$env:PATH modification.'
 # GUID = 'd0a9150d-b6a4-4b17-a325-e3a24fed0aa9'
 # HelpInfoURI = ''
 
@@ -21,16 +14,6 @@ the AppVeyor build environment.'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '5.1'
-# Name of the Windows PowerShell host required by this module
-# PowerShellHostName = ''
-# Minimum version of the Windows PowerShell host required by this module
-# PowerShellHostVersion = ''
-# Minimum version of the .NET Framework required by this module
-# DotNetFrameworkVersion = ''
-# Minimum version of the common language runtime (CLR) required by this module
-# CLRVersion = ''
-# Processor architecture (None, X86, Amd64) required by this module
-# ProcessorArchitecture = ''
 
 ##====--------------------------------------------------------------------====##
 # Import configuration
@@ -44,11 +27,7 @@ PowerShellVersion = '5.1'
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
 # Modules that must be imported into the global environment prior to importing this module
-RequiredModules = @(
-  @{ModuleName="${PSScriptRoot}\..\local\All.psd1"; ModuleVersion='0.2'},
-  @{ModuleName="${PSScriptRoot}\..\General\Test-Command.psd1"; ModuleVersion='0.3'},
-  @{ModuleName="${PSScriptRoot}\Send-Message.psd1"; ModuleVersion='0.4'}
-)
+# RequiredModules = @()
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 # NestedModules = @()
 
@@ -56,7 +35,7 @@ RequiredModules = @(
 # Export configuration
 
 # Functions to export from this module
-FunctionsToExport = 'Show-SystemInfo'
+FunctionsToExport = 'Add-EnvironmentPath'
 # Cmdlets to export from this module
 CmdletsToExport = ''
 # Variables to export from this module
@@ -76,9 +55,8 @@ AliasesToExport = ''
 
 # List of all files packaged with this module
 FileList = @(
-  'Show-SystemInfo.psd1',
-  'Show-SystemInfo.psm1',
-  'Show-SystemInfo.Tests.ps1'
+  'EnvironmentPath.psd1',
+  'EnvironmentPath.psm1',
+  'EnvironmentPath.Tests.ps1'
 )
-
 }
