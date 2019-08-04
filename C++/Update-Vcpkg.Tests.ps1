@@ -348,12 +348,15 @@ Describe 'Internal Import-CachedVcpkg' {
         Should -Match '-WhatIf.*-Confirm'
     }
 
-    Context '$cached_dir not defined' {
+    It '$cached_dir or $Location not defined' {
       Mock Assert-CI { return $true } -ModuleName 'Update-Vcpkg'
 
-      It 'should throw' {
-        { Import-CachedVcpkg 2>$null } | Should -Throw
-      }
+      { Import-CachedVcpkg 2>$null } | Should -Throw
+      $cached_dir = 'TestDrive:\'
+      { Import-CachedVcpkg 2>$null } | Should -Throw
+      $cached_dir = ''
+      $Location = 'TestDrive:\'
+      { Import-CachedVcpkg 2>$null } | Should -Throw
     }
 
     Context 'WhatIf' {
@@ -364,6 +367,7 @@ Describe 'Internal Import-CachedVcpkg' {
       New-Item -Path $cache_dir -ItemType Directory
       function Invoke-Import {
         $cache_dir = 'TestDrive:\cache'
+        $Location = 'TestDrive:\target'
         return (Import-CachedVcpkg -WhatIf)
       }
       In -Path $target_dir {
@@ -393,6 +397,7 @@ Describe 'Internal Import-CachedVcpkg' {
       New-Item -Path $target_dir -ItemType Directory
       function Invoke-Import {
         $cache_dir = 'TestDrive:\cache 1'
+        $Location = 'TestDrive:\target 1'
         return Import-CachedVcpkg
       }
       In -Path $target_dir {

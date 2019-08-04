@@ -240,6 +240,8 @@ function Import-CachedVcpkg {
     Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
 
     $Path = Get-Variable -Scope 1 -Name 'cache_dir' -ValueOnly
+    $install_dir = Join-Path (
+      Get-Variable -Scope 1 -Name 'Location' -ValueOnly) 'installed'
   }
   Process
   {
@@ -255,6 +257,8 @@ function Import-CachedVcpkg {
     ('Vcpkg has been rebuild, but there was no cache available.',"`n",
     'Add the following to your AppVeyor configuration:',"`n`n",
     'cache:',"`n- '${Path}'`n`n",
+    'To cache packages that take a significant time to build, add:',"`n",
+    "- '${install_dir}'`n`n",
     'Optionally, enable cacheing on failed builds to reduce build time ',
     'for repeatedly failing jobs.',"`n",
     'Add in your AppVeyor configuration:',"`n`n",
