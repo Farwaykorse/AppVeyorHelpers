@@ -7,7 +7,8 @@ Set-StrictMode -Version Latest
 .DESCRIPTION
    Send output to both the console and the AppVeyor message API.
 .FUNCTIONALITY
-  
+  Messages send to the message API are split into multiple messages when they
+  exceed the character limit.
 .EXAMPLE
   Send-Message 'Message text or title'
   INFO: Message text or title
@@ -49,7 +50,7 @@ Set-StrictMode -Version Latest
   -- word
   -- 5
   -- text with spaces
-  -- and a 
+  -- and a
   --  newline
 
   --- Equivalent: ---
@@ -58,7 +59,7 @@ Set-StrictMode -Version Latest
 .EXAMPLE
   Send-Message 'Title' word 5 "text a manual `n newline" -NoNewLine
   INFO: Title
-  -- word 5 text with a manual 
+  -- word 5 text with a manual
   -- newline
 .EXAMPLE
   'Details over',"multiple`nlines" | Send-Message 'Title' -Warning
@@ -111,11 +112,17 @@ function Send-Message {
     # This is only useful on AppVeyor.
     # Implies -HideDetails and -ContinueOnError.
     [Switch]$LogOnly,
-    # Concatenate all inputs to Details into a single string.
     [parameter(ParameterSetName='Details')]
     [parameter(ParameterSetName='ErrorDetails')]
     [parameter(ParameterSetName='WarningDetails')]
-    [Switch]$NoNewLine
+    # Concatenate all inputs to Details into a single string.
+    [Switch]$NoNewLine,
+    [parameter(ParameterSetName='Details')]
+    [parameter(ParameterSetName='ErrorDetails')]
+    [parameter(ParameterSetName='WarningDetails')]
+    [ValidateRange(1,[Int32](2147483647))]
+    # Separate into multiple messages on message API when exceeded.
+    [Int]$MaxLength = 1000
   )
   Begin
   {
@@ -133,21 +140,43 @@ function Send-Message {
     if ($intDetails) {
       $intDetails = $(
         if ($NoNewLine) {
-          $intDetails -join ' ' -replace "`n ([^\s])", "`n`$1"
+          $intDetails -join ' ' -replace "`n ([^ ])", "`n`$1"
         } else {
           $intDetails -join "`n"
         }
       )
+      $intDetails = $intDetails -replace '[ \t]*\r?\n',"`n"
     }
     if (Assert-CI) {
       # Send to AppVeyor Message API
-      $AppVeyor = 'Add-AppveyorMessage ${Message} -Category '
-      if       ($Error) {   $AppVeyor += 'Error'
-      } elseif ($Warning) { $AppVeyor += 'Warning'
-      } else {              $AppVeyor += 'Information'
+      $textSplit = Split-Text $intDetails -MaxLength:$MaxLength
+      if ( -not ($intDetails) -or
+        ( $textSplit.GetType().Name -eq 'String') # less than MaxLength
+      ) {
+        $AppVeyor = 'Add-AppveyorMessage ${Message} -Category '
+        if       ($Error) {   $AppVeyor += 'Error'
+        } elseif ($Warning) { $AppVeyor += 'Warning'
+        } else {              $AppVeyor += 'Information'
+        }
+        if ($intDetails) { $AppVeyor += ' -Details $intDetails' }
+        Invoke-Expression -Command $AppVeyor
+      } else { # Divide over multiple messages
+        $i = 0
+        foreach ($part in $textSplit) {
+          $i++
+          if ($Error) {
+            $continue = ($ContinueOnError -or ($i -lt $textSplit.Length) )
+            Send-Message -Error:$Error -LogOnly:$true `
+              -Message ($Message + ' [' + $i + '/' + $textSplit.Length + ']') `
+              -Details:$part -HideDetails:$HideDetails -MaxLength:$MaxLength `
+              -ContinueOnError:$continue
+          } else { # -Warning or -Info
+            Send-Message -Warning:$Warning -LogOnly:$true `
+              -Message ($Message + ' [' + $i + '/' + $textSplit.Length + ']') `
+              -Details:$part -HideDetails:$HideDetails -MaxLength:$MaxLength
+          }
+        }
       }
-      if ($intDetails) { $AppVeyor += ' -Details $intDetails' }
-      Invoke-Expression -Command $AppVeyor
     }
     if (-not $LogOnly) {
       if ($Error) {
@@ -171,6 +200,89 @@ function Send-Message {
     }
   }
 } # /function Send-Message
+##====--------------------------------------------------------------------====##
+
+<#
+.SYNOPSIS
+  Determine where to split the text to stay within the maximum length.
+.DESCRIPTION
+  Order of preference:
+  1. split at a form feed (FF)
+  2. no need to split if within or at the limit.
+  3. split at the last new-line (LF or CR) character within the limit.
+  4. split after the last white space character within the limit.
+  5. split after the character at the limit.
+#>
+function Find-SplitLocation {
+  [OutputType([Int32])]
+  param(
+    [String]$Text = $(throw '-Text is required'),
+    [Int]$MaxLength = $(throw '-MaxLength is required')
+  )
+  $loc = $Text.IndexOf("`f") # FF
+  if ( ($loc -ge 0) -and ($loc -le $MaxLength) ) {
+    return $loc
+  }
+  if ($Text.Length -gt $MaxLength) {
+    $loc = [System.Math]::Max(
+      $Text.LastIndexOf("`n", $MaxLength), # LF
+      $Text.LastIndexOf("`r", $MaxLength)  # CR
+    )
+  } else {
+    return $Text.Length
+  }
+  if ($loc -le 0) {
+    $loc = [System.Math]::Max(
+      $Text.LastIndexOf(' ', $MaxLength),
+      $Text.LastIndexOf("`t", $MaxLength)
+    ) + 1 # don't start next section with the white space character
+    if ($loc -le 1) {
+      return $MaxLength
+    }
+  }
+  return $loc
+}
+##====--------------------------------------------------------------------====##
+
+<#
+.SYNOPSIS
+  Returns the input text as an array of sections with the given maximum length.
+.DESCRIPTION
+  Order of preference:
+  1. split at a form feed (FF)
+  2. no need to split if within or at the limit.
+  3. split at the last new-line (LF or CR) character within the limit.
+  4. split after the last white space character within the limit.
+  5. split after the character at the limit.
+.NOTES
+  Special UTF-8 characters consisting of multiple characters, can break when
+  splitting at the character limit.
+#>
+function Split-Text {
+  [OutputType([String[]])]
+  param(
+    [String]$Text = $(throw '-Text is required'),
+    [Int]$MaxLength = $(throw '-MaxLength is required')
+  )
+  Begin
+  {
+    $work = $Text.TrimStart("`f","`r","`n").TrimEnd()
+    $out = @()
+  }
+  Process
+  {
+    while ($true) {
+      $loc = Find-SplitLocation $work $MaxLength
+      if ($loc -eq 0) { break }
+      $out += $work.Substring(0, $loc).TrimEnd()
+      $work = $work.Substring($loc).TrimStart("`f","`r","`n")
+    }
+  }
+  End
+  {
+    return $out
+  }
+}
 ##====--------------------------------------------------------------------====##
 
 Export-ModuleMember -Function Send-Message
