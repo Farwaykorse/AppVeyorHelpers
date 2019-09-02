@@ -28,16 +28,15 @@ Describe 'Internal Select-VcpkgLocation' {
     Context 'find from executable' {
       Mock Assert-CI { return $true } -ModuleName Update-Vcpkg
       Mock Test-Path { return $true } -ModuleName Update-Vcpkg
+      $original_CI_WINDOWS = $env:CI_WINDOWS
       if ($env:CI_WINDOWS -ne 'true') {
-        $changed = $true; $env:CI_WINDOWS = 'true'
-      } else { $changed = $false }
+        $env:CI_WINDOWS = $true
+      }
       It 'default location (Windows)' {
-          { Select-VcpkgLocation } | Should -not -Throw
+        { Select-VcpkgLocation } | Should -not -Throw
         Select-VcpkgLocation | Should -Be 'C:\Tools\vcpkg'
       }
-      if ($changed) {
-       $changed = $null; $env:CI_WINDOWS = 'false'
-      }
+      $env:CI_WINDOWS = $original_CI_WINDOWS
     }
     Context 'find from executable' {
       Mock Assert-CI { return $false } -ModuleName Update-Vcpkg
