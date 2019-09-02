@@ -25,11 +25,9 @@ Describe 'Send-Message' {
     It 'Throw on missing Message input' {
       { Send-Message -Message } | Should -Throw 'Missing an argument'
     }
-    It 'Throw for empty Message input' {
+    It 'Throw for empty or $null Message input' {
       { Send-Message -Message '' } |
         Should -Throw 'argument is null or empty'
-    }
-    It 'Throw for $null Message input' {
       { Send-Message -Message $null } |
         Should -Throw 'argument is null or empty'
     }
@@ -43,18 +41,12 @@ Describe 'Send-Message' {
       { Send-Message -Message 'title' -Details } |
         Should -Throw 'Missing an argument'
     }
-    It 'Throw for empty Details input' {
-      if ($PSVersionTable.PSVersion.major -lt 6) {
-        { Send-Message -Message 'title' -Details '' } |
-          Should -Throw 'argument is null or empty'
-      } else {
-        { Send-Message -Message 'title' -Details '' } |
-          Should -Throw 'argument is null, empty'
-      }
+    It 'Allow empty Details input' {
+      { Send-Message -Message 'title' -Details '' 6>$null } | Should -not -Throw
     }
     It 'Throw for $null Details input' {
       { Send-Message -Message 'title' -Details $null } |
-        Should -Throw 'argument is null or empty'
+        Should -Throw 'Cannot bind argument to parameter'
     }
     It 'Mandatory parameter Details when setting HideDetails' {
       { Send-Message -Message 'title' -HideDetails } |

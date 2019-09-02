@@ -83,7 +83,7 @@ function Send-Message {
       ParameterSetName='WarningDetails',Mandatory)]
     [parameter(Position=1,ValueFromRemainingArguments,ValueFromPipeline,
       ParameterSetName='Details',Mandatory)]
-    [ValidateNotNullOrEmpty()]
+    [AllowEmptyString()]
     [alias('d','Body')]
     # Additional information. Reported on the Message log.
     [String[]]$Details,
