@@ -204,13 +204,13 @@ function Update-Vcpkg {
       return $null
     }
     # Update packages
-    vcpkg list   | Send-Message 'vcpkg list' -LogOnly:$Quiet
     vcpkg update | Send-Message 'vcpkg update' -LogOnly:$Quiet
     if (!($(vcpkg upgrade) -match "^All installed packages are up-to-date")) {
       if ($PSCmdlet.ShouldProcess('upgrade installed packages')) {
         vcpkg upgrade --no-dry-run
       }
     }
+    vcpkg list | Send-Message 'vcpkg list' -LogOnly:$Quiet
     if (-not $Quiet) { Write-Host "-- Update vcpkg ... done" }
   }
 } #/ function Update-Vcpkg
