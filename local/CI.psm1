@@ -19,7 +19,11 @@ function Assert-CI {
 #>
 function Assert-Windows {
   if ($env:CI_WINDOWS -ne $null) {
-    return ($env:CI_WINDOWS -ceq 'True')
+    ### Temporary - old build agent. ###########################################
+    return ($env:CI_WINDOWS -eq 'true')
+    <### new build agent.
+    return ($env:CI_WINDOWS -ceq 'true')
+    #>
   }
   return (
     ($PSVersionTable.PSVersion.Major -lt 6) -or

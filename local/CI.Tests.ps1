@@ -36,15 +36,25 @@ Describe 'Assert-Windows' {
     if (Assert-CI) {
       $env:CI_WINDOWS | Should -not -Be $null
       $env:CI_LINUX | Should -not -Be $null
-      $env:CI_WINDOWS | Should -BeIn @('True', 'False')
-      $env:CI_LINUX | Should -BeIn @('True', 'False')
-      if ($env:CI_WINDOWS -ceq 'True') {
+      $env:CI_WINDOWS | Should -BeIn @('true', 'false')
+      $env:CI_LINUX | Should -BeIn @('true', 'false')
+      if ($env:CI_WINDOWS -ceq 'true') {
+        $env:CI_LINUX | Should -BeExactly 'false'
+        ### Start Temporary - old build agent. #################################
+        # https://help.appveyor.com/discussions/problems/24669
+        # New build agent will use lower-case text: true; false.
+        Send-Message -Warning 'New build agent: remove compatibility code.' `
+          -Details "CI.Tests.ps1`nOnly lower-case values."
+      } elseif ($env:CI_WINDOWS -ceq 'True') {
         $env:CI_LINUX | Should -BeExactly 'False'
+        # note: also clean up section below.
+        #       and in CI.psm1
+        ### End Temporary - old build agent. ###################################
       } else {
-        $env:CI_WINDOWS | Should -BeExactly 'False'
-        $env:CI_LINUX | Should -BeExactly 'True'
+        $env:CI_WINDOWS | Should -BeExactly 'false'
+        $env:CI_LINUX | Should -BeExactly 'true'
       }
-    } else {
+    } else { # local
       $env:CI_WINDOWS | Should -Be $null
       $env:CI_LINUX | Should -Be $null
     }
@@ -65,14 +75,26 @@ Describe 'Assert-Windows' {
   }
   $original_CI_WINDOWS = $env:CI_WINDOWS
   It 'use environment variable CI_WINDOWS' {
-    $env:CI_WINDOWS = 'True'
+    $env:CI_WINDOWS = 'true'
     Assert-Windows | Should -Be $true
-    $env:CI_WINDOWS = 'False'
+    $env:CI_WINDOWS = 'false'
     Assert-Windows | Should -Be $false
+    ### Start Temporary - old build agent. #####################################
+    $env:CI_WINDOWS = 'True'
+    if (Assert-Windows) {
+      $env:CI_WINDOWS = $true
+      Assert-Windows | Should -Be $true
+      $env:CI_WINDOWS = $false
+      Assert-Windows | Should -Be $false
+    } else {
+    ### End Temporary - old build agent. #######################################
     $env:CI_WINDOWS = $true
-    Assert-Windows | Should -Be $true
+    Assert-Windows | Should -Be $false
     $env:CI_WINDOWS = $false
     Assert-Windows | Should -Be $false
+    ### Start Temporary - old build agent. #####################################
+    }
+    ### End Temporary - old build agent. #######################################
     $env:CI_WINDOWS = 1
     Assert-Windows | Should -Be $false
     $env:CI_WINDOWS = 'someText'
