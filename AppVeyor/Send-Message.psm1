@@ -169,8 +169,7 @@ function Send-Message {
           Write-Host $intDetails -ForegroundColor Red
         }
         if (-not $ContinueOnError) {
-          if (Assert-CI) { $Host.SetShouldExit(1) }
-          throw $Message
+          Stop-Execution $Message
         }
       } elseif ($Warning) {
         if ($intDetails -and -not $HideDetails) { $Message += "`n${intDetails}" }
@@ -184,6 +183,14 @@ function Send-Message {
     }
   }
 } # /function Send-Message
+##====--------------------------------------------------------------------====##
+
+function Stop-Execution {
+  param($Message)
+
+  if (Assert-CI) { $Host.SetShouldExit(1) }
+  throw $Message
+}
 ##====--------------------------------------------------------------------====##
 
 <#

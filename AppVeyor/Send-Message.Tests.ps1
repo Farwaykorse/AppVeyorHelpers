@@ -948,21 +948,24 @@ Describe 'Send-Message' {
   Context 'split Details Error message' {
     # Enable output to Message console.
     Mock Assert-CI { return $true } -ModuleName Send-Message
-    # Catch call to Add-AppveyorMessage, evaluated in reverse order of creation.
-    Mock Invoke-Expression { return $false } -ModuleName Send-Message
+    # Catch call to Add-AppveyorMessage, preventing calls to AppveyorMessage.
+    Mock Invoke-Expression { } -ModuleName Send-Message
+    Mock Stop-Execution { return 'error2' } -ModuleName Send-Message
     # Get parameter after -Details -> return content
-    Mock Invoke-Expression {
-      $param = [regex]::Match(
-        $Command,' -ContinueOnError[\s:]+\$[^\s"]+'
-      ).ToString()
-      return Get-Variable $param.Remove(0,11) -ValueOnly
-    } -ModuleName Send-Message `
-      -ParameterFilter { $Command -and $Command -match ' -ContinueOnError \$.' }
+    Mock Send-Message {
+      if ($ContinueOnError -eq $true) { return $Details }
+      else { return 'error1' }
+    } -ModuleName Send-Message -ParameterFilter { $ContinueOnError }
 
     # only last part of message throws and stops execution
-    It '...' {
+    It 'last part should error' {
+      $out = (Send-Message -Error 'title' -Details '123456789012345' `
+        -MaxLength 5 6>$null)
+      $out.Length | Should -Be 3
+      $out[0] | Should -Be '12345'
+      $out[1] | Should -Be '67890'
+      $out[2] | Should -Be 'error2'
     }
-    # unless ContinueOnError has been set
   }
 }
 
