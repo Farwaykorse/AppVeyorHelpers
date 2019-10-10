@@ -77,12 +77,9 @@ function Send-Message {
     [alias('m','Title')]
     # Message string is always displayed and serves as title in the Message log.
     [String]$Message,
-    [parameter(Position=1,ValueFromRemainingArguments,ValueFromPipeline,
-      ParameterSetName='ErrorDetails',Mandatory)]
-    [parameter(Position=1,ValueFromRemainingArguments,ValueFromPipeline,
-      ParameterSetName='WarningDetails',Mandatory)]
-    [parameter(Position=1,ValueFromRemainingArguments,ValueFromPipeline,
-      ParameterSetName='Details',Mandatory)]
+    [parameter(ValueFromPipeline,ParameterSetName='ErrorDetails',Mandatory)]
+    [parameter(ValueFromPipeline,ParameterSetName='WarningDetails',Mandatory)]
+    [parameter(ValueFromPipeline,ParameterSetName='Details',Mandatory)]
     [AllowEmptyString()]
     [alias('d','Body')]
     # Additional information. Reported on the Message log.

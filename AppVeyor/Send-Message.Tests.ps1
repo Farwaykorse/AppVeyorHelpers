@@ -48,6 +48,13 @@ Describe 'Send-Message' {
       { Send-Message -Message 'title' -Details $null } |
         Should -Throw 'Cannot bind argument to parameter'
     }
+    It 'Throw on missing parameter flag for Details' {
+      { Send-Message -Message 'title' 'details text' } |
+        Should -Throw 'parameter cannot be found'
+      { Send-Message 'title' 'details text' } |
+        Should -Throw 'parameter cannot be found'
+      { Send-Message 'title' -Details 'text' 6>$null } | Should -not -Throw
+    }
     It 'Mandatory parameter Details when setting HideDetails' {
       { Send-Message -Message 'title' -HideDetails } |
         Should -Throw 'Parameter set cannot be resolved'
@@ -99,6 +106,7 @@ Describe 'Send-Message' {
       { Send-Message -Warning -Error -Message 'title' } | Should -Throw
     }
   }
+
   Context 'Info' {
     # Suppress output to Message console.
     Mock Assert-CI { return $false } -ModuleName Send-Message
@@ -127,21 +135,6 @@ Describe 'Send-Message' {
         Should -Be "INFO: text`n-- a`n-- b`n-- c"
       Send-Message -Info -Message 'text' -Details 'a', 'b', 'c' 6>&1 |
         Should -Be "INFO: text`n-- a`n-- b`n-- c"
-    }
-    It 'With Details, multiple inputs, no label' {
-      Send-Message -Info -Message 'text' 'a' 'b' 'c' 6>&1 |
-        Should -Be "INFO: text`n-- a`n-- b`n-- c"
-      if ($PSVersionTable.PSVersion.major -lt 6) {
-        Send-Message -Info -Message 'text' @('a', 'b', 'c') 6>&1 |
-          Should -Be "INFO: text`n-- a b c"
-        Send-Message -Info -Message 'text' 'a', 'b', 'c' 6>&1 |
-          Should -Be "INFO: text`n-- a b c"
-      } else {
-        Send-Message -Info -Message 'text' @('a', 'b', 'c') 6>&1 |
-          Should -Be "INFO: text`n-- a`n-- b`n-- c"
-        Send-Message -Info -Message 'text' 'a', 'b', 'c' 6>&1 |
-          Should -Be "INFO: text`n-- a`n-- b`n-- c"
-      }
     }
     It 'Hide Details' {
       Send-Message -Info 'text' -Details 'more text' -HideDetails 6>&1 |
@@ -197,21 +190,6 @@ Describe 'Send-Message' {
         Should -Be "text`na`nb`nc"
       Send-Message -Warning -Message 'text' -Details 'a', 'b', 'c' 3>&1 |
         Should -Be "text`na`nb`nc"
-    }
-    It 'With Details, multiple inputs, no label' {
-      Send-Message -Warning -Message 'text' 'a' 'b' 'c' 3>&1 |
-        Should -Be "text`na`nb`nc"
-      if ($PSVersionTable.PSVersion.major -lt 6) {
-        Send-Message -Warning -Message 'text' @('a', 'b', 'c') 3>&1 |
-          Should -Be "text`na b c"
-        Send-Message -Warning -Message 'text' 'a', 'b', 'c' 3>&1 |
-          Should -Be "text`na b c"
-      } else {
-        Send-Message -Warning -Message 'text' @('a', 'b', 'c') 3>&1 |
-          Should -Be "text`na`nb`nc"
-        Send-Message -Warning -Message 'text' 'a', 'b', 'c' 3>&1 |
-          Should -Be "text`na`nb`nc"
-      }
     }
     It 'Hide Details' {
       Send-Message -Warning 'text' -Details 'more text' -HideDetails 3>&1 |
@@ -329,21 +307,6 @@ Describe 'Send-Message' {
         Should -Be "A`nB`nC"
       Send-Message -Info -Message 'text' -Details 'A', 'B', 'C' 6>$null |
         Should -Be "A`nB`nC"
-    }
-    It 'With Details, multiple inputs, no label' {
-      Send-Message -Info -Message 'text' 'A' 'B' 'C' 6>$null |
-        Should -Be "A`nB`nC"
-      if ($PSVersionTable.PSVersion.major -lt 6) {
-        Send-Message -Info -Message 'text' @('A', 'B', 'C') 6>$null |
-          Should -Be 'A B C'
-        Send-Message -Info -Message 'text' 'A', 'B', 'C' 6>$null |
-          Should -Be 'A B C'
-      } else {
-        Send-Message -Info -Message 'text' @('A', 'B', 'C') 6>$null |
-          Should -Be "A`nB`nC"
-        Send-Message -Info -Message 'text' 'A', 'B', 'C' 6>$null |
-          Should -Be "A`nB`nC"
-      }
     }
     It 'Hide Details' {
       Send-Message -Info 'text' -Details 'more text' -HideDetails 6>$null |
