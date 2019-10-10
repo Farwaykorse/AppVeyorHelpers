@@ -108,7 +108,8 @@ function Send-Message {
     # Don't show Details on the console, only in the Message log.
     [Switch]$HideDetails,
     # Only display in the Message log, no message on the build console.
-    # This is only useful on AppVeyor. Implies -HideDetails.
+    # This is only useful on AppVeyor.
+    # Implies -HideDetails and -ContinueOnError.
     [Switch]$LogOnly,
     # Concatenate all inputs to Details into a single string.
     [parameter(ParameterSetName='Details')]
@@ -119,6 +120,7 @@ function Send-Message {
   Begin
   {
     $intDetails = @();
+    if ($LogOnly -and -not ($ContinueOnError)) { $ContinueOnError = $true }
   }
   Process
   {

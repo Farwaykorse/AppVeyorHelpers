@@ -243,6 +243,11 @@ Describe 'Send-Message' {
       Send-Message -Error -Message 'text' -Details 'more text' `
         -ContinueOnError 6>&1 | Should -Be @('ERROR: text', 'more text')
     }
+    It '-LogOnly implies -ContinueOnError' {
+      { Send-Message -Error 'text' -LogOnly } | Should -not -Throw
+      Send-Message -Error -Message 'some text' -LogOnly *>&1 |
+        Should -Be $null
+    }
   }
   Context 'Call to Add-AppveyorMessage' {
     # Enable output to Message console.
@@ -340,5 +345,20 @@ Describe 'Send-Message' {
       'a','b','c' | Send-Message -Info 'title' -NoNewLine 6>$null |
         Should -Be "a b c"
     }
+  }
+}
+
+Describe 'LiveTest Send-Message' {
+  It 'Info' {
+    Send-Message -Info 'Test Info' -Details ('some text' + "`n" + `
+      'more text') -LogOnly
+  }
+  It 'Warning' {
+    Send-Message -Warning 'Test Warning' -Details ('some text' + "`n" + `
+      'more text') -LogOnly
+  }
+  It 'Error' {
+    Send-Message -Error 'Test Warning' -Details ('some text' + "`n" + `
+      'more text') -LogOnly
   }
 }
