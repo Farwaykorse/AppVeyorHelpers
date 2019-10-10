@@ -14,53 +14,37 @@ Set-StrictMode -Version Latest
   INFO: Message text or title
 
   --- Equivalent: ---
-  Message 'Message text or title'
-  Send-Message 'Message text or title' -Info
+  Send-Message -Info 'Message text or title'
 .EXAMPLE
   Send-Message -Error 'text or title'
   ERROR: text or title
-
-  --- Equivalent: ---
-  Error 'text or title'
 .EXAMPLE
   Send-Message -Warning 'text or title'
   WARNING: text or title
-
-  --- Equivalent: ---
-  Warning 'text or title'
 .EXAMPLE
   Send-Message 'Message title' -Details 'Extensive description'
   INFO: Message text or title
   -- Extensive description
-
-  --- Equivalent: ---
-  Send-Message 'Message title' 'Extensive description'
 .EXAMPLE
-  Send-Message 'Title' -Details 'Multi-line description', 'with additional information', 'To help understand the problem'
+  Send-Message 'Title' -Details 'Multi-line description',
+    'with additional information', 'To help understand the problem'
   INFO: Title
   -- Multi-line description
   -- with additional information
   -- To help understand the problem
-
-  --- Equivalent: ---
-  Send-Message 'Title' 'Multi-line description' 'Notice: no commas!'
 .EXAMPLE
-  Send-Message 'Title' word 5 'text with spaces' "and a `n newline"
+  Send-Message 'Title' -Details word, 5, 'text with spaces', "and a`n newline"
   INFO: Title
   -- word
   -- 5
   -- text with spaces
   -- and a
   --  newline
-
-  --- Equivalent: ---
-  Send-Message 'Title' -Details word, 5, 'text with spaces', "and a `n newline"
-  (Notice the use of the ',' operator.)
 .EXAMPLE
-  Send-Message 'Title' word 5 "text a manual `n newline" -NoNewLine
+  Send-Message 'Title' -Details 'word 5', "text a manual`nNewline" -NoNewLine
   INFO: Title
   -- word 5 text with a manual
-  -- newline
+  -- Newline
 .EXAMPLE
   'Details over',"multiple`nlines" | Send-Message 'Title' -Warning
   WARNING: Title
