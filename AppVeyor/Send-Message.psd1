@@ -3,7 +3,7 @@
 #>
 @{
 RootModule = 'Send-Message.psm1'
-ModuleVersion = '0.5'
+ModuleVersion = '0.7'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
