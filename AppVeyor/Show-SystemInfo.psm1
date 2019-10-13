@@ -215,9 +215,10 @@ function Show-7zipVersion {
   param()
   if (Test-Command '7z') {
     return (
-      ($(7z) -split "`n" | Select-Object -Skip 1 -First 1) -split ' : ' |
+      ( ($(7z) -split "`n" -match '^7-zip.*') -split ' : ' |
         Select-Object -First 1
-    ) -split ' ' | Select-Object -Skip 1 -First 1
+      ) -split ' '
+    ) -match '^[0-9]+\.[0-9].+'
   } else { return ' ?' }
 }
 
