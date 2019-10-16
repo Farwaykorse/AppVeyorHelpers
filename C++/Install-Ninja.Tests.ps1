@@ -114,11 +114,11 @@ Describe 'Install-Ninja' {
       It 'Call with -WhatIf' {
         { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\dir' `
           -SHA512 CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E `
-          -WhatIf 6>$null
+          -WhatIf -Quiet 6>$null
         } | Should -not -Throw
         Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\dir' -Hash `
           CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E `
-          -WhatIf | Should -Be $null
+          -WhatIf -Quiet | Should -Be $null
       }
       It 'after: no archive present' {
         $Temporary = Join-Path $env:TEMP 'ninja-v1.8.2'
@@ -149,10 +149,11 @@ Describe 'Install-Ninja' {
         }
         { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\dir' -Hash `
           CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E `
-          -WhatIf -AddToPath 6>$null } | Should -not -Throw
+          -WhatIf -AddToPath -Quiet 6>$null
+        } | Should -not -Throw
         Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\dir' -Hash `
           CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E `
-          -WhatIf -AddToPath | Should -Be $null
+          -WhatIf -AddToPath -Quiet | Should -Be $null
       }
       It 'after: no archive present' {
         $Temporary = Join-Path $env:TEMP 'ninja-v1.8.2'
