@@ -173,10 +173,10 @@ function Install-Uploader {
     'Are you sure you want to run "pip install codecov" on this system?',
     'Install Codecov uploader') # Caption
   ) {
-    $(pip --disable-pip-version-check -q install codecov) 1>$null
+    $(pip --disable-pip-version-check -qq install codecov)
     if (-not $(Check-Installed)) {
       Write-Verbose 'Retry in user profile ...'
-      $(pip --disable-pip-version-check -q install codecov --user) 1>$null
+      $(pip --disable-pip-version-check -qq install codecov --user)
       if (-not $(Check-Installed)) {
         $(pip --disable-pip-version-check install codecov) |
           Send-Message -Error 'Installing Codecov uploader failed.'
