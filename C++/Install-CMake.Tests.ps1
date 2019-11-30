@@ -55,7 +55,7 @@ Describe 'Internal Assert-DefaultCMake' {
 }
 
 ##====--------------------------------------------------------------------====##
-Describe 'Internal Get-HashFromGitHub' {
+Describe 'Internal Get-HashFromGitHub' -Tag 'online' {
   InModuleScope Install-CMake {
     It 'has documentation' {
       Get-Help Get-HashFromGitHub | Out-String |
@@ -691,7 +691,7 @@ Describe 'Install-CMake' {
   }
 }
 
-Describe 'Install-CMake (online)' {
+Describe 'Install-CMake (online)' -Tag 'online' {
   Context 'mocked File operations' {
     # Suppress output to the Appveyor Message API.
     Mock Assert-CI { return $false } -ModuleName Send-Message

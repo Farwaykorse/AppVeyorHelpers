@@ -626,9 +626,14 @@ Describe 'Internal Update-Repository' {
       Get-Command -Name Update-Repository -Syntax |
         Should -Match '-WhatIf.*-Confirm'
     }
+  }
+}
 
-    Context 'Input Validation' {
-    }
+Describe 'Internal Update-Repository (online)' -Tag 'online' {
+  InModuleScope Update-Vcpkg {
+    # Suppress output to the Appveyor Message API.
+    Mock Assert-CI { return $false } -ModuleName Send-Message
+
     Context 'WhatIf' {
       $dir = New-Item 'TestDrive:\dir0' -ItemType Directory
       In -Path $dir {

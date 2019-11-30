@@ -179,6 +179,9 @@ Describe 'Assert-ValidCodecovYML' {
       }
     }
   }
+}
+
+Describe 'Assert-ValidCodecovYML (online)' -Tag 'online' {
   Context 'Check Samples' {
     New-Item -Path TestDrive:\ -Name samples -ItemType Directory
     # valid Sample
