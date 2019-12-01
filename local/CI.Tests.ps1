@@ -110,3 +110,24 @@ Describe 'Assert-Windows' {
   }
   $env:CI_WINDOWS = $original_CI_WINDOWS
 }
+
+##====--------------------------------------------------------------------====##
+Describe 'Assert-Admin' {
+  It 'has documentation' {
+    Get-Help Assert-Admin | Out-String | Should -MatchExactly 'SYNOPSIS' `
+      -Because $msg_documentation
+  }
+  It 'not throwing' {
+    if (-not (Assert-Windows) ) {
+      Set-ItResult -Inconclusive -Because 'Requires administrative privileges'
+    }
+    { Assert-Admin } | Should -not -Throw
+    (Assert-Admin).GetType().Name | Should -Be 'Boolean'
+  }
+  Context 'not on Windows' {
+    It 'throws when not on Windows' {
+      Mock Assert-Windows { return $false } -ModuleName CI
+      { Assert-Admin } | Should -Throw 'only implemented for Windows'
+    }
+  }
+}

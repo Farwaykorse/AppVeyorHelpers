@@ -9,6 +9,8 @@ Set-StrictMode -Version Latest
   AppVeyor Message API.
 #>
 function Assert-CI {
+  [OutputType([Bool])]
+  param()
   return ($env:APPVEYOR -or $env:CI)
 }
 ##====--------------------------------------------------------------------====##
@@ -18,6 +20,8 @@ function Assert-CI {
   Checks if executed on the Microsoft Windows Platform.
 #>
 function Assert-Windows {
+  [OutputType([Bool])]
+  param()
   if ($env:CI_WINDOWS -ne $null) {
     ### Temporary - old build agent. ###########################################
     return ($env:CI_WINDOWS -eq 'true')
@@ -32,4 +36,20 @@ function Assert-Windows {
 }
 ##====--------------------------------------------------------------------====##
 
-Export-ModuleMember -Function Assert-CI, Assert-Windows
+<#
+.SYNOPSIS
+  Checks if executed with administrative privileges.
+#>
+function Assert-Admin {
+  [OutputType([Bool])]
+  param()
+  if (Assert-Windows) {
+    return (
+      [Security.Principal.WindowsPrincipal] `
+      [Security.Principal.WindowsIdentity]::GetCurrent() `
+    ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+  } else { throw 'Assert-Admin is only implemented for Windows' }
+}
+##====--------------------------------------------------------------------====##
+
+Export-ModuleMember -Function Assert-CI, Assert-Windows, Assert-Admin
