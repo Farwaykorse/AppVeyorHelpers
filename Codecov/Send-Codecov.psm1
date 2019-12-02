@@ -68,7 +68,7 @@ function Send-Codecov {
   {
     Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
 
-    $BuildName = Correct-BuildName($BuildName)
+    $BuildName = Format-BuildName($BuildName)
     Write-Verbose "BuildName: $BuildName"
     if ($Flags) {
       $wrong = @()
@@ -143,7 +143,7 @@ function Send-Codecov {
   The test is expensive, so the result is cached in the global variable
   `CodecovInstalled`.
 #>
-function Check-Installed {
+function Assert-CodecovInstalled {
   [CmdletBinding()]
   param()
   Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
@@ -167,17 +167,17 @@ function Install-Uploader {
   param()
   Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
 
-  if ($(Check-Installed)) { return }
+  if ($(Assert-CodecovInstalled)) { return }
   if ($PSCmdlet.ShouldProcess(
     'Installing Codecov uploader ...', # Verbose/ WhatIf
     'Are you sure you want to run "pip install codecov" on this system?',
     'Install Codecov uploader') # Caption
   ) {
     $(pip --disable-pip-version-check -qq install codecov)
-    if (-not $(Check-Installed)) {
+    if (-not $(Assert-CodecovInstalled)) {
       Write-Verbose 'Retry in user profile ...'
       $(pip --disable-pip-version-check -qq install codecov --user)
-      if (-not $(Check-Installed)) {
+      if (-not $(Assert-CodecovInstalled)) {
         $(pip --disable-pip-version-check install codecov) |
           Send-Message -Error 'Installing Codecov uploader failed.'
       }
@@ -194,7 +194,7 @@ function Install-Uploader {
   Strip leading/trailing white-space.
   Replace any white space with a single underscore. (Codecov)
 #>
-function Correct-BuildName {
+function Format-BuildName {
   param(
     [String]$BuildName = $(throw '-BuildName is required')
   )

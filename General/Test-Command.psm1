@@ -66,16 +66,16 @@ function Test-Command {
     [Switch]$IgnoreExitCode
   )
   if ($Match) {
-    return Match-Output -Command:$Command -Match:$Match
+    return Test-Output -Command:$Command -Match:$Match
   } elseif ($cMatch) {
-    return Match-Output -Command:$Command -Match:$cMatch -CaseSensitive
+    return Test-Output -Command:$Command -Match:$cMatch -CaseSensitive
   } else {
     return Test-ErrorFree $Command -IgnoreExitCode:$IgnoreExitCode
   }
 }
 ##====--------------------------------------------------------------------====##
 
-function Match-Output {
+function Test-Output {
   [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Low')]
   param(
     [ValidateNotNullOrEmpty()]

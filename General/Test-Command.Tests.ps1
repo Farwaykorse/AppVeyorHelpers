@@ -37,7 +37,7 @@ Describe 'Test-Command' {
     }
   }
 
-  Context 'Match-Output' {
+  Context 'Test-Output' {
     It 'Write-Output, success stream (1)' {
       Test-Command -Command 'Write-Output something' -Match 'something' |
         Should -BeTrue
