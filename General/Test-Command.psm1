@@ -92,7 +92,7 @@ function Test-Output {
         return $true
       }
     }
-  } catch {}
+  } catch { Write-Verbose '' }
   return $false
 }
 ##====--------------------------------------------------------------------====##

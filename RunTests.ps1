@@ -97,10 +97,11 @@ Send-TestResult -File $OutputFile -Format $OutputFormatUpload `
   -WhatIf:$UseWhatif
 if ($Coverage) {
   try {
-    Send-Codecov -File $CodeCoverageOutputFile -BuildName:$BuildName -Flag:$Flag `
-      -Whatif:$UseWhatif
+    Send-Codecov -File $CodeCoverageOutputFile -BuildName:$BuildName `
+      -Flag:$Flag -Whatif:$UseWhatif
   } catch {
     # ignore exit-code
+    Write-Verbose 'Send-Codecov failed'
   }
 }
 Write-Verbose 'Run Pester unit tests ... done'
