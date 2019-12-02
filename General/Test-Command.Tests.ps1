@@ -11,10 +11,6 @@ Describe 'Test-Command' {
     Get-Help Test-Command | Out-String |
       Should -MatchExactly 'SYNOPSIS' -Because $msg_documentation
   }
-  It 'supports -WhatIf and -Confirm' {
-    Get-Command -Name Test-Command -Syntax |
-      Should -Match '-Whatif.*-Confirm'
-  }
 
   Context 'Test-ErrorFree' {
     It 'Write-Host' {

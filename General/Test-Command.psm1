@@ -45,7 +45,6 @@ Set-StrictMode -Version Latest
   Not capable of containing $Hosts.SetShouldExit().
 #>
 function Test-Command {
-  [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Low')]
   [OutputType([Bool])]
   param(
     [Parameter(Position=0,Mandatory)]
@@ -76,7 +75,6 @@ function Test-Command {
 ##====--------------------------------------------------------------------====##
 
 function Test-Output {
-  [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Low')]
   param(
     [ValidateNotNullOrEmpty()]
     [String]$Command,
@@ -101,7 +99,6 @@ function Test-Output {
 
 # check if command executes without error
 function Test-ErrorFree {
-  [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Low')]
   param(
     [ValidateNotNullOrEmpty()]
     [String]$Command,
