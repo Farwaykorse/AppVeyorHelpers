@@ -271,6 +271,23 @@ Describe 'Split-Text' {
 } # Split-Text
 
 ##====--------------------------------------------------------------------====##
+Describe 'Internal Stop-Execution' {
+  InModuleScope Send-Message {
+    It 'supports -WhatIf and -Confirm' {
+      Get-Command -Name Stop-Execution -Syntax |
+        Should -Match '-Whatif.*-Confirm'
+    }
+    Context 'CI' {
+      Mock Assert-CI { return $true } -ModuleName Send-Message
+
+      It 'WhatIf' {
+        { Stop-Execution -WhatIf -Message 'xX' } | Should -Throw 'xX' 
+      }
+    }
+  }
+} # Internal Stop-Execution
+
+##====--------------------------------------------------------------------====##
 Describe 'Send-Message' {
   It 'has documentation' {
     Get-Help Send-Message | Out-String |
