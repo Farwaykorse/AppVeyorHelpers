@@ -75,6 +75,8 @@ function Test-Command {
 ##====--------------------------------------------------------------------====##
 
 function Test-Output {
+  [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+    'PSPossibleIncorrectUsageOfRedirectionOperator', '', Scope='Function')]
   param(
     [ValidateNotNullOrEmpty()]
     [String]$Command,
