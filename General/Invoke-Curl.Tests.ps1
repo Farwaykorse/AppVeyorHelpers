@@ -126,7 +126,7 @@ Describe 'Invoke-Curl (offline)' {
     It 'no change in current working directory' {
       $PWD.Path | Should -Be $start_path.Path
     }
-    if ($PWD -ne $start_path) { cd $start_path }
+    if ($PWD -ne $start_path) { Set-Location $start_path }
 
     It 'download image.zip to a specific file name' {
       { Invoke-Curl -URL $Url -OutPath 'TestDrive:\dir2\file.zip' -WhatIf } |
@@ -141,7 +141,7 @@ Describe 'Invoke-Curl (offline)' {
     It 'no change in current working directory' {
       $PWD.Path | Should -Be $start_path.Path
     }
-    if ($PWD -ne $start_path) { cd $start_path }
+    if ($PWD -ne $start_path) { Set-Location $start_path }
   }
 }
 
@@ -170,7 +170,7 @@ Describe 'Invoke-Curl (online)' -Tag 'online' {
     It 'no change in current working directory' {
       $PWD.Path | Should -Be $start_path.Path
     }
-    if ($PWD -ne $start_path) { cd $start_path }
+    if ($PWD -ne $start_path) { Set-Location $start_path }
     It 'download image.zip to a specific file name' {
       { Invoke-Curl -URL $Url -OutPath 'TestDrive:\file.zip' } |
         Should -not -Throw
@@ -186,7 +186,7 @@ Describe 'Invoke-Curl (online)' -Tag 'online' {
     It 'no change in current working directory' {
       $PWD.Path | Should -Be $start_path.Path
     }
-    if ($PWD -ne $start_path) { cd $start_path }
+    if ($PWD -ne $start_path) { Set-Location $start_path }
     It 'download image.zip to a specific path' {
       { Invoke-Curl -URL $Url -OutPath 'TestDrive:\dir\file.zip' } |
         Should -not -Throw
@@ -207,7 +207,7 @@ Describe 'Invoke-Curl (online)' -Tag 'online' {
     It 'no change in current working directory' {
       $PWD.Path | Should -Be $start_path.Path
     }
-    if ($PWD -ne $start_path) { cd $start_path }
+    if ($PWD -ne $start_path) { Set-Location $start_path }
   }
 
   Context 'download failures' {
@@ -244,7 +244,7 @@ Describe 'Invoke-Curl (online)' -Tag 'online' {
     It 'no change in current working directory' {
       $PWD.Path | Should -Be $start_path.Path
     }
-    if ($PWD -ne $start_path) { cd $start_path }
+    if ($PWD -ne $start_path) { Set-Location $start_path }
   }
 
 }
