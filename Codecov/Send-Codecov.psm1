@@ -145,6 +145,7 @@ function Send-Codecov {
 #>
 function Assert-CodecovInstalled {
   [CmdletBinding()]
+  [OutputType([Bool])]
   param()
   Get-CommonFlagsCaller $PSCmdlet $ExecutionContext.SessionState
 
