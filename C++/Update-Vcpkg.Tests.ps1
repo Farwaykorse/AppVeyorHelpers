@@ -4,8 +4,6 @@ Set-StrictMode -Version Latest
 
 ##====--------------------------------------------------------------------====##
 $global:msg_documentation = 'at least 1 empty line above documentation'
-$default_cache_dir = Join-Path (Join-Path (Join-Path $HOME 'Tools') 'cache'
-  ) 'vcpkg'
 
 if (Assert-CI) {
   # Prevent warnings on AppVeyor.
@@ -289,10 +287,11 @@ Describe 'Internal Test-ChangedVcpkgSource' {
     Context '$cache_dir defined' {
       $hash_file = Join-Path $PSScriptRoot 'vcpkg_source.hash'
       $cache_dir = Join-Path 'TestDrive:\' 'cache'
-      $cached_file = Join-Path $cache_dir 'vcpkg_source.hash'
 
       # Helper function
       function Invoke-Test {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+          'PSUseDeclaredVarsMoreThanAssignment', 'cache_dir')]
         $cache_dir = Join-Path 'TestDrive:\' 'cache'
         Test-ChangedVcpkgSource
       }
@@ -351,21 +350,31 @@ Describe 'Internal Import-CachedVcpkg' {
       Mock Assert-CI { return $true } -ModuleName 'Update-Vcpkg'
 
       { Import-CachedVcpkg 2>$null } | Should -Throw
+      [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseDeclaredVarsMoreThanAssignment', 'cache_dir')]
       $cached_dir = 'TestDrive:\'
       { Import-CachedVcpkg 2>$null } | Should -Throw
       $cached_dir = ''
+      [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseDeclaredVarsMoreThanAssignment', 'Location')]
       $Location = 'TestDrive:\'
       { Import-CachedVcpkg 2>$null } | Should -Throw
     }
 
     Context 'WhatIf' {
       Mock Assert-CI { return $true } -ModuleName 'Update-Vcpkg'
+      [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseDeclaredVarsMoreThanAssignment', 'cache_dir')]
       $cache_dir = 'TestDrive:\cache'
       $target_dir = 'TestDrive:\target'
       New-Item -Path $target_dir -ItemType Directory
       New-Item -Path $cache_dir -ItemType Directory
       function Invoke-Import {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+          'PSUseDeclaredVarsMoreThanAssignment', 'cache_dir')]
         $cache_dir = 'TestDrive:\cache'
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+          'PSUseDeclaredVarsMoreThanAssignment', 'Location')]
         $Location = 'TestDrive:\target'
         return (Import-CachedVcpkg -WhatIf)
       }
@@ -391,11 +400,17 @@ Describe 'Internal Import-CachedVcpkg' {
 
     Context '$cache_dir defined' {
       Mock Assert-CI { return $true } -ModuleName 'Update-Vcpkg'
+      [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseDeclaredVarsMoreThanAssignment', 'cache_dir')]
       $cache_dir = 'TestDrive:\cache 1'
       $target_dir = 'TestDrive:\target 1'
       New-Item -Path $target_dir -ItemType Directory
       function Invoke-Import {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+          'PSUseDeclaredVarsMoreThanAssignment', 'cache_dir')]
         $cache_dir = 'TestDrive:\cache 1'
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+          'PSUseDeclaredVarsMoreThanAssignment', 'Location')]
         $Location = 'TestDrive:\target 1'
         return Import-CachedVcpkg
       }
@@ -508,11 +523,15 @@ Describe 'Internal Export-CachedVcpkg' {
 
     Context 'WhatIf' {
       Mock Assert-CI { return $true } -ModuleName 'Update-Vcpkg'
+      [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseDeclaredVarsMoreThanAssignment', 'cache_dir')]
       $cache_dir = 'TestDrive:\cache'
       $vcpkg_dir = 'TestDrive:\vcpkg'
       New-Item -Path $vcpkg_dir -ItemType Directory
       New-Item -Path $cache_dir -ItemType Directory
       function Invoke-Export {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+          'PSUseDeclaredVarsMoreThanAssignment', 'cache_dir')]
         $cache_dir = 'TestDrive:\cache'
         return (Export-CachedVcpkg -WhatIf)
       }
@@ -539,10 +558,14 @@ Describe 'Internal Export-CachedVcpkg' {
 
     Context '$cache_dir defined' {
       Mock Assert-CI { return $true } -ModuleName 'Update-Vcpkg'
+      [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseDeclaredVarsMoreThanAssignment', 'cache_dir')]
       $cache_dir = 'TestDrive:\cache 1'
       $vcpkg_dir = 'TestDrive:\vcpkg dir'
       New-Item -Path $vcpkg_dir -ItemType Directory
       function Invoke-Export {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+          'PSUseDeclaredVarsMoreThanAssignment', 'cache_dir')]
         $cache_dir = 'TestDrive:\cache 1'
         return Export-CachedVcpkg
       }
@@ -812,6 +835,8 @@ Describe 'Update-Vcpkg' {
     $vcpkg_dir = New-Item -Path 'TestDrive:\' -Name 'vc 1' -ItemType Directory
     It '-Path (existing) clone & merge' {
       Assert-VcpkgRequirements
+      [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseDeclaredVarsMoreThanAssignment', 'vcpkg_dir')]
       $path = Join-Path $vcpkg_dir 'vcpkg'
       { Update-Vcpkg -Path $vcpkg_dir -WhatIf *>$null } |
         Should -not -Throw
@@ -825,6 +850,8 @@ Describe 'Update-Vcpkg' {
     $vcpkg_dir = Join-Path (Join-Path 'TestDrive:\' 'vc 2') 'vcpkg'
     It '-Path (non-existing) - creates directory' {
       Assert-VcpkgRequirements
+      [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseDeclaredVarsMoreThanAssignment', 'vcpkg_dir')]
       $path = Join-Path $vcpkg_dir 'vcpkg'
       { Update-Vcpkg -Path $vcpkg_dir -Quiet -WhatIf *>$null } |
         Should -not -Throw
@@ -838,6 +865,8 @@ Describe 'Update-Vcpkg' {
     $vcpkg_dir = New-Item -Path 'TestDrive:\' -Name 'vc 3' -ItemType Directory
     It '-FixedCommit: clone & checkout' {
       Assert-VcpkgRequirements
+      [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseDeclaredVarsMoreThanAssignment', 'vcpkg_dir')]
       $path = Join-Path $vcpkg_dir 'vcpkg'
       { Update-Vcpkg -Path $vcpkg_dir `
         -FixedCommit CF83E1357000000DF1542850D66D8007D620E405 -Quiet -WhatIf `
