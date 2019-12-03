@@ -62,7 +62,7 @@ function Invoke-Curl {
       "--retry-max-time $RetryTimeout"
     )
     if (Test-Path -LiteralPath $OutPath -PathType Container) {
-      pushd $OutPath
+      Push-Location $OutPath
       $flags += @(
         '--remote-name'  # -O, Write output to a file named as the remote file.
       )
@@ -73,7 +73,7 @@ function Invoke-Curl {
         $OutPath = $OutPath -replace '^TestDrive:\\',
           (Resolve-Path TestDrive:\).ProviderPath
       }
-      pushd $pwd
+      Push-Location $pwd
       $flags += @(
         '--create-dirs', # Create necessary local directory hierarchy.
         '--output', "`"$OutPath`"" # -o, Write to file.
@@ -103,7 +103,7 @@ function Invoke-Curl {
   }
   End
   {
-    popd
+    Pop-Location
   }
 } #/ function Invoke-Curl
 ##====--------------------------------------------------------------------====##

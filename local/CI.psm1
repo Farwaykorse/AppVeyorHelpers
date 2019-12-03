@@ -22,7 +22,7 @@ function Assert-CI {
 function Assert-Windows {
   [OutputType([Bool])]
   param()
-  if ($env:CI_WINDOWS -ne $null) {
+  if ($null -ne $env:CI_WINDOWS) {
     ### Temporary - old build agent. ###########################################
     return ($env:CI_WINDOWS -eq 'true')
     <### new build agent.

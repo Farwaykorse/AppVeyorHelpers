@@ -60,17 +60,12 @@ Describe 'Assert-Windows' {
     }
   }
   It 'expected output' {
-    if ($PSVersionTable.PSVersion.Major -lt 6) {
+    if ((Get-CimInstance CIM_OperatingSystem).Caption -Match 'Windows') {
       Assert-Windows | Should -Be $true
-      (Get-WmiObject Win32_OperatingSystem).Caption | Should -Match 'Windows'
+      (Get-CimInstance CIM_OperatingSystem).Caption |
+        Should -Match 'Microsoft Windows'
     } else {
-      if ((Get-CimInstance CIM_OperatingSystem).Caption -Match 'Windows') {
-        Assert-Windows | Should -Be $true
-        (Get-CimInstance CIM_OperatingSystem).Caption |
-          Should -Match 'Microsoft Windows'
-      } else {
-        Assert-Windows | Should -Be $false
-      }
+      Assert-Windows | Should -Be $false
     }
   }
   $original_CI_WINDOWS = $env:CI_WINDOWS

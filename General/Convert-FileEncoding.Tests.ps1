@@ -261,6 +261,8 @@ Describe 'Internal Convert-EOL' {
           Should -Throw 'Unknown LineEnding input'
       }
       It 'Should not throw on valid input' {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+          'PSUseDeclaredVarsMoreThanAssignment', 'SourcePath')]
         $SourcePath = 'placeholder'
         { Convert-EOL 'some text' -LineEnding Unix } | Should -Not -Throw
         { Convert-EOL 'some text' -LineEnding LF } | Should -Not -Throw
@@ -270,6 +272,8 @@ Describe 'Internal Convert-EOL' {
       }
     }
     Context 'Operation' {
+      [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseDeclaredVarsMoreThanAssignment', 'SourcePath')]
       $SourcePath = 'placeholder'
       It 'no newline characters' {
         Convert-EOL 'no new-line characters' Unix |
@@ -341,12 +345,16 @@ Describe 'Internal Convert-EOL' {
       }
     }
     Context '-WhatIf' {
+      [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseDeclaredVarsMoreThanAssignment', 'SourcePath')]
       $SourcePath = 'placeholder'
       It 'CR to CRLF' {
         Convert-EOL "last`r" Windows -WhatIf | Should -BeExactly "last`r"
       }
     }
     Context 'Input from pipeline' {
+      [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseDeclaredVarsMoreThanAssignment', 'SourcePath')]
       $SourcePath = 'placeholder'
       It 'Do not throw for -Text from pipeline' {
         { 'some text' | Convert-EOL -LineEnding LF } |

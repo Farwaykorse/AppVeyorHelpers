@@ -45,7 +45,6 @@ Set-StrictMode -Version Latest
   Not capable of containing $Hosts.SetShouldExit().
 #>
 function Test-Command {
-  [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Low')]
   [OutputType([Bool])]
   param(
     [Parameter(Position=0,Mandatory)]
@@ -66,17 +65,18 @@ function Test-Command {
     [Switch]$IgnoreExitCode
   )
   if ($Match) {
-    return Match-Output -Command:$Command -Match:$Match
+    return Test-Output -Command:$Command -Match:$Match
   } elseif ($cMatch) {
-    return Match-Output -Command:$Command -Match:$cMatch -CaseSensitive
+    return Test-Output -Command:$Command -Match:$cMatch -CaseSensitive
   } else {
     return Test-ErrorFree $Command -IgnoreExitCode:$IgnoreExitCode
   }
 }
 ##====--------------------------------------------------------------------====##
 
-function Match-Output {
-  [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Low')]
+function Test-Output {
+  [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+    'PSPossibleIncorrectUsageOfRedirectionOperator', '', Scope='Function')]
   param(
     [ValidateNotNullOrEmpty()]
     [String]$Command,
@@ -94,14 +94,13 @@ function Match-Output {
         return $true
       }
     }
-  } catch {}
+  } catch { Write-Verbose '' }
   return $false
 }
 ##====--------------------------------------------------------------------====##
 
 # check if command executes without error
 function Test-ErrorFree {
-  [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Low')]
   param(
     [ValidateNotNullOrEmpty()]
     [String]$Command,

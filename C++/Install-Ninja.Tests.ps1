@@ -114,11 +114,10 @@ Describe 'Install-Ninja' {
       It 'Call with -WhatIf' {
         { Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\dir' `
           -SHA512 CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E `
-          -WhatIf -Quiet 6>$null
-        } | Should -not -Throw
+          -WhatIf 6>$null } | Should -not -Throw
         Install-Ninja -Tag 'v1.8.2' -InstallDir 'TestDrive:\dir' -Hash `
           CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E `
-          -WhatIf -Quiet | Should -Be $null
+          -WhatIf | Should -Be $null
       }
       It 'after: no archive present' {
         $Temporary = Join-Path $env:TEMP 'ninja-v1.8.2'
@@ -133,7 +132,7 @@ Describe 'Install-Ninja' {
       It 'no change in current working directory' {
         $PWD.Path | Should -Be $start_path.Path
       }
-      if ($PWD -ne $start_path) { cd $start_path }
+      if ($PWD -ne $start_path) { Set-Location $start_path }
     }
     Context 'AddToPath' {
       It 'Call with -WhatIf and -AddToPath' {
@@ -168,7 +167,7 @@ Describe 'Install-Ninja' {
       It 'no change in current working directory' {
         $PWD.Path | Should -Be $start_path.Path
       }
-      if ($PWD -ne $start_path) { cd $start_path }
+      if ($PWD -ne $start_path) { Set-Location $start_path }
       It 'no change in search path' {
         $env:Path | Should -Be $original_path
       }
@@ -485,7 +484,7 @@ Describe 'Install-Ninja (online)' -Tag 'online' {
     It 'no change in current working directory' {
       $PWD.Path | Should -Be $start_path.Path
     }
-    if ($PWD -ne $start_path) { cd $start_path }
+    if ($PWD -ne $start_path) { Set-Location $start_path }
   }
 
   $original_path = $env:Path
@@ -521,7 +520,7 @@ Describe 'Install-Ninja (online)' -Tag 'online' {
     It 'no change in current working directory' {
       $PWD.Path | Should -Be $start_path.Path
     }
-    if ($PWD -ne $start_path) { cd $start_path }
+    if ($PWD -ne $start_path) { Set-Location $start_path }
     Context 'path failure' {
       Mock Test-Command { return $false } -ModuleName Install-Ninja
 

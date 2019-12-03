@@ -28,8 +28,12 @@ $Flag = 'ci_scripts'
 ##====--------------------------------------------------------------------====##
 Import-Module "${PSScriptRoot}\AppVeyor\Send-Message.psd1"
 
-( Resolve-Path "${PSScriptRoot}\*.psd1", "${PSScriptRoot}\*\*.psd1" |
-    Test-ModuleManifest | Format-Table -Wrap -AutoSize | Out-String
+( Resolve-Path ".\*.psd1", ".\*\*.psd1" |
+  ForEach-Object -Process {
+    if (-not ($_.Path -match '.*PSScriptAnalyzerSettings\.psd1$') ) {
+      Test-ModuleManifest -Path $_
+    }
+  } | Format-Table -Wrap -AutoSize | Out-String
 ).Trim() -replace '[ ]*(\r?\n)','$1' |
   Send-Message -Info -Message 'Detected Modules:'
 
@@ -104,10 +108,11 @@ Send-TestResult -File $OutputFile -Format $OutputFormatUpload `
   -WhatIf:$UseWhatif
 if ($Coverage) {
   try {
-    Send-Codecov -File $CodeCoverageOutputFile -BuildName:$BuildName -Flag:$Flag `
-      -Whatif:$UseWhatif
+    Send-Codecov -File $CodeCoverageOutputFile -BuildName:$BuildName `
+      -Flag:$Flag -Whatif:$UseWhatif
   } catch {
     # ignore exit-code
+    Write-Verbose 'Send-Codecov failed'
   }
 }
 Write-Verbose 'Run Pester unit tests ... done'
