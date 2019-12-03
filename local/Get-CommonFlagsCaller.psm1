@@ -52,7 +52,7 @@ function Get-CommonFlagsCaller {
 
     # Get variable from caller
     $CallerVar = $Cmdlet.SessionState.PSVariable.Get($Preferences[$Flag])
-    if ($CallerVar -eq $null) { continue }
+    if ($null -eq $CallerVar) { continue }
     Write-Debug ($Flag + ': ' + $CallerVar.Value)
 
     # Set in calling scope

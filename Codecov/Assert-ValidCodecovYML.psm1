@@ -53,7 +53,7 @@ function Assert-ValidCodecovYML {
     }
     Write-Verbose ('Resolved path: ' + $Path[0].Path)
     $content = Get-Content -Raw -LiteralPath ($Path[0].Path)
-    if ($content -eq $null ) {
+    if ($null -eq $content) {
       Send-Message -Error -Message "$($MyInvocation.MyCommand): Empty File"
     }
     $Uri = 'https://codecov.io/validate'
@@ -66,7 +66,7 @@ function Assert-ValidCodecovYML {
           $output = Invoke-RestMethod -Uri $Uri `
             -Body (Get-Content -Raw -LiteralPath ($Path[0].Path)) -Method POST
         } catch [System.Net.WebException] {
-          if ($_.Exception.Response -eq $null) {
+          if ($null -eq $_.Exception.Response) {
             Send-Message -Warning ('Failed to connect to "' + $Uri + '"!') `
               -Details ($_).ToString().Trim()
             return $null

@@ -120,7 +120,7 @@ function Send-Codecov {
       }
       foreach ($FilePath in $ResolvedList) {
         Write-Verbose "Report: ${FilePath}"
-        if ( $(Get-Content -Raw -LiteralPath ($FilePath.Path) ) -eq $null ) {
+        if ($null -eq $(Get-Content -Raw -LiteralPath ($FilePath.Path) ) ) {
           Send-Message -Warning -Message `
             "$($MyInvocation.MyCommand): Skip, empty file: ${FilePath}"
           continue
