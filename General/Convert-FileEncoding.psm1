@@ -17,7 +17,7 @@ Set-StrictMode -Version Latest
   3. LineEnding: Windows is equivalent to CRLF and Unix is equivalent to LF.
 .EXAMPLE
   Convert-FileEncoding '.\*.md'
-  
+
   All markdown files in the current directory are converted to use UTF-8
   without a byte-order-mark. This is the default behaviour. Equivalent to:
   Convert-FileEncoding -SourcePath '.\*.md' -Encoding UTF8NoBOM

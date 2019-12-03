@@ -153,7 +153,7 @@ function Assert-CodecovInstalled {
     if ( Test-Command -Command 'python -c "import codecov"' ) {
       Set-Variable -Name CodecovInstalled -Value $true -Scope Global
     } else { return $false }
-  } 
+  }
   return $true
 }
 ##====--------------------------------------------------------------------====##

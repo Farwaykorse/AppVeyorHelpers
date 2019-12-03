@@ -18,7 +18,7 @@ function Test-InconclusiveMissingFile {
   } elseif ($Not -and (Test-Path "$Path" -PathType Leaf) ) {
     Set-ItResult -Inconclusive -Because ('should not exist: ' + "$Path")
   }
-} 
+}
 ##====--------------------------------------------------------------------====##
 
 Describe 'Expand-Archive' {

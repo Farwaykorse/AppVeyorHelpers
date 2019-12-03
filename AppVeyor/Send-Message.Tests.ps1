@@ -281,7 +281,7 @@ Describe 'Internal Stop-Execution' {
       Mock Assert-CI { return $true } -ModuleName Send-Message
 
       It 'WhatIf' {
-        { Stop-Execution -WhatIf -Message 'xX' } | Should -Throw 'xX' 
+        { Stop-Execution -WhatIf -Message 'xX' } | Should -Throw 'xX'
       }
     }
   }
