@@ -32,7 +32,7 @@ NestedModules = @(
 FunctionsToExport = @(
   'Add-EnvironmentPath',
   'Assert-CI',
-  'Assert-Windows',
+  'Assert-WindowsOS',
   'Assert-Admin',
   'Get-CommonFlagsCaller'
 )

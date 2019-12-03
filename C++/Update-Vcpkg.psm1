@@ -109,7 +109,7 @@ function Update-Vcpkg {
         ) 'vcpkg'
     }
 
-    if (Assert-Windows) {
+    if (Assert-WindowsOS) {
       $vcpkg = 'vcpkg.exe'
     } else {
       $vcpkg = 'vcpkg'

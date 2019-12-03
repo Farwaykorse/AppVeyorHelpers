@@ -51,7 +51,7 @@ PowerShellVersion = '5.1'
 # Export configuration
 
 # Functions to export from this module
-FunctionsToExport = @('Assert-CI', 'Assert-Windows', 'Assert-Admin')
+FunctionsToExport = @('Assert-CI', 'Assert-WindowsOS', 'Assert-Admin')
 # Cmdlets to export from this module
 CmdletsToExport = ''
 # Variables to export from this module

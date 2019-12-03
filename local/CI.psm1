@@ -19,7 +19,7 @@ function Assert-CI {
 .SYNOPSIS
   Checks if executed on the Microsoft Windows Platform.
 #>
-function Assert-Windows {
+function Assert-WindowsOS {
   [OutputType([Bool])]
   param()
   if ($null -ne $env:CI_WINDOWS) {
@@ -43,7 +43,7 @@ function Assert-Windows {
 function Assert-Admin {
   [OutputType([Bool])]
   param()
-  if (Assert-Windows) {
+  if (Assert-WindowsOS) {
     return (
       [Security.Principal.WindowsPrincipal] `
       [Security.Principal.WindowsIdentity]::GetCurrent() `
@@ -52,4 +52,4 @@ function Assert-Admin {
 }
 ##====--------------------------------------------------------------------====##
 
-Export-ModuleMember -Function Assert-CI, Assert-Windows, Assert-Admin
+Export-ModuleMember -Function Assert-CI, Assert-WindowsOS, Assert-Admin

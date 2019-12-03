@@ -742,7 +742,7 @@ Describe 'Install-CMake (online)' -Tag 'online' {
   }
   Context 'Installer' {
     It 'Install CMake v3.16.0' {
-      if ((Assert-Windows) -and -not (Assert-Admin)) {
+      if ((Assert-WindowsOS) -and -not (Assert-Admin)) {
         Set-ItResult -Inconclusive -Because 'Requires administrative privileges'
       }
       { Install-CMake -Version '3.16.0' -Installer } | Should -not -Throw

@@ -23,14 +23,14 @@ Describe 'Assert-CI' {
 }
 
 ##====--------------------------------------------------------------------====##
-Describe 'Assert-Windows' {
+Describe 'Assert-WindowsOS' {
   It 'has documentation' {
-    Get-Help Assert-Windows | Out-String | Should -MatchExactly 'SYNOPSIS' `
+    Get-Help Assert-WindowsOS | Out-String | Should -MatchExactly 'SYNOPSIS' `
       -Because $msg_documentation
   }
   It 'checks if on Microsoft Windows' {
-    { Assert-Windows } | Should -not -Throw
-    (Assert-Windows).GetType().Name | Should -Be 'Boolean'
+    { Assert-WindowsOS } | Should -not -Throw
+    (Assert-WindowsOS).GetType().Name | Should -Be 'Boolean'
   }
   It 'expected environment' {
     if (Assert-CI) {
@@ -61,44 +61,44 @@ Describe 'Assert-Windows' {
   }
   It 'expected output' {
     if ((Get-CimInstance CIM_OperatingSystem).Caption -Match 'Windows') {
-      Assert-Windows | Should -Be $true
+      Assert-WindowsOS | Should -Be $true
       (Get-CimInstance CIM_OperatingSystem).Caption |
         Should -Match 'Microsoft Windows'
     } else {
-      Assert-Windows | Should -Be $false
+      Assert-WindowsOS | Should -Be $false
     }
   }
   $original_CI_WINDOWS = $env:CI_WINDOWS
   It 'use environment variable CI_WINDOWS' {
     $env:CI_WINDOWS = 'true'
-    Assert-Windows | Should -Be $true
+    Assert-WindowsOS | Should -Be $true
     $env:CI_WINDOWS = 'false'
-    Assert-Windows | Should -Be $false
+    Assert-WindowsOS | Should -Be $false
     ### Start Temporary - old build agent. #####################################
     $env:CI_WINDOWS = 'True'
-    if (Assert-Windows) {
+    if (Assert-WindowsOS) {
       $env:CI_WINDOWS = $true
-      Assert-Windows | Should -Be $true
+      Assert-WindowsOS | Should -Be $true
       $env:CI_WINDOWS = $false
-      Assert-Windows | Should -Be $false
+      Assert-WindowsOS | Should -Be $false
     } else {
     ### End Temporary - old build agent. #######################################
     $env:CI_WINDOWS = $true
-    Assert-Windows | Should -Be $false
+    Assert-WindowsOS | Should -Be $false
     $env:CI_WINDOWS = $false
-    Assert-Windows | Should -Be $false
+    Assert-WindowsOS | Should -Be $false
     ### Start Temporary - old build agent. #####################################
     }
     ### End Temporary - old build agent. #######################################
     $env:CI_WINDOWS = 1
-    Assert-Windows | Should -Be $false
+    Assert-WindowsOS | Should -Be $false
     $env:CI_WINDOWS = 'someText'
-    Assert-Windows | Should -Be $false
+    Assert-WindowsOS | Should -Be $false
   }
   $env:CI_WINDOWS = $null
   It 'PowerShell 5: only on Windows' {
     if ($PSVersionTable.PSVersion.Major -lt 6) {
-      Assert-Windows | Should -Be $true
+      Assert-WindowsOS | Should -Be $true
     } else {
       Set-ItResult -Inconclusive -Because 'ran in pwsh'
     }
@@ -113,7 +113,7 @@ Describe 'Assert-Admin' {
       -Because $msg_documentation
   }
   It 'not throwing' {
-    if (-not (Assert-Windows) ) {
+    if (-not (Assert-WindowsOS) ) {
       Set-ItResult -Inconclusive -Because 'Requires administrative privileges'
     }
     { Assert-Admin } | Should -not -Throw
@@ -121,7 +121,7 @@ Describe 'Assert-Admin' {
   }
   Context 'not on Windows' {
     It 'throws when not on Windows' {
-      Mock Assert-Windows { return $false } -ModuleName CI
+      Mock Assert-WindowsOS { return $false } -ModuleName CI
       { Assert-Admin } | Should -Throw 'only implemented for Windows'
     }
   }
