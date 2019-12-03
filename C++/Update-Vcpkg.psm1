@@ -149,12 +149,12 @@ function Update-Vcpkg {
       } elseif (-not (Test-Path $vcpkg -PathType Leaf) -or # no vcpkg installed
         (Test-Command './vcpkg update' `
           -match 'different source is available for vcpkg') -or
-        (Test-IfReleaseWithIssues)
+        (Test-IfReleaseWithIssue)
       ) {
         if (Import-CachedVcpkg) {
           $build = ( (Test-Command './vcpkg update' `
             -match 'different source is available for vcpkg') -or
-            (Test-IfReleaseWithIssues)
+            (Test-IfReleaseWithIssue)
           )
         } else { $build = $true }
       } elseif ( (Assert-CI) -and
@@ -358,7 +358,7 @@ function Select-VcpkgLocation {
 .SYNOPSIS
   Checks to determine if a rebuild of vcpkg is required.
 #>
-function Test-IfReleaseWithIssues {
+function Test-IfReleaseWithIssue {
   [OutputType([Bool])]
   param()
 

@@ -44,7 +44,7 @@ Set-StrictMode -Version Latest
   C:\folder\cmake-3.16.0-win64-x64\bin\cmake.exe
 .NOTES
   No Linux or MacOSX support.
-  Assumes a 64-bit Windows system. Thus only CMake v3.6.0 and newer are supported. 
+  Assumes a 64-bit Windows system. Thus only CMake v3.6.0 and newer are supported.
 #>
 function Install-CMake {
   [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Low')]
@@ -309,6 +309,7 @@ function Assert-DefaultCMake {
 ##====--------------------------------------------------------------------====##
 
 function Remove-Temporary {
+  [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Low')]
   param(
     [ValidatePattern('^[^\\\/\~]')]
     [String]$Path

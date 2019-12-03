@@ -41,7 +41,7 @@ function Assert-ValidCodecovYML {
 
     Write-Verbose 'Validate Yaml file at codecov.io/validate'
     if (-not $Path) {
-      $Path = Test-DefaultLocations
+      $Path = Test-DefaultLocation
     }
     [Object[]]$Path = Resolve-Path $Path -ErrorAction SilentlyContinue
     if (-not $Path) {
@@ -123,7 +123,7 @@ function Assert-ValidCodecovYML {
 .SYNOPSIS
   Try a few locations for the existence of a (.)codecov.yml file.
 #>
-function Test-DefaultLocations {
+function Test-DefaultLocation {
   if ($env:APPVEYOR_BUILD_FOLDER) {
     $Path = ($env:APPVEYOR_BUILD_FOLDER + '/.codecov.yml')
     if (Test-Path $Path) { return $Path }

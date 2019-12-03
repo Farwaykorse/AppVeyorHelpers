@@ -357,7 +357,7 @@ Describe 'Install-CMake' {
       It 'no change in current working directory' {
         $PWD.Path | Should -Be $start_path.Path
       }
-      if ($PWD -ne $start_path) { cd $start_path }
+      if ($PWD -ne $start_path) { Set-Location $start_path }
     }
     Context 'AddToPath' {
       # Suppress output to the Appveyor Message API.
@@ -402,7 +402,7 @@ Describe 'Install-CMake' {
       It 'no change in current working directory' {
         $PWD.Path | Should -Be $start_path.Path
       }
-      if ($PWD -ne $start_path) { cd $start_path }
+      if ($PWD -ne $start_path) { Set-Location $start_path }
       It 'no change in search path' {
         $env:Path | Should -Be $original_path
       }
@@ -564,7 +564,7 @@ Describe 'Install-CMake' {
     }
     It '-Force: overwrite archive and install' {
       Install-CMake -Version '3.12.4' -Hash $empty_SHA512 -Quiet -Force `
-        -KeepArchive 
+        -KeepArchive
       Assert-MockCalled Get-HashFromGitHub -ModuleName Install-CMake -Scope It `
         -Times 0 -Exactly
       Assert-MockCalled Invoke-Curl -ModuleName Install-CMake -Scope It `
