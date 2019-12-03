@@ -706,7 +706,7 @@ Describe 'Internal Update-Repository' {
 }
 
 ##====--------------------------------------------------------------------====##
-function Assert-VcpkgRequirements {
+function Assert-RequirementsVcpkg {
   if ($env:APPVEYOR_BUILD_WORKER_IMAGE -match 'Visual Studio 2013') {
     Set-ItResult -Skipped -Because 'not supported for VS2013'
   }
@@ -780,7 +780,7 @@ Describe 'Update-Vcpkg' {
         New-Item -Path $path -ItemType Directory
         New-Item -Path $path -Name 'somefile.txt' -ItemType File
         It 'throw: non-empty, not a git working directory' {
-          Assert-VcpkgRequirements
+          Assert-RequirementsVcpkg
           { Update-vcpkg -Path $path 3>$null 6>$null } |
             Should -Throw 'not empty and not a git working directory'
           if (Assert-CI) {
@@ -816,7 +816,7 @@ Describe 'Update-Vcpkg' {
     }
     $cache = New-Item -Path 'TestDrive:\' -name 'some_cache' -ItemType Container
     It 'warning from -CachePath' {
-      Assert-VcpkgRequirements
+      Assert-RequirementsVcpkg
       Mock Assert-CI { return $false } -ModuleName Update-Vcpkg
       (Update-Vcpkg -CachePath $cache -WhatIf 6>$null) 3>&1 |
         Should -Match 'CachePath has no use outside the AppVeyor environment'
@@ -834,7 +834,7 @@ Describe 'Update-Vcpkg' {
     # clone / merge
     $vcpkg_dir = New-Item -Path 'TestDrive:\' -Name 'vc 1' -ItemType Directory
     It '-Path (existing) clone & merge' {
-      Assert-VcpkgRequirements
+      Assert-RequirementsVcpkg
       [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseDeclaredVarsMoreThanAssignment', 'vcpkg_dir')]
       $path = Join-Path $vcpkg_dir 'vcpkg'
@@ -849,7 +849,7 @@ Describe 'Update-Vcpkg' {
     }
     $vcpkg_dir = Join-Path (Join-Path 'TestDrive:\' 'vc 2') 'vcpkg'
     It '-Path (non-existing) - creates directory' {
-      Assert-VcpkgRequirements
+      Assert-RequirementsVcpkg
       [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseDeclaredVarsMoreThanAssignment', 'vcpkg_dir')]
       $path = Join-Path $vcpkg_dir 'vcpkg'
@@ -864,7 +864,7 @@ Describe 'Update-Vcpkg' {
     # clone / checkout
     $vcpkg_dir = New-Item -Path 'TestDrive:\' -Name 'vc 3' -ItemType Directory
     It '-FixedCommit: clone & checkout' {
-      Assert-VcpkgRequirements
+      Assert-RequirementsVcpkg
       [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseDeclaredVarsMoreThanAssignment', 'vcpkg_dir')]
       $path = Join-Path $vcpkg_dir 'vcpkg'
@@ -897,7 +897,7 @@ Describe 'Update-Vcpkg' {
     $vcpkg_dir = New-Item -Path 'TestDrive:\' -Name 'loc' -ItemType Directory
 
     It 'no changes with -Latest -WhatIf' {
-      Assert-VcpkgRequirements
+      Assert-RequirementsVcpkg
       if (-not (Test-Command 'vcpkg version')) {
         Set-ItResult -Skipped -Because 'requires installed vcpkg'
       }
@@ -932,7 +932,7 @@ Describe 'Update-Vcpkg' {
     ) > (Join-Path $vcpkg_dir 'vcpkg.ps1')
 
     It 'build after retrieval from cache (mocked)' {
-      Assert-VcpkgRequirements
+      Assert-RequirementsVcpkg
       { Update-Vcpkg -Path $vcpkg_dir -Quiet -WhatIf 3>$null } |
         Should -not -Throw
       Assert-MockCalled -CommandName Update-Repository `
@@ -945,7 +945,7 @@ Describe 'Update-Vcpkg' {
     }
     Mock Test-IfReleaseWithIssues { return $false } -ModuleName Update-Vcpkg
     It 'no build after retrieval from cache (mocked)' {
-      Assert-VcpkgRequirements
+      Assert-RequirementsVcpkg
       { Update-Vcpkg -Path $vcpkg_dir -Quiet -WhatIf 3>$null } |
         Should -not -Throw
       Assert-MockCalled -CommandName Update-Repository `
@@ -983,7 +983,7 @@ Describe 'Update-Vcpkg' {
     ) > (Join-Path $vcpkg_dir 'vcpkg.ps1')
 
     It 'vcpkg is up-to-date' {
-      Assert-VcpkgRequirements
+      Assert-RequirementsVcpkg
       { Update-Vcpkg -Path $vcpkg_dir -Quiet -Verbose -WhatIf 4>$null } |
         Should -not -Throw
       Assert-MockCalled -CommandName Update-Repository `
@@ -1007,7 +1007,7 @@ Describe 'Update-Vcpkg' {
   }
   $original_CI_WINDOWS = $env:CI_WINDOWS
   It 'failed build' {
-    Assert-VcpkgRequirements # not for image: Visual Studio 2013
+    Assert-RequirementsVcpkg # not for image: Visual Studio 2013
     Mock Push-Location { throw 'something' } -ModuleName Update-vcpkg
     Mock Assert-CI { return $true } -ModuleName Update-vcpkg
     Mock Test-Path { return $false } -ModuleName Update-vcpkg
