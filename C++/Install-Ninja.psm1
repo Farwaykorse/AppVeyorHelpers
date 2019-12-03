@@ -184,6 +184,7 @@ function Install-Ninja {
 ##====--------------------------------------------------------------------====##
 
 function Remove-Temporary {
+  [CmdletBinding(SupportsShouldProcess,ConfirmImpact='Medium')]
   param(
     [ValidatePattern('^[^\\\/\~]')]
     [ValidateScript({ "$_" -match (('^' + $env:TEMP) -replace '\\','\\') })]

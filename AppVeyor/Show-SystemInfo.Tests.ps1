@@ -47,7 +47,7 @@ Describe 'Internal Join-Info' {
         (Join-Info 'some' 'text').Length | Should -Be 24 -Because '20+4'
         Join-Info 'some' 'text' |
           Should -MatchExactly 'some:               text' `
-          -Because 'default Length = 20'
+          -Because ('default Length = ' + $Align)
         Join-Info 'some' 'text' |
           Should -not -MatchExactly 'some:    text' -Because 'test-error'
       }
@@ -56,11 +56,13 @@ Describe 'Internal Join-Info' {
         Join-Info 'some' 'text' | Should -Match 'some:.*text'
         (Join-Info 'some' 'text').Length | Should -Be 21 -Because '17+4'
         Join-Info 'some' 'text' | Should -MatchExactly 'some:            text' `
-          -Because '$Align = 17'
+          -Because ('$Align = ' + $Align)
         Join-Info 'some' 'text' |
           Should -not -MatchExactly 'some:    text' -Because 'test-error'
       }
       It '-Name longer than (15-2=13) characters' {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+          'PSUseDeclaredVarsMoreThanAssignment', 'Align')]
         $Align = 15
         Join-Info '1234567890123' 'text' |
           Should -Match '1234567890123: text'
@@ -76,6 +78,8 @@ Describe 'Internal Join-Info' {
           Should -Be 36 -Because '30+2+4'
       }
       It 'align to different -Length' {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+          'PSUseDeclaredVarsMoreThanAssignment', 'Align')]
         $Align = 15
         Join-Info 'some' 'text' -Length 10 | Should -Match 'some:.*text'
         (Join-Info 'some' 'text' -Length 10).Length |

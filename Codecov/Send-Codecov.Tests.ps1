@@ -7,33 +7,33 @@ $global:msg_documentation = 'at least 1 empty line above documentation'
 $global:Codecov_token = 'd6c1c65d-1656-4321-a080-e0a0eee9a613'
 
 ##====--------------------------------------------------------------------====##
-Describe 'Internal Check-Installed' {
+Describe 'Internal Assert-CodecovInstalled' {
   InModuleScope Send-Codecov {
     It 'has documentation' {
-      Get-Help Check-Installed | Out-String |
+      Get-Help Assert-CodecovInstalled | Out-String |
         Should -MatchExactly 'SYNOPSIS' -Because $msg_documentation
     }
     Context 'Test-Command: $false; uploader is not installed' {
       Mock Test-Command { return $false } -ModuleName Send-Codecov
 
       $script:CodecovInstalled = $true
-      It 'Check-Installed variable $true, skip expensive test' {
-        Check-Installed | Should -BeTrue
-        Check-Installed | Should -BeOfType System.Boolean
+      It 'Assert-CodecovInstalled variable $true, skip expensive test' {
+        Assert-CodecovInstalled | Should -BeTrue
+        Assert-CodecovInstalled | Should -BeOfType System.Boolean
       }
       $script:CodecovInstalled = $false
-      It 'Check-Installed failure' {
-        Check-Installed | Should -BeFalse
+      It 'Assert-CodecovInstalled failure' {
+        Assert-CodecovInstalled | Should -BeFalse
       }
     }
     Context 'Test-Command: $true; uploader is installed' {
       Mock Test-Command { return $true } -ModuleName Send-Codecov
 
       $script:CodecovInstalled = $false
-      It 'Check-Installed returns $true' {
-        Check-Installed | Should -BeTrue
+      It 'Assert-CodecovInstalled returns $true' {
+        Assert-CodecovInstalled | Should -BeTrue
       }
-      It 'Check-Installed sets $global:CodecovInstalled' {
+      It 'Assert-CodecovInstalled sets $global:CodecovInstalled' {
         $CodecovInstalled | Should -BeTrue
       }
     }
@@ -59,14 +59,14 @@ Describe 'Internal Install-Uploader' {
     It 'Install-Uploader' {
       { Install-Uploader 2>$null } | Should -Not -Throw
     }
-    It 'tests Check-Installed (install succeeded)' {
-      Check-Installed | Should -BeTrue
+    It 'tests Assert-CodecovInstalled (install succeeded)' {
+      Assert-CodecovInstalled | Should -BeTrue
     }
 
-    Context 'Mock: Check-Installed' {
+    Context 'Mock: Assert-CodecovInstalled' {
       [Int]$script:counter = 0
       [Int]$script:first_true = 2
-      Mock Check-Installed {
+      Mock Assert-CodecovInstalled {
         $script:counter += 1
         if ($counter -lt $first_true) { return $false }
         else { return $true }
@@ -78,7 +78,7 @@ Describe 'Internal Install-Uploader' {
         $script:counter = 0
         $script:first_true = 1
         { Install-Uploader } | Should -not -Throw
-        Assert-MockCalled Check-Installed -Exactly 1 -Scope It
+        Assert-MockCalled Assert-CodecovInstalled -Exactly 1 -Scope It
         $script:counter = 0
         Install-Uploader | Should -Be $null
         $script:counter = 0
@@ -112,43 +112,43 @@ Describe 'Internal Install-Uploader' {
         $script:counter = 0
         $script:first_true = 1000
         { Install-Uploader 2>$null 6>&1 } | Should -Throw
-        Assert-MockCalled Check-Installed -Exactly 3 -Scope It
+        Assert-MockCalled Assert-CodecovInstalled -Exactly 3 -Scope It
       }
       It '-WhatIf, no throw; no installation' {
         $script:counter = 0
         $script:first_true = 1000
         { Install-Uploader -Whatif } | Should -not -Throw
-        Assert-MockCalled Check-Installed -Exactly 1 -Scope It
+        Assert-MockCalled Assert-CodecovInstalled -Exactly 1 -Scope It
       }
     }
   }
 }
 
 ##====--------------------------------------------------------------------====##
-Describe 'Internal Correct-BuildName' {
+Describe 'Internal Format-BuildName' {
   InModuleScope Send-Codecov {
     It 'has documentation' {
-      Get-Help Correct-BuildName | Out-String |
+      Get-Help Format-BuildName | Out-String |
         Should -MatchExactly 'SYNOPSIS' -Because $msg_documentation
     }
     It 'BuildName input required' {
-      { Correct-BuildName } | Should -Throw 'BuildName is required'
+      { Format-BuildName } | Should -Throw 'BuildName is required'
     }
     It 'trim white-space' {
-      Correct-BuildName '  Begin' | Should -MatchExactly 'Begin'
-      Correct-BuildName 'End   ' | Should -MatchExactly 'End'
-      Correct-BuildName "`tBegin" | Should -MatchExactly 'Begin'
-      Correct-BuildName "End`t`t" | Should -MatchExactly 'End'
+      Format-BuildName '  Begin' | Should -MatchExactly 'Begin'
+      Format-BuildName 'End   ' | Should -MatchExactly 'End'
+      Format-BuildName "`tBegin" | Should -MatchExactly 'Begin'
+      Format-BuildName "End`t`t" | Should -MatchExactly 'End'
     }
     It 'replace spaces' {
-      Correct-BuildName 'In Between    These' |
+      Format-BuildName 'In Between    These' |
         Should -MatchExactly 'In_Between_These'
-      Correct-BuildName 'Name Like This' | Should -MatchExactly 'Name_Like_This'
+      Format-BuildName 'Name Like This' | Should -MatchExactly 'Name_Like_This'
     }
     It 'replace tabs' {
-      Correct-BuildName "In`tBetween" | Should -MatchExactly 'In_Between'
-      Correct-BuildName "In`t`tBetween" | Should -MatchExactly 'In_Between'
-      Correct-BuildName "In`t `tBetween" | Should -MatchExactly 'In_Between'
+      Format-BuildName "In`tBetween" | Should -MatchExactly 'In_Between'
+      Format-BuildName "In`t`tBetween" | Should -MatchExactly 'In_Between'
+      Format-BuildName "In`t `tBetween" | Should -MatchExactly 'In_Between'
     }
   }
 }
@@ -235,7 +235,7 @@ Describe 'Internal Send-Report' {
 
 ##====--------------------------------------------------------------------====##
 
-function Require-CodecovInstalled {
+function Assert-CodecovInstalled {
   if (-not $global:CodecovInstalled) {
     Set-ItResult -Inconclusive -Because 'Install failure codecov uploader.'
   }
@@ -273,24 +273,24 @@ Describe 'Send-Codecov' {
         Should -Throw 'argument is null or empty'
     }
     It 'throws on invalid pattern (single path)' {
-      Require-CodecovInstalled
+      Assert-CodecovInstalled
       { Send-Codecov -Path 'report.html' -BuildName build 6>$null } |
         Should -Throw 'invalid pattern'
     }
     It 'no throw on invalid pattern (multiple paths)' {
-      Require-CodecovInstalled
+      Assert-CodecovInstalled
       { Send-Codecov -Path @('report.html','ahaXml') -BuildName build 6>$null
       } | Should -Not -Throw
       Send-Codecov -Path @('report.html','ahaXml') -BuildName build 6>&1 |
         Should -Match 'Invalid pattern'
     }
     It 'throws on non-existing file (single path)' {
-      Require-CodecovInstalled
+      Assert-CodecovInstalled
       { Send-Codecov -Path 'report.xml' -BuildName build 6>$null } |
         Should -Throw 'invalid path'
     }
     It 'no throw on non-existing file (multiple paths)' {
-      Require-CodecovInstalled
+      Assert-CodecovInstalled
       { Send-Codecov -Path @('report.xml','report2.xml') -BuildName build `
         6>$null
       } | Should -Not -Throw
@@ -300,7 +300,7 @@ Describe 'Send-Codecov' {
     In TestDrive:\ {
       New-Item -Path . -Name report.xml
       It 'non-existing file (multiple paths)' {
-        Require-CodecovInstalled
+        Assert-CodecovInstalled
         { Send-Codecov -Path @('report.xml','report2.xml') -BuildName build `
           3>$null 6>$null
         } | Should -Not -Throw
@@ -308,7 +308,7 @@ Describe 'Send-Codecov' {
           3>$null 6>&1 | Should -Match 'Invalid path'
       }
       It 'skips on empty file' {
-        Require-CodecovInstalled
+        Assert-CodecovInstalled
         { Send-Codecov -Path 'report.xml' -BuildName build 3>$null } |
           Should -Not -Throw
         Send-Codecov -Path 'report.xml' -BuildName build 3>&1 |
@@ -316,22 +316,22 @@ Describe 'Send-Codecov' {
       }
       'text to fill file' > report.xml
       It 'valid call' {
-        Require-CodecovInstalled
+        Assert-CodecovInstalled
         Send-Codecov -Path 'report.xml' -BuildName build |
           Should -Match '.*[\\/]report\.xml$'
       }
       It 'wild card characters' {
-        Require-CodecovInstalled
+        Assert-CodecovInstalled
         Send-Codecov -Path 'r*.xml' -BuildName build |
           Should -Match '.*[\\/]report\.xml$'
       }
       It 'wild card characters 2' {
-        Require-CodecovInstalled
+        Assert-CodecovInstalled
         Send-Codecov -Path 'r?port.xml' -BuildName build |
           Should -Match '.*[\\/]report\.xml$'
       }
       It 'Path separators' {
-        Require-CodecovInstalled
+        Assert-CodecovInstalled
         Send-Codecov -Path './report.xml' -BuildName build |
           Should -Match '.*[\\/]report\.xml$'
         Send-Codecov -Path '.\report.xml' -BuildName build |
@@ -381,12 +381,12 @@ Describe 'Send-Codecov' {
         Should -Throw 'argument is null or empty'
     }
     It 'valid call' {
-      Require-CodecovInstalled
+      Assert-CodecovInstalled
       Send-Codecov 'TestDrive:\report.xml' -BuildName 'Name Like This 3' |
         Should -MatchExactly 'Name_Like_This_3'
     }
     It 'valid call (with -Flag)' {
-      Require-CodecovInstalled
+      Assert-CodecovInstalled
       Send-Codecov 'TestDrive:\report.xml' -BuildName 'Name Like This 3' `
         -Flag unit_tests_2 | Should -MatchExactly 'Name_Like_This_3'
     }
@@ -424,7 +424,7 @@ Describe 'Send-Codecov' {
       } | Should -not -Throw
     }
     It 'Flags has a maximum length of 45 characters' {
-      Require-CodecovInstalled
+      Assert-CodecovInstalled
       { Send-Codecov 'TestDrive:\report.xml' -BuildName build `
         -Flags 'abcdefghijklmnopqrstuvwxyz0123456789_abcdefgh'
       } | Should -Not -Throw
@@ -435,7 +435,7 @@ Describe 'Send-Codecov' {
         -Scope It
     }
     It 'valid call' {
-      Require-CodecovInstalled
+      Assert-CodecovInstalled
       Send-Codecov 'TestDrive:\report.xml' -BuildName build `
         -Flags unit_tests_2 | Should -MatchExactly 'unit_tests_2'
       Assert-MockCalled Send-Report -ModuleName Send-Codecov -Exactly 1 `
@@ -474,17 +474,17 @@ Describe 'Send-Codecov' {
     New-Item -Path TestDrive: -Name report.xml
     'text' > TestDrive:\report.xml
     It 'Path alias: Report' {
-      Require-CodecovInstalled
+      Assert-CodecovInstalled
       Send-Codecov -Report 'TestDrive:\report.xml' -BuildName build |
         Should -Match 'report.xml'
     }
     It 'Path alias: File' {
-      Require-CodecovInstalled
+      Assert-CodecovInstalled
       Send-Codecov -File 'TestDrive:\Report.xml' -BuildName build |
         Should -Match 'report.xml'
     }
     It 'Path alias: FileName' {
-      Require-CodecovInstalled
+      Assert-CodecovInstalled
       Send-Codecov -FileName 'TestDrive:\report.xml' -BuildName build |
         Should -Match 'report.xml'
     }

@@ -186,9 +186,12 @@ function Send-Message {
 ##====--------------------------------------------------------------------====##
 
 function Stop-Execution {
+  [CmdletBinding(SupportsShouldProcess,ConfirmImpact='None')]
   param($Message)
 
-  if (Assert-CI) { $Host.SetShouldExit(1) }
+  if ((Assert-CI) -and $PSCmdlet.ShouldProcess('Host.SetShouldExit')) {
+    $Host.SetShouldExit(1)
+  }
   throw $Message
 }
 ##====--------------------------------------------------------------------====##

@@ -18,7 +18,7 @@ function Test-InconclusiveMissingFile {
   } elseif ($Not -and (Test-Path "$Path" -PathType Leaf) ) {
     Set-ItResult -Inconclusive -Because ('should not exist: ' + "$Path")
   }
-} 
+}
 ##====--------------------------------------------------------------------====##
 
 Describe 'Expand-Archive' {
@@ -227,7 +227,8 @@ Describe 'Expand-Archive' {
         if ( $PSVersionTable.PSVersion.Major -lt 6 ) {
           $file = [IO.Path]::Combine("$test_drive", $archive_name, $file_1)
         } else {
-          $file = Join-Path "$test_drive" $archive_name $file_1
+          $file = Join-Path -Path "$test_drive" -ChildPath $archive_name `
+            -AdditionalChildPath $file_1
         }
         Test-Path $file | Should -Be $true
       }
@@ -336,7 +337,8 @@ Describe 'Expand-Archive' {
         if ( $PSVersionTable.PSVersion.Major -lt 6 ) {
           $file = [IO.Path]::Combine("$test_drive", $archive_name, $dir_file)
         } else {
-          $file = Join-Path "$test_drive" $archive_name $dir_file
+          $file = Join-Path -Path "$test_drive" -ChildPath $archive_name `
+            -AdditionalChildPath $dir_file
         }
         Test-Path $file | Should -Be $true
       }

@@ -132,7 +132,7 @@ Describe 'Install-Ninja' {
        It 'no change in current working directory' {
          $PWD.Path | Should -Be $start_path.Path
        }
-       if ($PWD -ne $start_path) { cd $start_path }
+       if ($PWD -ne $start_path) { Set-Location $start_path }
     }
     Context 'AddToPath' {
       It 'Call with -WhatIf and -AddToPath' {
@@ -166,7 +166,7 @@ Describe 'Install-Ninja' {
       It 'no change in current working directory' {
         $PWD.Path | Should -Be $start_path.Path
       }
-      if ($PWD -ne $start_path) { cd $start_path }
+      if ($PWD -ne $start_path) { Set-Location $start_path }
       It 'no change in search path' {
         $env:Path | Should -Be $original_path
       }
@@ -483,7 +483,7 @@ Describe 'Install-Ninja (online)' -Tag 'online' {
     It 'no change in current working directory' {
       $PWD.Path | Should -Be $start_path.Path
     }
-    if ($PWD -ne $start_path) { cd $start_path }
+    if ($PWD -ne $start_path) { Set-Location $start_path }
   }
 
   $original_path = $env:Path
@@ -519,7 +519,7 @@ Describe 'Install-Ninja (online)' -Tag 'online' {
     It 'no change in current working directory' {
       $PWD.Path | Should -Be $start_path.Path
     }
-    if ($PWD -ne $start_path) { cd $start_path }
+    if ($PWD -ne $start_path) { Set-Location $start_path }
     Context 'path failure' {
       Mock Test-Command { return $false } -ModuleName Install-Ninja
 

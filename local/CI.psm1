@@ -18,7 +18,7 @@ function Assert-CI {
   Checks if executed on the Microsoft Windows Platform.
 #>
 function Assert-Windows {
-  if ($env:CI_WINDOWS -ne $null) {
+  if ($null -ne $env:CI_WINDOWS) {
     ### Temporary - old build agent. ###########################################
     return ($env:CI_WINDOWS -eq 'true')
     <### new build agent.
