@@ -98,17 +98,17 @@ Describe 'Internal Select-VcpkgLocation' {
 }
 
 ##====--------------------------------------------------------------------====##
-Describe 'Internal Test-IfReleaseWithIssues' {
+Describe 'Internal Test-IfReleaseWithIssue' {
   InModuleScope Update-Vcpkg {
     # Suppress output to the Appveyor Message API.
     Mock Assert-CI { return $false } -ModuleName Send-Message
 
     It 'has documentation' {
-      Get-Help Test-IfReleaseWithIssues | Out-String |
+      Get-Help Test-IfReleaseWithIssue | Out-String |
         Should -MatchExactly 'SYNOPSIS' -Because $msg_documentation
     }
     It 'no support for -WhatIf and -Confirm' {
-      Get-Command -Name Test-IfReleaseWithIssues -Syntax |
+      Get-Command -Name Test-IfReleaseWithIssue -Syntax |
         Should -not -Match '-WhatIf.*-Confirm'
     }
 
@@ -116,7 +116,7 @@ Describe 'Internal Test-IfReleaseWithIssues' {
       In -Path 'TestDrive:\' {
         '"version 2019.02.11"' > vcpkg.ps1
         It 'no throw' {
-          { Test-IfReleaseWithIssues } | Should -not -Throw
+          { Test-IfReleaseWithIssue } | Should -not -Throw
           Assert-MockCalled Assert-CI -ModuleName Send-Message -Times 0 `
             -Exactly -Scope It
         }
@@ -124,8 +124,8 @@ Describe 'Internal Test-IfReleaseWithIssues' {
           '2019.06.26-nohash' + '`n`nSee LICENSE.txt for license information."'
         ) > vcpkg.ps1
         It 'no issue' {
-          { Test-IfReleaseWithIssues } | Should -not -Throw
-          Test-IfReleaseWithIssues | Should -Be $false
+          { Test-IfReleaseWithIssue } | Should -not -Throw
+          Test-IfReleaseWithIssue | Should -Be $false
           Assert-MockCalled Assert-CI -ModuleName Send-Message -Times 0 `
             -Exactly -Scope It
         }
@@ -133,8 +133,8 @@ Describe 'Internal Test-IfReleaseWithIssues' {
           '0.0.113' + '`n`nSee LICENSE.txt for license information."'
         ) > vcpkg.ps1
         It 'version 0.0.113' {
-          { Test-IfReleaseWithIssues 3>$null } | Should -not -Throw
-          Test-IfReleaseWithIssues 3>$null | Should -Be $true
+          { Test-IfReleaseWithIssue 3>$null } | Should -not -Throw
+          Test-IfReleaseWithIssue 3>$null | Should -Be $true
           Assert-MockCalled Assert-CI -ModuleName Send-Message -Times 2 `
             -Exactly -Scope It
         }
@@ -142,12 +142,12 @@ Describe 'Internal Test-IfReleaseWithIssues' {
           '2018.11.23-nohash' + '`n`nSee LICENSE.txt for license information."'
         ) > vcpkg.ps1
         It 'version 2018.11.23-nohash' {
-          Test-IfReleaseWithIssues 3>$null | Should -Be $true
+          Test-IfReleaseWithIssue 3>$null | Should -Be $true
           Assert-MockCalled Assert-CI -ModuleName Send-Message -Times 1 `
             -Exactly -Scope It
         }
         It 'warning output' {
-          (Test-IfReleaseWithIssues 1>$null) 3>&1 |
+          (Test-IfReleaseWithIssue 1>$null) 3>&1 |
             Should -Match 'This vcpkg release has known issues. Rebuilding'
         }
       }
@@ -649,9 +649,14 @@ Describe 'Internal Update-Repository' {
       Get-Command -Name Update-Repository -Syntax |
         Should -Match '-WhatIf.*-Confirm'
     }
+  }
+}
 
-    Context 'Input Validation' {
-    }
+Describe 'Internal Update-Repository (online)' -Tag 'online' {
+  InModuleScope Update-Vcpkg {
+    # Suppress output to the Appveyor Message API.
+    Mock Assert-CI { return $false } -ModuleName Send-Message
+
     Context 'WhatIf' {
       $dir = New-Item 'TestDrive:\dir0' -ItemType Directory
       In -Path $dir {
@@ -921,7 +926,7 @@ Describe 'Update-Vcpkg' {
   Context 'WhatIf: build after retrieval from cache (mocked)' {
     Mock Update-Repository { return $null } -ModuleName Update-Vcpkg
     Mock Import-CachedVcpkg { return $true } -ModuleName Update-Vcpkg
-    Mock Test-IfReleaseWithIssues { return $true } -ModuleName Update-Vcpkg
+    Mock Test-IfReleaseWithIssue { return $true } -ModuleName Update-Vcpkg
     $vcpkg_dir = New-Item -Path 'TestDrive:\' -Name 'vc 4' -ItemType Directory
     # Mock vcpkg
     ( 'param([String]$input)' +
@@ -939,11 +944,11 @@ Describe 'Update-Vcpkg' {
         -ModuleName update-Vcpkg -Times 1 -Exactly -Scope It
       Assert-MockCalled -CommandName Import-CachedVcpkg `
         -ModuleName update-Vcpkg -Times 1 -Exactly -Scope It
-      Assert-MockCalled -CommandName Test-IfReleaseWithIssues `
+      Assert-MockCalled -CommandName Test-IfReleaseWithIssue `
         -ModuleName update-Vcpkg -Times 1 -Exactly -Scope It
       $env:APPVEYOR_CACHE_SKIP_SAVE | Should -Be $null
     }
-    Mock Test-IfReleaseWithIssues { return $false } -ModuleName Update-Vcpkg
+    Mock Test-IfReleaseWithIssue { return $false } -ModuleName Update-Vcpkg
     It 'no build after retrieval from cache (mocked)' {
       Assert-RequirementsVcpkg
       { Update-Vcpkg -Path $vcpkg_dir -Quiet -WhatIf 3>$null } |
@@ -952,7 +957,7 @@ Describe 'Update-Vcpkg' {
         -ModuleName update-Vcpkg -Times 1 -Exactly -Scope It
       Assert-MockCalled -CommandName Import-CachedVcpkg `
         -ModuleName update-Vcpkg -Times 1 -Exactly -Scope It
-      Assert-MockCalled -CommandName Test-IfReleaseWithIssues `
+      Assert-MockCalled -CommandName Test-IfReleaseWithIssue `
         -ModuleName update-Vcpkg -Times 1 -Exactly -Scope It
       $env:APPVEYOR_CACHE_SKIP_SAVE | Should -Be $null
     }
@@ -969,7 +974,7 @@ Describe 'Update-Vcpkg' {
   Context 'WhatIf: no cache needed' {
     Mock Update-Repository { return $null } -ModuleName Update-Vcpkg
     Mock Import-CachedVcpkg { return $true } -ModuleName Update-Vcpkg
-    Mock Test-IfReleaseWithIssues { return $false } -ModuleName Update-Vcpkg
+    Mock Test-IfReleaseWithIssue { return $false } -ModuleName Update-Vcpkg
     Mock Assert-CI { return $true } -ModuleName Update-Vcpkg
     Mock Test-Path { return $true } -ModuleName Update-Vcpkg
     Mock Remove-Item { return $null } -ModuleName Update-Vcpkg
@@ -990,7 +995,7 @@ Describe 'Update-Vcpkg' {
         -ModuleName Update-Vcpkg -Times 1 -Exactly -Scope It
       Assert-MockCalled -CommandName Import-CachedVcpkg `
         -ModuleName Update-Vcpkg -Times 0 -Exactly -Scope It
-      Assert-MockCalled -CommandName Test-IfReleaseWithIssues `
+      Assert-MockCalled -CommandName Test-IfReleaseWithIssue `
         -ModuleName Update-Vcpkg -Times 1 -Exactly -Scope It
       Assert-MockCalled -CommandName Remove-Item `
         -ModuleName Update-Vcpkg -Times 1 -Exactly -Scope It
@@ -1015,7 +1020,7 @@ Describe 'Update-Vcpkg' {
     Mock Update-Repository { throw 'do not call' } -ModuleName Update-Vcpkg
     Mock Import-CachedVcpkg { throw 'do not call' } -ModuleName Update-Vcpkg
     Mock Export-CachedVcpkg { throw 'do not call' } -ModuleName Update-Vcpkg
-    Mock Test-IfReleaseWithIssues { throw 'do not' } -ModuleName Update-Vcpkg
+    Mock Test-IfReleaseWithIssue { throw 'do not' } -ModuleName Update-Vcpkg
     Mock Add-EnvironmentPath { throw 'do not call' } -ModuleName Update-Vcpkg
 
     $env:CI_WINDOWS = 'True'
@@ -1036,7 +1041,7 @@ Describe 'Update-Vcpkg' {
     Mock Update-Repository { throw 'do not call' } -ModuleName Update-Vcpkg
     Mock Import-CachedVcpkg { throw 'do not call' } -ModuleName Update-Vcpkg
     Mock Export-CachedVcpkg { throw 'do not call' } -ModuleName Update-Vcpkg
-    Mock Test-IfReleaseWithIssues { throw 'do not' } -ModuleName Update-Vcpkg
+    Mock Test-IfReleaseWithIssue { throw 'do not' } -ModuleName Update-Vcpkg
     Mock Add-EnvironmentPath { throw 'do not call' } -ModuleName Update-Vcpkg
 
     It 'vcpkg requires minimally VS2015 on Windows' {

@@ -1,7 +1,7 @@
 @{
 ##====--------------------------------------------------------------------====##
 RootModule = ''
-ModuleVersion = '0.2'
+ModuleVersion = '0.3'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
@@ -21,6 +21,7 @@ PowerShellVersion = '5.1'
 # Import configuration
 
 NestedModules = @(
+  "${PSScriptRoot}\Install-CMake.psd1",
   "${PSScriptRoot}\Install-Ninja.psd1",
   "${PSScriptRoot}\Update-Vcpkg.psd1"
 )

@@ -1,7 +1,7 @@
 @{
 ##====--------------------------------------------------------------------====##
 RootModule = ''
-ModuleVersion = '0.4.1'
+ModuleVersion = '0.5'
 Author = 'Roelf-Jilling Wolthuis'
 Copyright = 'Copyright (c) 2019 Farwaykorse (R-J Wolthuis).
 Code released under the MIT license.'
@@ -32,7 +32,8 @@ NestedModules = @(
 FunctionsToExport = @(
   'Add-EnvironmentPath',
   'Assert-CI',
-  'Assert-Windows',
+  'Assert-WindowsOS',
+  'Assert-Admin',
   'Get-CommonFlagsCaller'
 )
 # Cmdlets to export from this module

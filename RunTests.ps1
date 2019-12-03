@@ -1,6 +1,8 @@
 param(
   # Enable code coverage reporting.
-  [Switch]$Coverage
+  [Switch]$Coverage,
+  # Enable tests requiring internet access on local builds.
+  [Switch]$Online
 )
 
 <#
@@ -45,13 +47,18 @@ Import-Module "${PSScriptRoot}\AppVeyorHelpers.psd1" -Force
 ##====--------------------------------------------------------------------====##
 # Pester Configuration
 ##====--------------------------------------------------------------------====##
+Import-Module "${PSScriptRoot}\local\CI.psd1"
+
 # Specifies the test files run by Pester.
 # Here: Only run dedicated test-files in subdirectories relative to this script.
 [Object[]]$Script = "${PSScriptRoot}\*\*.Tests.ps1"
 # Runs only tests in Describe blocks named to match this pattern.
 [String[]]$TestName = @('*')
 [String[]]$Tag = ''
-[String[]]$ExcludeTag = 'AlwaysExclude'
+[String[]]$ExcludeTag = @('AlwaysExclude')
+if (-not ((Assert-CI) -or $Online) ) {
+  $ExcludeTag += 'online'
+}
 
 [String]$OutputFile = 'ScriptTestResults.xml'
 [String]$OutputFormat = 'NUnitXML'

@@ -6,20 +6,20 @@ Set-StrictMode -Version Latest
 $global:msg_documentation = 'at least 1 empty line above documentation'
 
 ##====--------------------------------------------------------------------====##
-Describe 'Internal Test-DefaultLocations' {
+Describe 'Internal Test-DefaultLocation' {
   InModuleScope Assert-ValidCodecovYML {
     It 'has documentation' {
-      Get-Help Test-DefaultLocations | Out-String |
+      Get-Help Test-DefaultLocation | Out-String |
         Should -MatchExactly 'SYNOPSIS' -Because $msg_documentation
     }
     It 'returns a String' {
-      Test-DefaultLocations | Should -BeOfType String
+      Test-DefaultLocation | Should -BeOfType String
     }
     It 'return a path' {
-      Test-Path $(Test-DefaultLocations) -IsValid | Should -Be $true
+      Test-Path $(Test-DefaultLocation) -IsValid | Should -Be $true
     }
     It 'should match \.?codecov.yml$' {
-      Test-DefaultLocations | Should -Match '\.?codecov.yml$'
+      Test-DefaultLocation | Should -Match '\.?codecov.yml$'
     }
     Context 'Not on CI platform' {
       $OriginalValue = $env:APPVEYOR_BUILD_FOLDER
@@ -29,17 +29,17 @@ Describe 'Internal Test-DefaultLocations' {
       New-Item -Path TestDrive:\dir -Name codecov.yml
       In 'TestDrive:\dir' {
         It 'find in current directory' {
-          Test-DefaultLocations | Should -Be './codecov.yml'
+          Test-DefaultLocation | Should -Be './codecov.yml'
         }
         New-Item -Path .\ -Name .codecov.yml
         It 'prefer .codecov.yml over codecov.yml' {
-          Test-DefaultLocations | Should -Be './.codecov.yml'
+          Test-DefaultLocation | Should -Be './.codecov.yml'
         }
         New-Item -Path TestDrive:\ -Name codecov.yml
         It 'ignore project root' {
-          Test-DefaultLocations | Should -Be './.codecov.yml'
+          Test-DefaultLocation | Should -Be './.codecov.yml'
           New-Item -Path TestDrive:\ -Name .codecov.yml
-          Test-DefaultLocations | Should -Be './.codecov.yml'
+          Test-DefaultLocation | Should -Be './.codecov.yml'
         }
       }
       $env:APPVEYOR_BUILD_FOLDER = $OriginalValue
@@ -52,19 +52,19 @@ Describe 'Internal Test-DefaultLocations' {
       New-Item -Path TestDrive:\dir -Name codecov.yml
       In 'TestDrive:\dir' {
         It 'find in current directory' {
-          Test-DefaultLocations | Should -Be './codecov.yml'
+          Test-DefaultLocation | Should -Be './codecov.yml'
         }
         New-Item -Path .\ -Name .codecov.yml
         It 'prefer .codecov.yml over codecov.yml' {
-          Test-DefaultLocations | Should -Be './.codecov.yml'
+          Test-DefaultLocation | Should -Be './.codecov.yml'
         }
         New-Item -Path TestDrive:\ -Name codecov.yml
         It 'prefer project root' {
-          Test-DefaultLocations | Should -Be 'TestDrive:/codecov.yml'
+          Test-DefaultLocation | Should -Be 'TestDrive:/codecov.yml'
         }
         New-Item -Path TestDrive:\ -Name .codecov.yml
         It 'prefer .codecov.yml over codecov.yml' {
-          Test-DefaultLocations | Should -Be 'TestDrive:/.codecov.yml'
+          Test-DefaultLocation | Should -Be 'TestDrive:/.codecov.yml'
         }
       }
       $env:APPVEYOR_BUILD_FOLDER = $OriginalValue
@@ -179,6 +179,9 @@ Describe 'Assert-ValidCodecovYML' {
       }
     }
   }
+}
+
+Describe 'Assert-ValidCodecovYML (online)' -Tag 'online' {
   Context 'Check Samples' {
     New-Item -Path TestDrive:\ -Name samples -ItemType Directory
     # valid Sample
