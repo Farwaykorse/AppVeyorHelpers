@@ -4,6 +4,7 @@ shallow_clone: true
 skip_branch_with_pr: true
 skip_commits:
   files:
+  - .editorconfig
   - .git*
   - LICENSE
   - PSScriptAnalyzerSettings.psd1

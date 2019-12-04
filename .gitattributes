@@ -17,6 +17,7 @@
 *.yaml      yaml
 *.yml       yaml
 # Per file settings
+.editorconfig   eol=lf whitespace=trailing-space,tab-in-indent,tabwidth=4
 .gitattributes  eol=lf whitespace=trailing-space
 .gitignore      -text whitespace=trailing-space
 .yamllint       yaml
