@@ -95,6 +95,16 @@ function Install-CMake {
     $EXT = 'zip'
     $Toolset = 'win64-x64'
     if ($Installer) {
+      if (Assert-CI) {
+        Send-Message -Warning -Message (
+          $($MyInvocation.MyCommand).ToString() +
+          '-Installer is inefficient for CI applications.'
+        ) -Details (
+          'Performance issues. Updating is relatively slow.',
+          'Not usable when testing multiple compilers in a singe job.',
+          'For systems with persistent storage prefer "-KeepArchive".'
+        ) -NoNewLine -HideDetails -LogOnly:$Quiet
+      }
       if (-not (Assert-Admin) ) {
         Send-Message -Error (
         ($MyInvocation.MyCommand).ToString() +

@@ -412,6 +412,7 @@ Describe 'Install-CMake' {
 
   Context 'WhatIf (Installer)' {
     Mock Assert-Admin { return $true } -ModuleName Install-CMake
+    Mock Start-Process { } -ModuleName Install-CMake
     It 'before: no installer present' {
       $Temporary = Join-Path $env:TEMP 'CMake-3.12.4'
       Test-Path -LiteralPath "$(
@@ -421,7 +422,9 @@ Describe 'Install-CMake' {
     }
     It 'test' {
       Install-CMake -Version 3.12.4 -Installer -WhatIf -Quiet -Hash $empty_MD5 |
-        should -Be $null
+        Should -Be $null
+      Assert-MockCalled Start-Process -ModuleName Install-CMake -Times 0 `
+        -Exactly
     }
     It 'after: no installer present' {
       $Temporary = Join-Path $env:TEMP 'CMake-3.12.4'
@@ -436,7 +439,17 @@ Describe 'Install-CMake' {
         -Hash $empty_MD5 6>$null
       } | Should -Throw 'Installer requires administrative permissions!'
     }
-  }
+    It 'performance warning when on CI' {
+      Mock Assert-CI { return $true } -ModuleName Install-CMake
+      Mock Assert-CI { return $false } -ModuleName Send-Message
+      Mock Assert-Admin { return $true } -ModuleName Install-CMake
+      Install-CMake -Version 3.12.4 -Installer -WhatIf `
+        -Hash $empty_SHA256 6>$null 3>&1 |
+        Should -match '-Installer is inefficient'
+      Install-CMake -Version 3.12.4 -Installer -WhatIf `
+        -Hash $empty_SHA256 -Quiet 3>&1 | Should -Be $null
+    }
+  } # WhatIf (Installer)
 
   Context 'mock download failure' {
     Mock Invoke-Curl { return 'curl: (1) some error' } -ModuleName Install-CMake
