@@ -87,6 +87,9 @@ or [run Invoke-Pester][Invoke-Pester-link] for an individual sub-module:
 `````PowerShell
 Invoke-Pester -Script .\<script>.Tests.ps1 -CodeCoverage .\<script>.psm1
 `````
+Note: The version of Pester supplied with Windows (10 and Server 2016) is not
+compatible. Refer to the [Pester documentation][PesterDoc-link] for
+instructions.
 
 <!---------------------------------------------------------><a id="license"></a>
 ## ⚖ License
@@ -97,5 +100,6 @@ Code licensed under the [MIT License](./LICENSE).
 
 [AppVeyor-badge]: https://ci.appveyor.com/api/projects/status/l6stx6b6ibi57d9q/branch/master?svg=true
 [AppVeyor-link]:  https://ci.appveyor.com/project/Farwaykorse/appveyorhelpers/branch/master
-[Pester-link]:    https://github.com/pester/Pester
+[Pester-link]:    https://pester.dev
+[PesterDoc-link]: https://pester.dev/docs/introduction/installation
 [Invoke-Pester-link]: https://github.com/pester/Pester/wiki/Invoke‐Pester
