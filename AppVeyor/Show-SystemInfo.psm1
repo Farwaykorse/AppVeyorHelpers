@@ -41,6 +41,9 @@ Set-StrictMode -Version Latest
   LLVM/clang:         8.0.0
   CMake:              3.14.4
   Python:             2.7.16
+  Curl:               7.55.1
+  Ninja:              1.10.0
+  vcpkg:              2020.02.04-nohash
   ------------------------------------------------------------------------------
   Initial path:       C:\projects\sampleproject
 #>
@@ -58,6 +61,7 @@ function Show-SystemInfo {
     [switch]$Python,
     [switch]$SevenZip,
     [switch]$Curl,
+    [switch]$Ninja,
     [switch]$Vcpkg
   )
   Begin
@@ -124,6 +128,7 @@ function Show-SystemInfo {
     if ($CMake -or $All)    { $out += Join-Info CMake $(Show-CMakeVersion) }
     if ($Python -or $All)   { $out += Join-Info Python $(Show-PythonVersion) }
     if ($Curl -or $All)     { $out += Join-Info Curl $(Show-CurlVersion) }
+    if ($Ninja -or $All)    { $out += Join-Info Ninja $(Show-NinjaVersion) }
     if ($Vcpkg -or $All)    { $out += Join-Info vcpkg $(Show-VcpkgVersion) }
 
     if ($Path) { Show-EnvPath }
@@ -274,6 +279,18 @@ function Show-VcpkgVersion {
       (vcpkg version | Select-String -Pattern 'version [0-9]') -split ' ' |
         Select-String -Pattern '^[0-9].+'
     )
+  } else { return ' ?' }
+}
+
+<#
+.SYNOPSIS
+  Acquire the version number from Ninja-build.
+#>
+function Show-NinjaVersion {
+  [OutputType([String])]
+  param()
+  if (Test-Command 'ninja --version') {
+    return $(ninja --version)
   } else { return ' ?' }
 }
 

@@ -176,6 +176,18 @@ Describe 'Internal Show-<software>Version' {
         Show-VcpkgVersion | Should -match '^([0-9]+\.)+[0-9]+'
       }
     }
+    Context 'Ninja' {
+      $available = $(Test-Command 'ninja --version')
+      It 'no throw' {
+          { Show-NinjaVersion } | Should -not -Throw
+      }
+      It 'return version number' {
+        if (-not $available) {
+          Set-ItResult -Inconclusive -Because ('no Ninja')
+        }
+        Show-NinjaVersion | Should -match '^([0-9]+\.)+[0-9]+'
+      }
+    }
     Context 'mock software unavailable' {
       Mock Test-Command { return $false } -ModuleName Show-SystemInfo
       It 'CMake' {
@@ -195,6 +207,9 @@ Describe 'Internal Show-<software>Version' {
       }
       It 'vcpkg' {
         Show-VcpkgVersion | Should -MatchExactly ' ?'
+      }
+      It 'Ninja' {
+        Show-NinjaVersion | Should -MatchExactly ' ?'
       }
     }
   }
@@ -236,6 +251,9 @@ Describe 'Show-SystemInfo' {
     }
     It 'no throw on -Vcpkg' {
       { Show-SystemInfo -Vcpkg } | Should -not -Throw
+    }
+    It 'no throw on -Ninja' {
+      { Show-SystemInfo -Ninja } | Should -not -Throw
     }
     It 'no throw on -All' {
       { Show-SystemInfo -All } | Should -not -Throw
