@@ -2,7 +2,8 @@
 # 🔧 AppVeyorHelpers
 <!----------------------------------------------------------------------------->
 <!-- Badges -->
-[![Build status][AppVeyor-badge]][AppVeyor-link]
+[![AppVeyor][AppVeyor-logo] ![Status][AppVeyor-badge] ![tests][AppVeyor-tests]
+][AppVeyor-link]
 <!-- Description -->
 A PowerShell module, containing a collection of helper functions for use with
 the AppVeyor CI platform.
@@ -98,7 +99,9 @@ Code licensed under the [MIT License](./LICENSE).
 
 [top](#top)
 
+[AppVeyor-logo]:  https://img.shields.io/static/v1?label=&message=AppVeyor&style=flat&logo=appveyor&color=grey
 [AppVeyor-badge]: https://ci.appveyor.com/api/projects/status/l6stx6b6ibi57d9q/branch/master?svg=true
+[AppVeyor-tests]: https://img.shields.io/appveyor/tests/Farwaykorse/appveyorhelpers/master?compact_message&logo=appveyor
 [AppVeyor-link]:  https://ci.appveyor.com/project/Farwaykorse/appveyorhelpers/branch/master
 [Pester-link]:    https://pester.dev
 [PesterDoc-link]: https://pester.dev/docs/introduction/installation
